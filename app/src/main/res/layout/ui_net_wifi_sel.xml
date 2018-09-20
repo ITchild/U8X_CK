@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/xhdpi_500dp"
+    android:layout_height="@dimen/xhdpi_370dp"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_45dp"
+        android:background="#F6B800"
+        android:orientation="horizontal" > 
+        
+	    <TextView
+	        android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2.0"
+	        android:background="#F6B800"
+	        android:gravity="left|center_vertical"
+	        android:padding="@dimen/xhdpi_3dp"
+	        android:text=" WIFI选择"
+	        android:textColor="#FFFFFF"
+	        android:textSize="@dimen/xhdpi_25sp" />
+    
+    	<Button
+            android:id="@+id/btn_wifi_new"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" 
+            android:background="@drawable/btn_style10"
+            android:gravity="center|center_vertical"
+            android:text=" [ WIFI密码 ] "
+            android:onClick="NewWifi"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/xhdpi_25sp" /> 
+            
+    </LinearLayout>        
+    	
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_320dp"
+        android:orientation="horizontal"
+        android:padding="0dp" >
+
+        <View
+            android:layout_width="@dimen/xhdpi_2dp"
+            android:layout_height="match_parent"
+            android:background="#555555" />
+
+        <LinearLayout
+            android:layout_width="@dimen/xhdpi_496dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="0dp" >
+
+            <TextView
+                android:id="@+id/upload_data_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/xhdpi_4dp"
+                android:gravity="left|center_vertical"
+                android:text="可用WIFI列表"
+                android:textColor="#AAAAAA"
+                android:textSize="@dimen/xhdpi_22sp" />
+
+
+            <ListView
+	            android:id="@+id/wifiList"
+	            android:layout_width="fill_parent"
+	            android:layout_height="0dip"
+	            android:layout_weight="1"
+	            android:background="#030303"
+	            android:divider = "#000000"
+	            
+	            android:dividerHeight="1dp"
+	            android:fadeScrollbars="false"               
+	            android:scrollbarTrackVertical="@drawable/scrollbar_color_11"  
+	            android:scrollbarThumbVertical="@drawable/scrollbar_color_22"
+	            android:scrollbarSize = "@dimen/xhdpi_5dp" 
+	            android:scrollingCache="false" >
+            </ListView>  
+                    
+            
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="#Fec70b" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/xhdpi_7dp" >
+                
+                <Button
+                    android:id="@+id/btn_wifi_brush"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_marginLeft="@dimen/xhdpi_10dp"
+                    android:layout_marginRight="@dimen/xhdpi_10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_white_yellow"
+                    android:onClick="WifiBrush"
+                    android:text="扫描..."
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/xhdpi_25sp" />
+                	                        
+
+                <Button
+                    android:id="@+id/btn_wifi_ok"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_marginLeft="@dimen/xhdpi_10dp"
+                    android:layout_marginRight="@dimen/xhdpi_10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_white_yellow"
+                    android:onClick="WifiOK"
+                    android:text="连接WIFI"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/xhdpi_25sp" />
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_marginLeft="@dimen/xhdpi_10dp"
+                    android:layout_marginRight="@dimen/xhdpi_10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_white_yellow"
+                    android:onClick="BtnReturn"
+                    android:text="返回"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/xhdpi_25sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="@dimen/xhdpi_2dp"
+            android:layout_height="match_parent"
+            android:background="#555555" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_2dp"
+        android:background="#555555" />
+
+</LinearLayout>

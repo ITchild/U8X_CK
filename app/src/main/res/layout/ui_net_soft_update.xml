@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/xhdpi_500dp"
+    android:layout_height="@dimen/xhdpi_370dp"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_45dp"
+        android:background="#F6B800"
+        android:gravity="left|center_vertical"
+        android:padding="@dimen/xhdpi_3dp"
+        android:text=" 软件更新"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/xhdpi_25sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_323dp"
+        android:orientation="horizontal"
+        android:padding="0dp" >
+
+        <View
+            android:layout_width="@dimen/xhdpi_2dp"
+            android:layout_height="match_parent"
+            android:background="#555555" />
+
+        <LinearLayout
+            android:layout_width="@dimen/xhdpi_496dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="0dp" >
+
+            <TextView
+                android:id="@+id/cur_version_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/xhdpi_4dp"
+                android:gravity="left|center_vertical"
+                android:text="当前版本:V1.00"
+                android:textColor="#F6B800"
+                android:textSize="@dimen/xhdpi_25sp" />
+
+            <ScrollView
+                android:id="@+id/scrollView1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fadeScrollbars="false" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/ver_update_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/xhdpi_4dp"
+                        android:gravity="left"
+                        android:text="更新记录"
+                        android:textColor="#999999"
+                        android:textSize="@dimen/xhdpi_22sp" />
+                </LinearLayout>
+            </ScrollView>
+
+            
+            <FrameLayout
+	            android:id="@+id/FrameLayout1"
+	            android:layout_width="match_parent"
+	            android:layout_height="@dimen/xhdpi_16dp" >
+	
+	            <ProgressBar
+	                android:id="@+id/check_update_progressBar"
+	                style="?android:attr/progressBarStyleHorizontal"
+	                android:layout_width="match_parent"
+	                android:layout_height="@dimen/xhdpi_16dp"
+	               />
+	
+	            <TextView
+	                android:id="@+id/check_update_textPercent"
+	                android:layout_width="wrap_content"
+	                android:layout_height="@dimen/xhdpi_20dp"
+	                android:layout_gravity="center"
+	                android:gravity="center"
+	                android:textColor="#AAAAAA"
+	                android:layout_marginLeft="@dimen/xhdpi_10dp"
+	                android:text="0 %" />
+	
+	            <TextView
+	                android:id="@+id/check_update_textAPKTotal"
+	                android:layout_width="wrap_content"
+	                android:layout_height="@dimen/xhdpi_20dp"
+	                android:gravity="center"
+	                android:layout_gravity="right"
+	                android:textColor="#AAAAAA"
+	                android:layout_marginRight="@dimen/xhdpi_10dp"
+	                android:visibility="invisible"
+	                android:text="0 / 0M" />
+            </FrameLayout>
+            
+            
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="#Fec70b" />
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/xhdpi_7dp" >
+
+                <Button
+                    android:id="@+id/btn_wifi_update"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_marginLeft="@dimen/xhdpi_10dp"
+                    android:layout_marginRight="@dimen/xhdpi_10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_white_yellow"
+                    android:onClick="WiFiUpdate"
+                    android:text="WIFI方式"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/xhdpi_25sp" />
+
+                <Button
+                    android:id="@+id/btn_gprs_update"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_marginLeft="@dimen/xhdpi_10dp"
+                    android:layout_marginRight="@dimen/xhdpi_10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_white_yellow"
+                    android:onClick="GprsUpdate"
+                    android:text="GPRS方式"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/xhdpi_25sp" />
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_marginLeft="@dimen/xhdpi_10dp"
+                    android:layout_marginRight="@dimen/xhdpi_10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_white_yellow"
+                    android:onClick="BtnReturn"
+                    android:text="返回"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/xhdpi_25sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="@dimen/xhdpi_2dp"
+            android:layout_height="match_parent"
+            android:background="#555555" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_2dp"
+        android:background="#555555" />
+
+</LinearLayout>

@@ -1,0 +1,96 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme_White" parent="android:Theme.Light">
+        <item name="button">@drawable/btn_white_yellow</item>
+        <item name="background">@color/white</item>
+        <item name="textColor">@color/black</item>
+    </style>
+
+    <style name="AppTheme_Black" parent="AppTheme_White">
+        <item name="button">@drawable/btn_black_yellow</item>
+        <item name="background">@color/black</item>
+        <item name="textColor">@color/white</item>
+    </style>
+
+    <!-- lv_item标题字体格式 -->
+    <style name="lv01ItemTxtStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">?attr/textColor</item>
+    </style>
+
+    <!-- lv_ht_item标题字体格式 -->
+    <style name="lvHtItemTxtStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?attr/textColor</item>
+    </style>
+
+    <style name="gjItemTxtStyle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">?attr/textColor</item>
+    </style>
+
+    <style name="settingMidStyle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">100dp</item>
+    </style>
+
+    <style name="AnalyzeMidStyle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- TTTTTTTTTTTTTTTTTTTTTTTT -->
+
+
+    <!-- 顶部标题格式 -->
+    <style name="titleTxtStyle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/textColor</item>
+    </style>
+
+    <!-- 底部button格式 -->
+    <style name="buttonStyle">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?attr/button</item>
+    </style>
+
+    <!-- 底部button格式 -->
+    <style name="HtButtonStyle">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?attr/button</item>
+    </style>
+
+    <!-- 底部button格式 -->
+    <style name="WifibuttonStyle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?attr/button</item>
+    </style>
+
+    <!-- lv01标题字体格式 -->
+    <style name="lv01TxtStyle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="MyDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/background_dark</item>
+    </style>
+
+</resources>

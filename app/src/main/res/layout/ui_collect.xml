@@ -1,0 +1,343 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/Layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:orientation="vertical"
+            android:visibility="visible" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/tv_proName"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_weight="4"
+                    android:background="#f6b800"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/xhdpi_10dp"
+                    android:text="工程名:"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_fileName"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:layout_weight="6"
+                    android:background="#f6b800"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/xhdpi_10dp"
+                    android:text="文件名:"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="?attr/textColor" />
+
+            <RelativeLayout
+                android:id="@+id/collect_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:orientation="horizontal" >
+
+                <SurfaceView
+                    android:id="@+id/collect_sfv"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:background="#00ffffff"
+                    android:layout_height="match_parent" />
+
+                <com.ck.collect.CameraView
+                    android:id="@+id/CameraView"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent" />
+
+                <View
+                    android:layout_width="@dimen/xhdpi_2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:background="?attr/textColor" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xhdpi_45dp"
+                android:background="#3d3b3b"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/xhdpi_10dp"
+                android:text="工程列表"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="?attr/textColor" />
+
+            <ListView
+                android:id="@+id/list_pro"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3.5"
+                android:divider="?attr/background" >
+            </ListView>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="?attr/textColor" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xhdpi_45dp"
+                android:background="#3d3b3b"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/xhdpi_10dp"
+                android:text="文件列表"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="?attr/textColor" />
+
+            <ListView
+                android:id="@+id/list_file"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="5.5"
+                android:divider="?attr/background" >
+            </ListView>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/View2"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/xhdpi_2dp"
+        android:background="?attr/textColor" />
+
+    <LinearLayout
+        android:id="@+id/ui_collect_start"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/background" >
+
+        <Button
+            android:id="@+id/ui_collect_begin"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onCollectStart"
+            android:text="   开始测量\n●停止测量"
+            android:textColor="?attr/textColor"
+            android:textSize="23sp" />
+
+        <Button
+            android:id="@+id/ui_collect_save"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onTakePic"
+            android:text="存储"
+            android:textColor="?attr/textColor"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/ButtonLayout2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:gravity="center"
+            android:onClick="onOpenFile"
+            android:text="文件"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/Button04"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onSetPar"
+            android:text="参数"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/btn_Cursor1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onSelectCursor"
+            android:text="●左侧游标\n  右侧游标"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <com.ck.collect.View_LongButton
+            android:id="@+id/long_btn1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onMoveLeft"
+            android:text="左移"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <com.ck.collect.View_LongButton
+            android:id="@+id/long_btn2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onMoveRight"
+            android:text="右移"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="activityFinish"
+            android:text="返回"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ui_collect_stop"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/background"
+        android:visibility="gone" >
+
+        <Button
+            android:id="@+id/Button01"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onCollectStop"
+            android:text="●开始测量\n  停止测量"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <Button
+            android:id="@+id/Button02"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onTakePic"
+            android:text="保存"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/btn_JiSuan"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:gravity="center"
+            android:onClick="onCountMode"
+            android:text="●自动计算\n  手动计算"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <Button
+            android:id="@+id/btn_Cursor2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onSelectCursor"
+            android:text="●左侧游标\n  右侧游标"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <com.ck.collect.View_LongButton
+            android:id="@+id/long_btn3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onMoveLeft"
+            android:text="左移"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <com.ck.collect.View_LongButton
+            android:id="@+id/long_btn4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="onMoveRight"
+            android:text="右移"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:onClick="activityFinish"
+            android:text="退出"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+    </LinearLayout>
+
+</LinearLayout>
