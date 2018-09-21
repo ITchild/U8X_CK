@@ -14,6 +14,7 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -56,13 +57,6 @@ public class CameraView extends View {
                 case OPEN_TRUE:
                     if (m_Listener != null)
                         m_Listener.OnOpenCameraResultListener(true);
-                    //点击屏幕的聚焦
-                    setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            focus();
-                        }
-                    });
                     break;
                 case OPEN_FALSE:
                     if (m_Listener != null)
@@ -314,23 +308,6 @@ public class CameraView extends View {
         isStart = false;
     }
 
-    /**
-     * 摄像机的聚焦
-     */
-    public void focus() {
-        if (null == m_Camera) {
-            return;
-        }
-        m_Camera.autoFocus(new Camera.AutoFocusCallback() {
-            @Override
-            public void onAutoFocus(boolean success, Camera camera) {
-                if (success) {
-
-                }
-            }
-        });
-    }
-
     private void changeByte(byte[] data, Camera camera) {
         synchronized (this) {
             try {
@@ -371,7 +348,6 @@ public class CameraView extends View {
                     v = (0xff & yuv420sp[uvp++]) - 128;
                     u = (0xff & yuv420sp[uvp++]) - 128;
                 }
-
                 int y1192 = 1192 * y;
                 int r = (y1192 + 1634 * v);
                 int g = (y1192 - 833 * v - 400 * u);
@@ -393,7 +369,6 @@ public class CameraView extends View {
                     b = 262143;
                 }
                 m_nTextureBuffer[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
-
             }
         }
         return m_nTextureBuffer;
@@ -419,7 +394,11 @@ public class CameraView extends View {
                 e.printStackTrace();
             }
             m_Parameters = m_Camera.getParameters();
-            m_Parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+            if (!Build.MODEL.equals("KORIDY H30")) {
+                m_Parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);// 1连续对焦
+            }else{
+                m_Parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            }
             List<Size> preSize = m_Parameters.getSupportedPreviewSizes();
             for (Size size : preSize) {
                 Log.i("fei", size.width + "*" + size.height);
@@ -428,7 +407,7 @@ public class CameraView extends View {
 //            Camera.Size size = preSize.get(preSize.size() - 1);
             Log.i("fei", "我选择的" + size.width + "*" + size.height + "屏幕自己的" + m_nScreenWidth + "*" + m_nScreenHeight);
             m_Parameters.setPreviewSize(size.width, size.height);
-            m_Camera.setParameters(m_Parameters);
+//            m_Camera.setParameters(m_Parameters);
             m_nBufferSize = size.width * size.height;
             m_nTextureBuffer = new int[m_nBufferSize];
             m_nBufferSize = m_nBufferSize * ImageFormat.getBitsPerPixel(m_Parameters.getPreviewFormat()) / 8;
@@ -439,6 +418,7 @@ public class CameraView extends View {
             try {
                 m_Camera.setPreviewDisplay(holder);
                 m_Camera.startPreview();
+                m_Camera.cancelAutoFocus();// 2如果要实现连续的自动对焦，这一句必须加上
             } catch (IOException e) {
                 e.printStackTrace();
                 m_Camera.release();
