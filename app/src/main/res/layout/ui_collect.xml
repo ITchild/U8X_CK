@@ -58,7 +58,7 @@
                 android:id="@+id/collect_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
+                android:background="@color/black"
                 android:orientation="horizontal" >
 
                 <SurfaceView
@@ -78,6 +78,7 @@
                     android:layout_width="@dimen/xhdpi_2dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
+                    android:visibility="gone"
                     android:background="?attr/textColor" />
             </RelativeLayout>
         </LinearLayout>
@@ -87,7 +88,6 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:orientation="vertical" >
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/xhdpi_45dp"
@@ -139,7 +139,34 @@
                 android:layout_weight="5.5"
                 android:divider="?attr/background" >
             </ListView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1">
+                <CheckBox
+                    android:id="@+id/uiCollect_blackWrite_cb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/str_blackWrite"/>
+
+                <Button
+                    android:id="@+id/uiCollect_enlarge_bt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_enlarge"/>
+
+                <Button
+                    android:id="@+id/uiCollect_Lessen_bt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_lessen"/>
+            </LinearLayout>
+
         </LinearLayout>
+
+
     </LinearLayout>
 
     <View
@@ -164,7 +191,7 @@
             android:onClick="onCollectStart"
             android:text="   开始测量\n●停止测量"
             android:textColor="?attr/textColor"
-            android:textSize="23sp" />
+            android:textSize="@dimen/xhdpi_23sp" />
 
         <Button
             android:id="@+id/ui_collect_save"
@@ -175,7 +202,7 @@
             android:onClick="onTakePic"
             android:text="存储"
             android:textColor="?attr/textColor"
-            android:textSize="30sp" />
+            android:textSize="@dimen/xhdpi_30sp" />
 
         <Button
             android:id="@+id/ButtonLayout2"
@@ -269,8 +296,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="?attr/button"
-            android:onClick="onTakePic"
-            android:text="保存"
+            android:onClick="onTakePicBefor"
+            android:text="预拍"
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_30sp" />
 

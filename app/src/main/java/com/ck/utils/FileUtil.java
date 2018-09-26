@@ -2,6 +2,9 @@ package com.ck.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -404,6 +407,64 @@ public class FileUtil {
 		} else {
 			return false;
 		}
-
 	}
+
+	/**
+	 * 保存bitmap图片为bmp格式
+	 * @param bmp
+	 */
+	public static void saveBmpImageFile(Bitmap bmp,String m_strSaveProName,String m_strSaveGJName,String style) {
+		String mediaState = Environment.getExternalStorageState();
+		if ((!mediaState.equals(Environment.MEDIA_MOUNTED)) || (mediaState.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
+			Log.d("fei", "Media storage not ready:" + mediaState);
+			return;
+		}
+		File path = null;
+		File imageFile = null;
+		path = new File(PathUtils.PROJECT_PATH, m_strSaveProName);
+		path.mkdirs();
+
+		String fileName = String.format(style, m_strSaveGJName);
+
+		imageFile = new File(path, fileName);
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(imageFile);
+			bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 获取现有的文件文件名称，并在存储时进行加1
+	 * @param strData
+	 * @return
+	 */
+	public static String GetDigitalPile(String strData) {
+		String strName = ""; // 汉字部分
+		String strDigital = ""; // 数字部分
+		int nDigital = 1; // 数字部分
+		for (int i = strData.length() - 1; i >= 0; i--) {
+			if (Character.isDigit(strData.charAt(i))) {
+				strDigital = String.valueOf(strData.charAt(i)) + strDigital;
+			} else {
+				strName = strData.substring(0, i + 1);
+				break;
+			}
+		}
+
+		if (!strDigital.equals("")) {
+			nDigital = Integer.parseInt(strDigital) + 1;
+		}
+		return strName + nDigital;
+	}
+
+
 }

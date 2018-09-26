@@ -1,56 +1,41 @@
 package com.ck.collect;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ck.adapter.ListGJAdapter;
+import com.ck.adapter.ListProjectAdapter;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
 import com.ck.main.App_DataPara;
 import com.ck.main.BaseActivity;
+import com.ck.utils.FileUtil;
 import com.ck.utils.PathUtils;
 import com.ck.utils.PreferenceHelper;
 import com.hc.u8x_ck.R;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
-public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
-    private final static String BMP_IMAGE_NAME_FORMAT = "%s.bmp";
+public class Ui_Collect extends BaseActivity {
     public String m_strSaveProName = "默认工程";
     public String m_strSaveGJName = "默认构件1";
-    Handler mActivityHandler = new Handler() {
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-            }
-        }
-
-        ;
-    };
     boolean m_bCountMode = true;
     boolean m_bIsZCursor = true;
     int m_nDrawFlag = 0;
@@ -60,8 +45,7 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
      * 防止没有测量时，点击保存，保存黑色背景图片
      */
     boolean m_bSaveImage = false;
-    private LinearLayout m_FLayout;
-    private LinearLayout m_LayStart;
+    private LinearLayout m_LayStart; //
     private LinearLayout m_LayStop;
     private CameraView m_CameraView;
     private TextView m_tvProName;
@@ -81,6 +65,10 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
     private ListGJAdapter m_GJAdapter;
     private SurfaceHolder mHolder;
 
+    private CheckBox uiCollect_blackWrite_cb;//黑白图的选择框
+    private Button uiCollect_enlarge_bt;//图片放大的按钮
+    private Button uiCollect_Lessen_bt; //图片缩小的按钮
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,38 +82,65 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
         AppDatPara.fDispDensity = dm.density;
         setContentView(R.layout.ui_collect);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED, WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+
+        initView();
+        initListener();
+    }
+
+    public void initView() {
+        collect_sfv =  findViewById(R.id.collect_sfv);
+        m_btnJiSuan = findViewById(R.id.btn_JiSuan);
+        m_btnY1 = findViewById(R.id.long_btn1);
+        m_btnY2 =  findViewById(R.id.long_btn2);
+        m_btnZ1 =  findViewById(R.id.long_btn3);
+        m_btnZ2 = findViewById(R.id.long_btn4);
+        m_btnCursor1 = findViewById(R.id.btn_Cursor1);
+        m_btnCursor2 = findViewById(R.id.btn_Cursor2);
+        m_CameraView = findViewById(R.id.CameraView);
+        m_LayStart = findViewById(R.id.ui_collect_start);
+        m_LayStop = findViewById(R.id.ui_collect_stop);
+        m_tvProName = findViewById(R.id.tv_proName);
+        m_tvGJName = findViewById(R.id.tv_fileName);
+        m_ListViewPro = findViewById(R.id.list_pro);
+        m_ListViewFile = findViewById(R.id.list_file);
+
+        uiCollect_blackWrite_cb = findViewById(R.id.uiCollect_blackWrite_cb);
+        uiCollect_enlarge_bt = findViewById(R.id.uiCollect_enlarge_bt);
+        uiCollect_Lessen_bt = findViewById(R.id.uiCollect_Lessen_bt);
+    }
+
+    private void initListener(){
+        uiCollect_blackWrite_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                m_CameraView.setBlackWrite(b);
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initView();
         initData();
-        showPic();
+        if (!m_CameraView.isStart) {
+            showPic();
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (m_CameraView.isStart) {
+                    onCollectStart(new View(Ui_Collect.this));
+                }
+            }
+        }).start();
     }
 
-    public void initView() {
-        collect_sfv = (SurfaceView) findViewById(R.id.collect_sfv);
-
-        m_btnJiSuan = (Button) findViewById(R.id.btn_JiSuan);
-        m_btnY1 = (View_LongButton) findViewById(R.id.long_btn1);
-        m_btnY2 = (View_LongButton) findViewById(R.id.long_btn2);
-        m_btnZ1 = (View_LongButton) findViewById(R.id.long_btn3);
-        m_btnZ2 = (View_LongButton) findViewById(R.id.long_btn4);
-        m_btnCursor1 = (Button) findViewById(R.id.btn_Cursor1);
-        m_btnCursor2 = (Button) findViewById(R.id.btn_Cursor2);
-        m_CameraView = (CameraView) findViewById(R.id.CameraView);
-        m_FLayout = (LinearLayout) findViewById(R.id.Layout);
-        m_LayStart = (LinearLayout) findViewById(R.id.ui_collect_start);
-        m_LayStop = (LinearLayout) findViewById(R.id.ui_collect_stop);
-        m_tvProName = (TextView) findViewById(R.id.tv_proName);
-        m_tvGJName = (TextView) findViewById(R.id.tv_fileName);
-        m_ListViewPro = (ListView) findViewById(R.id.list_pro);
-        m_ListViewFile = (ListView) findViewById(R.id.list_file);
-
-    }
-
-    private void initData(){
+    private void initData() {
         m_strSaveProName = PreferenceHelper.getProName(this);
         m_strSaveGJName = PreferenceHelper.getGJName(this);
         m_ListProject = PathUtils.getProFileList();
@@ -170,95 +185,106 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
         });
     }
 
+    /**
+     * 显示图片
+     */
     public void showPic() {
         if (AppDatPara.m_nProjectSeleteNidx < 0 || m_ListProject.size() <= AppDatPara.m_nProjectSeleteNidx) {
-            return;
+            return;  //判断工程list有没有被选中
         }
         ClasFileProjectInfo pro = m_ListProject.get(AppDatPara.m_nProjectSeleteNidx);
         if (AppDatPara.m_nGJSeleteNidx < 0 || pro.mstrArrFileGJ.size() <= AppDatPara.m_nGJSeleteNidx) {
-            return;
+            return;//判断工程中的构件List有没有被选中
         }
         ClasFileGJInfo file = pro.mstrArrFileGJ.get(AppDatPara.m_nGJSeleteNidx);
         String path = PathUtils.PROJECT_PATH + File.separator + pro.mFileProjectName + File.separator + file.mFileGJName;
         Bitmap bmp = BitmapFactory.decodeFile(path);
-        m_CameraView.setBitmap(bmp);
+        m_CameraView.setBitmap(bmp);  //正常图像
         m_tvProName.setText("工程名: " + pro.mFileProjectName);
         m_tvGJName.setText("文件名: " + file.mFileGJName.substring(0, file.mFileGJName.length() - 4));
     }
 
+    /**
+     * 开始进行测量
+     *
+     * @param v
+     */
+    public void onCollectStart(View v) {
+        m_CameraView.setStartView();
+        collect_sfv.setVisibility(View.VISIBLE);
+        mHolder = collect_sfv.getHolder();
+        m_CameraView.setHolder(mHolder);
+        uiCollect_blackWrite_cb.setClickable(false);
+        m_CameraView.onenCamera(new OnOpenCameraListener() {
+            @Override
+            public void OnOpenCameraResultListener(boolean bResult) {
+                if (bResult) {
+
+                    m_LayStart.setVisibility(View.GONE);
+                    m_LayStop.setVisibility(View.VISIBLE);
+                    // if (m_bCountMode) {
+                    m_bCountMode = true;
+                    m_bIsZCursor = true;
+                    m_nDrawFlag = 0;
+                    // }
+                    m_btnJiSuan.setText("●自动计算\n  手动计算");
+                    m_btnCursor2.setText("●左侧游标\n  右侧游标");
+                    m_CameraView.setCountMode(m_bCountMode);
+                    m_CameraView.setZY(m_nDrawFlag);
+                    m_bStart = true;
+                    m_bSaveImage = true;
+                } else {
+                    Toast.makeText(Ui_Collect.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (m_CameraView.isStart) {
+            m_CameraView.closeCamera();
+        }
+    }
+
     @Override
     protected void onDestroy() {
+        m_CameraView.closeCamera();
         AppDatPara.m_nGJSeleteNidx = -1;
         super.onDestroy();
     }
 
+    /**
+     * 拍照
+     *
+     * @param v
+     */
     public void onTakePic(View v) {
         if (!m_bSaveImage) {
             return;
         }
-		m_CameraView.setDrawingCacheEnabled(true);
-		m_CameraView.onTakePic(true);
-		Bitmap drawingCache = m_CameraView.getDrawingCache();
-		saveBmpImageFile(drawingCache);
-		m_CameraView.onTakePic(false);
+        m_CameraView.setDrawingCacheEnabled(true);
+        m_CameraView.onTakePic(true);
+        m_CameraView.buildDrawingCache();
+        Bitmap drawingCache = m_CameraView.getDrawingCache();
+        FileUtil.saveBmpImageFile(drawingCache, m_strSaveProName, m_strSaveGJName, "%s.bmp");
+        m_CameraView.onTakePic(false);
         m_CameraView.setDrawingCacheEnabled(false);
         AppDatPara.m_nProjectSeleteNidx = 0;
         AppDatPara.m_nGJSeleteNidx = 0;
         initData();
-        m_strSaveGJName = GetDigitalPile(m_strSaveGJName);
+        m_strSaveGJName = FileUtil.GetDigitalPile(m_strSaveGJName);
         PreferenceHelper.setGJName(this, m_strSaveGJName);
-		m_CameraView.setDrawingCacheEnabled(false);
+        m_CameraView.setDrawingCacheEnabled(false);
     }
 
-    private void saveBmpImageFile(Bitmap bmp) {
-
-        String mediaState = Environment.getExternalStorageState();
-        if ((!mediaState.equals(Environment.MEDIA_MOUNTED)) || (mediaState.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
-            Log.d("main", "Media storage not ready:" + mediaState);
-            return;
-        }
-        File path = null;
-        File imageFile = null;
-        path = new File(PathUtils.PROJECT_PATH, m_strSaveProName);
-        path.mkdirs();
-
-        String fileName = String.format(BMP_IMAGE_NAME_FORMAT, m_strSaveGJName);
-
-        imageFile = new File(path, fileName);
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(imageFile);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String GetDigitalPile(String strData) {
-        String strName = ""; // 汉字部分
-        String strDigital = ""; // 数字部分
-        int nDigital = 1; // 数字部分
-        for (int i = strData.length() - 1; i >= 0; i--) {
-            if (Character.isDigit(strData.charAt(i))) {
-                strDigital = String.valueOf(strData.charAt(i)) + strDigital;
-            } else {
-                strName = strData.substring(0, i + 1);
-                break;
-            }
-        }
-
-        if (!strDigital.equals("")) {
-            nDigital = Integer.parseInt(strDigital) + 1;
-        }
-        return strName + nDigital;
-    }
-
+    /**
+     * 裂缝的位置是手动计算还是自动识别
+     *
+     * @param v
+     */
     public void onCountMode(View v) {
         if (m_bCountMode) {
             m_bCountMode = false;
@@ -278,6 +304,11 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
         m_btnZ2.onMoveMode(m_bIsZCursor, m_CameraView);
     }
 
+    /**
+     * 人为移动光标的时候，左右两个裂缝标志的切换
+     *
+     * @param v
+     */
     public void onSelectCursor(View v) {
         if (m_bCountMode) {
             return;
@@ -300,15 +331,30 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
         m_btnZ2.onMoveMode(m_bIsZCursor, m_CameraView);
     }
 
+    /**
+     * 向左侧移动光标
+     *
+     * @param v
+     */
     public void onMoveLeft(View v) {
         m_CameraView.onMove();
     }
 
+    /**
+     * 向右侧移动光标
+     *
+     * @param v
+     */
     public void onMoveRight(View v) {
         m_CameraView.onMove();
 
     }
 
+    /**
+     * 参数的设置Dialog的显示
+     *
+     * @param v
+     */
     public void onSetPar(View v) {
         if (m_Dlg_SetPar == null || !m_Dlg_SetPar.isShowing()) {
             m_Dlg_SetPar = new DLG_SetPar(this, "参数设置");
@@ -316,48 +362,31 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
         m_Dlg_SetPar.show();
     }
 
+    /**
+     * 跳转到文件的列表的界面
+     *
+     * @param v
+     */
     public void onOpenFile(View v) {
         startActivity(new Intent(this, Ui_FileSelete.class));
     }
 
-    public void onCollectStart(View v) {
-        m_CameraView.setStartView();
-        m_CameraView.onenCamera(new OnOpenCameraListener() {
-            @Override
-            public void OnOpenCameraResultListener(boolean bResult) {
-                if (bResult) {
-                    mHolder = collect_sfv.getHolder();
-                    m_CameraView.setHolder(mHolder);
-                    mHolder.addCallback(Ui_Collect.this);
-
-                    m_LayStart.setVisibility(View.GONE);
-                    m_LayStop.setVisibility(View.VISIBLE);
-                    // if (m_bCountMode) {
-                    m_bCountMode = true;
-                    m_bIsZCursor = true;
-                    m_nDrawFlag = 0;
-                    // }
-                    m_btnJiSuan.setText("●自动计算\n  手动计算");
-                    m_btnCursor2.setText("●左侧游标\n  右侧游标");
-                    m_CameraView.setCountMode(m_bCountMode);
-                    m_CameraView.setZY(m_nDrawFlag);
-                    m_bStart = true;
-                    m_bSaveImage = true;
-                } else {
-                    Toast.makeText(Ui_Collect.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+    /**
+     * 停止测量
+     *
+     * @param v
+     */
+    public void onCollectStop(View v) {
+        uiCollect_blackWrite_cb.setClickable(false);
+        collect_sfv.setVisibility(View.GONE);
+        stopCameraView();
+        m_CameraView.showOriginalView();
     }
 
-    public void onCollectStop(View v) {
-        m_CameraView.setStopView();
-        m_CameraView.closeCamera();
-        m_bCountMode = false;
-        m_bStart = false;
-        m_LayStop.setVisibility(View.GONE);
-        m_LayStart.setVisibility(View.VISIBLE);
 
+    public void onTakePicBefor(View view){
+        stopCameraView();
+        uiCollect_blackWrite_cb.setClickable(true);
         if (m_bIsZCursor) {
             m_nDrawFlag = 1;
         } else {
@@ -370,170 +399,24 @@ public class Ui_Collect extends BaseActivity implements SurfaceHolder.Callback {
         m_btnZ2.onMoveMode(m_bIsZCursor, m_CameraView);
     }
 
+    /**
+     * 停止进行拍摄
+     */
+    private void stopCameraView(){
+        m_CameraView.setStopView();
+        m_CameraView.closeCamera();
+        m_bCountMode = false;
+        m_bStart = false;
+        m_LayStop.setVisibility(View.GONE);
+        m_LayStart.setVisibility(View.VISIBLE);
+    }
+    /**
+     * 退出Activity
+     *
+     * @param v
+     */
     public void activityFinish(View v) {
         m_CameraView.closeCamera();
         this.finish();
     }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        if (null != m_CameraView.m_Camera) {
-            m_CameraView.m_Camera.startPreview();
-        }
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
-    }
-
-    class ListProjectAdapter extends BaseAdapter {
-        public static final int File = 0;
-        public static final int Folder = 0;
-        ViewHolder holder;
-        private Context mContext;
-        private List<ClasFileProjectInfo> mProjects;
-        private int nSelect = 0;
-
-        public ListProjectAdapter(Context context, List<ClasFileProjectInfo> projects) {
-            mContext = context;
-            mProjects = projects;
-        }
-
-        public void setSelect(int nSelect) {
-            this.nSelect = nSelect;
-            this.notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            return mProjects.size();
-        }        @Override
-        public Object getItem(int position) {
-            return mProjects.get(position);
-        }
-
-        class ViewHolder {
-            TextView m_TVProject;
-            LinearLayout m_LL;
-
-            public ViewHolder(View view) {
-                m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
-                m_LL = (LinearLayout) view.findViewById(R.id.ui_list_project);
-            }
-        }        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-
-
-        @Override
-        public View getView(final int position, View view, ViewGroup arg2) {
-            if (view == null) {
-                view = View.inflate(mContext, R.layout.ui_file_select_list_project, null);
-                holder = new ViewHolder(view);
-                view.setTag(holder);
-            } else {
-                holder = (ViewHolder) view.getTag();
-            }
-            if (nSelect == position) {
-                holder.m_LL.setBackgroundColor(Color.rgb(246, 184, 00));
-            } else {
-                if (AppDatPara.nTheme == R.style.AppTheme_Black)
-                    holder.m_LL.setBackgroundColor(Color.BLACK);
-                else
-                    holder.m_LL.setBackgroundColor(Color.WHITE);
-            }
-            holder.m_TVProject.setText(mProjects.get(position).mFileProjectName);
-
-            return view;
-        }
-
-
-    }
-
-    class ListGJAdapter extends BaseAdapter {
-        public static final int File = 0;
-        public static final int Folder = 0;
-        ClasFileProjectInfo mProject;
-        ViewHolder holder;
-        private Context mContext;
-        private int nSelect = 0;
-
-        public ListGJAdapter(Context context, ClasFileProjectInfo project) {
-            mContext = context;
-            mProject = project;
-        }
-
-        public void clearProInfo() {
-            mProject.mstrArrFileGJ.clear();
-            this.notifyDataSetChanged();
-        }
-
-        public void setSelect(int nSelect) {
-            this.nSelect = nSelect;
-            this.notifyDataSetChanged();
-        }
-
-        public void initSelect(boolean flag) {
-            for (int i = 0; i < mProject.mstrArrFileGJ.size(); i++) {
-                mProject.mstrArrFileGJ.get(i).bIsSelect = flag;
-            }
-            notifyDataSetChanged();
-        }        @Override
-        public int getCount() {
-            return mProject.mstrArrFileGJ.size();
-        }
-
-        class ViewHolder {
-            TextView m_TVProject;
-            LinearLayout m_LL;
-
-            public ViewHolder(View view) {
-                m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
-                m_LL = (LinearLayout) view.findViewById(R.id.ui_list_gj);
-            }
-        }        @Override
-        public Object getItem(int position) {
-            return mProject.mstrArrFileGJ.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-
-
-        @Override
-        public View getView(final int position, View view, ViewGroup arg2) {
-            if (view == null) {
-                view = View.inflate(mContext, R.layout.ui_file_select_list_gj, null);
-                holder = new ViewHolder(view);
-                view.setTag(holder);
-            } else {
-                holder = (ViewHolder) view.getTag();
-            }
-            if (nSelect == position) {
-                holder.m_LL.setBackgroundColor(Color.rgb(246, 184, 00));
-            } else {
-                if (AppDatPara.nTheme == R.style.AppTheme_Black)
-                    holder.m_LL.setBackgroundColor(Color.BLACK);
-                else
-                    holder.m_LL.setBackgroundColor(Color.WHITE);
-            }
-            holder.m_TVProject.setText(mProject.mstrArrFileGJ.get(position).mFileGJName.substring(0, mProject.mstrArrFileGJ.get(position).mFileGJName.length() - 4));
-
-            return view;
-        }
-
-
-    }
-
 }

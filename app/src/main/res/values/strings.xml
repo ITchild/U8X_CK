@@ -10,4 +10,9 @@
     <string name="title_activity_ui__analysis">Ui_Analysis</string>
     <string name="title_activity_ui__browse_data">Ui_BrowseData</string>
 
+
+    <string name="str_blackWrite">黑白图</string>
+    <string name="str_enlarge">放  大</string>
+    <string name="str_lessen">缩  小</string>
+
 </resources>

@@ -31,6 +31,8 @@ public class App_DataPara extends Application {
 	 */
 	public boolean m_bPlayMusic;
 
+	private static App_DataPara app;
+
 	/**
 	 * 选择的仪器索引
 	 */
@@ -51,10 +53,15 @@ public class App_DataPara extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		app = this;
 		m_DbService = DBService.getInstence(this);
 		RegistDiskReceiver();
 		initPro();
 		initRegisterTime();
+	}
+
+	public static App_DataPara getApp(){
+		return app;
 	}
 	public void initRegisterTime() {
 		SharedPreferences sp = getSharedPreferences("RegisterTime", Context.MODE_PRIVATE);
