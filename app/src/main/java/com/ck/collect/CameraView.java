@@ -205,10 +205,17 @@ public class CameraView extends View implements Camera.PreviewCallback {
         invalidate();
     }
 
+    /**
+     * 计算模式，true自动计算，false手动计算
+     * @param bCountMode
+     */
     public void setCountMode(boolean bCountMode) {
         m_bCountMode = bCountMode;
     }
 
+    /**
+     * @param nDrawFlag 0自动，左右线红色，1手动，左侧游标，2手动，右侧游标
+     */
     public void setZY(int nDrawFlag) {
         m_nDrawFlag = nDrawFlag;
         invalidate();
@@ -224,9 +231,14 @@ public class CameraView extends View implements Camera.PreviewCallback {
         invalidate();
     }
 
+    /**
+     * 显示初始图像
+     */
     public void showOriginalView(){
-        m_DrawBitmap.recycle();
-        m_DrawBitmap = null;
+        if(null != m_DrawBitmap) {
+            m_DrawBitmap.recycle();
+            m_DrawBitmap = null;
+        }
         invalidate();
     }
 
@@ -355,7 +367,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
         CameraTask(byte[] data) {
             this.mData = data;
         }
-
         @Override
         protected Void doInBackground(Void... params) {
             synchronized (this) {

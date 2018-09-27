@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/xhdpi_60dp"
+    android:background="@color/yellow">
+
+    <TextClock
+        android:id="@+id/baseTitle_clock_tc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/xhdpi_10dp"
+        android:format24Hour="yyyy-MM-dd hh:mm:ss"
+        android:textColor="@color/white"
+        android:textSize="@dimen/xhdpi_22sp" />
+
+
+    <TextView
+        android:id="@+id/baseTitle_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/str_acTitle"
+        android:textColor="@color/white"
+        android:textSize="@dimen/xhdpi_25sp" />
+
+
+    <ImageView
+        android:id="@+id/baseTitle_power_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/xhdpi_10dp"
+        android:src="@drawable/checkbox_on" />
+
+</RelativeLayout>

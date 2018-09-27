@@ -1,0 +1,227 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:orientation="vertical">
+
+    <include layout="@layout/ac_basetitle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/Layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <RelativeLayout
+                android:id="@+id/collect_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/black"
+                android:orientation="horizontal">
+
+                <SurfaceView
+                    android:id="@+id/collect_sfv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#00ffffff" />
+
+                <com.ck.collect.CameraView
+                    android:id="@+id/collect_cameraView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <View
+                    android:layout_width="@dimen/xhdpi_2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:background="?attr/textColor"
+                    android:visibility="gone" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/collect_filelist_ll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:background="#3d3b3b"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/xhdpi_10dp"
+                    android:text="工程列表"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xhdpi_2dp"
+                    android:background="?attr/textColor" />
+
+                <ListView
+                    android:id="@+id/list_pro"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3.5"
+                    android:divider="?attr/background"></ListView>
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xhdpi_2dp"
+                    android:background="?attr/textColor" />
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/xhdpi_45dp"
+                    android:background="#3d3b3b"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/xhdpi_10dp"
+                    android:text="文件列表"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xhdpi_2dp"
+                    android:background="?attr/textColor" />
+
+                <ListView
+                    android:id="@+id/list_file"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="5.5"
+                    android:divider="?attr/background"></ListView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/collect_opr_ll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include layout="@layout/ac_collectitem_opr" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/View2"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/xhdpi_2dp"
+        android:background="?attr/textColor" />
+
+    <LinearLayout
+        android:id="@+id/ui_collect_start"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/background">
+
+        <Button
+            android:id="@+id/collect_startStop_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:gravity="center"
+            android:text="@string/str_startCollect"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <Button
+            android:id="@+id/collect_save_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <!--<Button-->
+        <!--android:id="@+id/ButtonLayout2"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--android:background="?attr/button"-->
+        <!--android:gravity="center"-->
+        <!--android:onClick="onOpenFile"-->
+        <!--android:text="文件"-->
+        <!--android:textColor="?attr/textColor"-->
+        <!--android:textSize="@dimen/xhdpi_30sp" />-->
+
+        <Button
+            android:id="@+id/collect_autoOrhand_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <Button
+            android:id="@+id/collect_Cursor_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <com.ck.collect.View_LongButton
+            android:id="@+id/collect_left_lbt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <com.ck.collect.View_LongButton
+            android:id="@+id/collect_right_lbt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/collect_back_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text="返回"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+    </LinearLayout>
+
+</LinearLayout>

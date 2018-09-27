@@ -14,5 +14,36 @@
     <string name="str_blackWrite">黑白图</string>
     <string name="str_enlarge">放  大</string>
     <string name="str_lessen">缩  小</string>
+    <string name="str_acTitle">海创高科裂缝测宽仪</string>
+    
+    <string name="str_measureWide">测量缝宽</string>
+    <string name="str_flieManger">文件管理</string>
+    <string name="str_onTimeMeasure">定时监测</string>
+    <string name="str_instrument">仪器标定</string>
+    <string name="str_setting">设置</string>
+    <string name="str_about">关于仪器</string>
+    
+    <string name="str_makeSure">确定</string>
+    <string name="str_prompt">提示</string>
+    <string name="str_noAc_msg">暂未开通，敬请期待</string>
 
+    <string name="str_back">返回</string>
+
+    <string name="str_startCollect">   开始测量\n●停止测量</string>
+    <string name="str_stopCollect">●开始测量\n   停止测量</string>
+
+    <string name="str_takePhoto">预拍</string>
+    <string name="str_save">存储</string>
+    <string name="str_saveSuccess">保存成功</string>
+
+    <string name="str_proName">工程名称：</string>
+    <string name="str_fileName">构件名称</string>
+    <string name="str_Auto">●自动计算\n  手动计算</string>
+    <string name="str_Hand">  自动计算\n●手动计算</string>
+
+    <string name="str_leftCursor">●左侧游标\n  右侧游标</string>
+    <string name="str_rightCursor">  左侧游标\n●右侧游标</string>
+
+    <string name="str_toLeft">左移</string>
+    <string name="str_toRight">右移</string>
 </resources>

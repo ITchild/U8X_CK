@@ -1,0 +1,118 @@
+package com.ck.activity;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import com.ck.adapter.HomeDisAdapter;
+import com.ck.collect.Ui_FileSelete;
+import com.hc.u8x_ck.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class HomeActivity extends TitleBaseActivity {
+
+    private RecyclerView home_display;
+    private HomeDisAdapter mHomeDisAdapter;
+    private List<String> homeDisData ;
+    @Override
+    protected int setLayout() {
+        return R.layout.ac_home;
+    }
+
+    @Override
+    protected void initView() {
+        super.initView();
+        home_display = findViewById(R.id.home_display);
+    }
+
+    @Override
+    protected void initData() {
+        super.initData();
+        if(null == homeDisData){
+            homeDisData = new ArrayList<>();
+            homeDisData.add(getStr(R.string.str_measureWide));
+            homeDisData.add(getStr(R.string.str_flieManger));
+            homeDisData.add(getStr(R.string.str_onTimeMeasure));
+            homeDisData.add(getStr(R.string.str_instrument));
+            homeDisData.add(getStr(R.string.str_setting));
+            homeDisData.add(getStr(R.string.str_about));
+        }
+        home_display.setLayoutManager(new GridLayoutManager(this,3));
+        mHomeDisAdapter = new HomeDisAdapter(this,homeDisData);
+        home_display.setAdapter(mHomeDisAdapter);
+    }
+
+    @Override
+    protected void initListener() {
+        super.initListener();
+        mHomeDisAdapter.setOnHomeDisItemClick(new HomeDisAdapter.OnHomeDisItemClick() {
+            @Override
+            public void onItem(int position) {
+                switch (position){
+                    case 0 :
+                        jumpToCollect();
+                        break;
+                    case 1 :
+                        jumpToFileManger();
+                        break;
+                    case 2 :
+                        showMsgDialog();
+                        break;
+                    case 3 :
+                        showMsgDialog();
+                        break;
+                    case 4 :
+                        jumpToSetting();
+                        break;
+                    case 5 :
+                        jumpToAbout();
+                        break;
+                }
+            }
+        });
+    }
+
+    /**
+     * 跳转到裂缝检测界面
+     */
+    private void jumpToCollect(){
+        startActivity(new Intent(this, CollectActivity.class));
+    }
+
+    /**
+     * 跳转到文件管理界面
+     */
+    private void jumpToFileManger(){
+        startActivity(new Intent(this, Ui_FileSelete.class));
+    }
+
+    private void jumpToSetting(){
+        startActivity(new Intent(this,SettingActivity.class));
+    }
+
+    private void jumpToAbout(){
+        startActivity(new Intent(this,AboutActivity.class));
+    }
+
+
+    /**
+     * 显示的提示框
+     */
+    private void showMsgDialog(){
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setTitle(getStr(R.string.str_prompt));
+        dialog.setMessage(getStr(R.string.str_noAc_msg));
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getStr(R.string.str_makeSure), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+}
