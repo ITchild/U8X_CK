@@ -1,9 +1,8 @@
-package com.ck.collect;
+package com.ck.ui;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
@@ -21,13 +20,21 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.widget.Toast;
 
+import com.ck.collect.OnOpenCameraListener;
 import com.ck.utils.DecodeUtil;
 import com.ck.utils.FindLieFenUtils;
+import com.hc.u8x_ck.R;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+* @author  fei
+* @date on 2018/10/12 0012
+* @describe  TODO :
+**/
 public class CameraView extends View implements Camera.PreviewCallback {
 
     public static final int BLUR = 0;
@@ -81,17 +88,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
     private Bitmap m_YBitmap;
     private boolean isBlackWrite = false;
     private CameraTask mCameraTask;
+    private Context mContext;
 
     public CameraView(Context context, int screenWidth, int screenHeight) {
         super(context);
         init(context);
-    }
-
-    private void init(Context context) {
-        m_SurfaceTexture = new SurfaceTexture(MAGIC_TEXTURE_ID);
-        DisplayMetrics dm = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(dm);
-        m_fDispDensity = dm.density; // 屏幕密度（像素比例：0.75/1.0/1.5/2.0）
     }
 
     public CameraView(Context context) {
@@ -109,9 +110,16 @@ public class CameraView extends View implements Camera.PreviewCallback {
         init(context);
     }
 
+    private void init(Context context) {
+        mContext = context;
+        m_SurfaceTexture = new SurfaceTexture(MAGIC_TEXTURE_ID);
+        DisplayMetrics dm = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(dm);
+        m_fDispDensity = dm.density; // 屏幕密度（像素比例：0.75/1.0/1.5/2.0）
+    }
+
     /**
      * 打开相机
-     *
      * @param listener
      */
     public void onenCamera(OnOpenCameraListener listener) {
@@ -124,7 +132,16 @@ public class CameraView extends View implements Camera.PreviewCallback {
      * 初始化相机
      */
     private void initCarmera() {
-        new Thread(new Runnable() {
+        if(null != carmeraThread && carmeraThread.isAlive()){
+            Toast.makeText(mContext,"操作过于频繁",Toast.LENGTH_SHORT).show();
+        }else {
+            carmeraThreadStart();
+        }
+    }
+
+    private Thread  carmeraThread;
+    private void carmeraThreadStart(){
+        carmeraThread =  new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -168,7 +185,8 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     m_Camera = null;
                 }
             }
-        }).start();
+        });
+        carmeraThread.start();
     }
 
     public void setHolder(SurfaceHolder holder) {
@@ -179,6 +197,10 @@ public class CameraView extends View implements Camera.PreviewCallback {
      * 关闭相机
      */
     public void closeCamera() {
+        if(null != carmeraThread && carmeraThread.isAlive()){
+            Toast.makeText(mContext,"操作过于频繁",Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (m_Camera != null) {
             m_Camera.setPreviewCallbackWithBuffer(null);
             m_Camera.stopPreview();
@@ -207,6 +229,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     /**
      * 计算模式，true自动计算，false手动计算
+     *
      * @param bCountMode
      */
     public void setCountMode(boolean bCountMode) {
@@ -234,10 +257,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
     /**
      * 显示初始图像
      */
-    public void showOriginalView(){
-        if(null != m_DrawBitmap) {
+    public void showOriginalView() {
+        if (null != m_DrawBitmap) {
             m_DrawBitmap.recycle();
             m_DrawBitmap = null;
+            System.gc();
         }
         invalidate();
     }
@@ -253,11 +277,12 @@ public class CameraView extends View implements Camera.PreviewCallback {
     @Override
     protected void onDraw(Canvas canvas) {
         if (m_DrawBitmap == null || m_DrawBitmap.isRecycled()) {
-            if (m_bTakePic) {
+            if (m_bTakePic || isStart) {
                 return; //防止异步线程中将m_DrawBitmap回收（在这里进行检测）
             }
             String str = "裂缝宽度检测";
-            Paint paint = getPaint(Style.FILL, 3, Color.RED, 50);
+            Paint paint = getPaint(Style.FILL, 3, Color.RED,
+                    mContext.getResources().getDimension(R.dimen.xhdpi_40sp));
             float fWidth = paint.measureText(str);
             canvas.drawText(str, m_nScreenWidth / 2 - fWidth / 2, m_nScreenHeight / 2, paint);
             return;
@@ -269,7 +294,8 @@ public class CameraView extends View implements Camera.PreviewCallback {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         RectF rectF = new RectF(0, 0, m_nScreenWidth, m_nScreenHeight); // w和h分别是屏幕的宽和高，也就是你想让图片显示的宽和高
         if (!isStart) {
-            canvas.drawBitmap(isBlackWrite ? DecodeUtil.convertToBlackWhite(m_DrawBitmap) : m_DrawBitmap, null, rectF, null);
+            canvas.drawBitmap(isBlackWrite ? DecodeUtil.convertToBlackWhite(m_DrawBitmap)
+                    : m_DrawBitmap, null, rectF, null);
         }
         if (m_bTakePic) {
             canvas.drawBitmap(m_DrawBitmap, null, rectF, null);
@@ -306,9 +332,9 @@ public class CameraView extends View implements Camera.PreviewCallback {
             m_YCanvas = new Canvas();
             if (null != m_YBitmap) {
                 m_YBitmap.recycle();
-                System.gc();
+                m_YBitmap = null;
             }
-            m_YBitmap = Bitmap.createBitmap(m_nScreenWidth, m_nScreenHeight, Config.ARGB_4444);
+            m_YBitmap = Bitmap.createBitmap(m_nScreenWidth, m_nScreenHeight, Bitmap.Config.ARGB_4444);
             m_YCanvas.setBitmap(m_YBitmap);
             Paint paint = getPaint(Style.FILL, 3, Color.RED, 20);
             int nKDY = nYMid + nYMid / 2;
@@ -354,11 +380,10 @@ public class CameraView extends View implements Camera.PreviewCallback {
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         // TODO Auto-generated method stub
-        camera.addCallbackBuffer(bytes); // <----这句一点要加上.
+        camera.addCallbackBuffer(m_Buffer); // <----这句一点要加上.
         mCameraTask = new CameraTask(bytes);
         mCameraTask.execute((Void) null);
     }
-
     /*自定义的CameraTask类，开启一个线程分析数据*/
     private class CameraTask extends AsyncTask<Void, Void, Void> {
         private byte[] mData;
@@ -367,11 +392,12 @@ public class CameraView extends View implements Camera.PreviewCallback {
         CameraTask(byte[] data) {
             this.mData = data;
         }
+
         @Override
         protected Void doInBackground(Void... params) {
             synchronized (this) {
                 try {
-                    if (!isStart){
+                    if (!isStart) {
                         return null;
                     }
                     if (m_Camera == null) {
@@ -383,7 +409,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     int w = m_Camera.getParameters().getPreviewSize().width;
                     int h = m_Camera.getParameters().getPreviewSize().height;
                     int[] rgb = DecodeUtil.decodeYUV420SP(mData, w, h, m_nTextureBuffer);
-                    m_DrawBitmap = Bitmap.createBitmap(rgb, w, h, Config.RGB_565);
+                    if(null != m_DrawBitmap){
+                        m_DrawBitmap.recycle();
+                        m_DrawBitmap = null;
+                    }
+                    m_DrawBitmap = Bitmap.createBitmap(rgb, w, h, Bitmap.Config.RGB_565);
                     FindLieFenUtils.findLieFen(rgb, w, h, m_bCountMode);
                     if (!m_bTakePic) {
                         postInvalidate();

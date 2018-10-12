@@ -1,6 +1,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme_White" parent="android:Theme.Light">
+    <style name="AppTheme_White" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="button">@drawable/btn_white_yellow</item>
         <item name="background">@color/white</item>
         <item name="textColor">@color/black</item>
@@ -56,7 +56,7 @@
 
     <!-- 底部button格式 -->
     <style name="buttonStyle">
-        <item name="android:textSize">32sp</item>
+        <item name="android:textSize">@dimen/xhdpi_32sp</item>
         <item name="android:textColor">?attr/textColor</item>
         <item name="android:gravity">center</item>
         <item name="android:background">?attr/button</item>
@@ -64,7 +64,7 @@
 
     <!-- 底部button格式 -->
     <style name="HtButtonStyle">
-        <item name="android:textSize">28sp</item>
+        <item name="android:textSize">@dimen/xhdpi_28sp</item>
         <item name="android:textColor">?attr/textColor</item>
         <item name="android:gravity">center</item>
         <item name="android:background">?attr/button</item>
@@ -72,7 +72,7 @@
 
     <!-- 底部button格式 -->
     <style name="WifibuttonStyle">
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">@dimen/xhdpi_22sp</item>
         <item name="android:textColor">?attr/textColor</item>
         <item name="android:gravity">center</item>
         <item name="android:background">?attr/button</item>
@@ -80,7 +80,7 @@
 
     <!-- lv01标题字体格式 -->
     <style name="lv01TxtStyle">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">@dimen/xhdpi_20sp</item>
         <item name="android:textColor">?attr/textColor</item>
         <item name="android:gravity">center</item>
     </style>

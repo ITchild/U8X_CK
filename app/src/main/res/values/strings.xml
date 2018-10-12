@@ -24,8 +24,8 @@
     <string name="str_about">关于仪器</string>
     
     <string name="str_makeSure">确定</string>
-    <string name="str_prompt">提示</string>
-    <string name="str_noAc_msg">暂未开通，敬请期待</string>
+    <string name="str_prompt">提示信息</string>
+    <string name="str_noAc_msg">暂未开放，敬请期待</string>
 
     <string name="str_back">返回</string>
 
@@ -46,4 +46,32 @@
 
     <string name="str_toLeft">左移</string>
     <string name="str_toRight">右移</string>
+
+    <string name="str_selectAll">全选</string>
+    <string name="str_cancelAll">取消全选</string>
+    <string name="str_noChice">没有选中项</string>
+
+    <string name="str_delMsg">确定要删除选中\n的工程或者构件吗？</string>
+    <string name="str_noU_pan">未检测到U盘</string>
+    <string name="str_pleaseOnHand">请手动拷贝文件。</string>
+    <string name="str_ToUError">转U盘失败</string>
+    <string name="str_pleaseUseU">请插入U盘</string>
+    <string name="str_System_Low">该安卓版本无法\n拷贝文件，请手动复制</string>
+    <string name="str_NoneUPan">未检测到U盘，如您已经\n插入U盘，请拔掉后重新插入。</string>
+
+
+    <string name="str_companyName">公司名称</string>
+    <string name="str_companyNameCon">北京海创高科科技有限公司</string>
+    <string name="str_compantNet">公司网址</string>
+    <string name="str_compantNetCon">http://www.bjhcgk.com</string>
+    <string name="str_phone">联系电话</string>
+    <string name="str_phoneNum">400-010-5818</string>
+    <string name="str_divice">仪器编号</string>
+    <string name="str_diviceNum">85117110001</string>
+
+    <string name="str_hardVision">硬件版本</string>
+    <string name="str_SysVision">系统版本</string>
+    <string name="str_lastVision">软件版本</string>
+    <string name="str_freeSpace">剩余空间</string>
+
 </resources>

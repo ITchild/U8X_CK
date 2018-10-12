@@ -28,10 +28,11 @@
 
     <ImageView
         android:id="@+id/baseTitle_power_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/xhdpi_80dp"
+        android:layout_height="@dimen/xhdpi_40dp"
         android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         android:layout_marginRight="@dimen/xhdpi_10dp"
-        android:src="@drawable/checkbox_on" />
+        android:src="@drawable/power" />
 
 </RelativeLayout>

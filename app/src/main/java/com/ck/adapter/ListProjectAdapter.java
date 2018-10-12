@@ -27,6 +27,11 @@ public class ListProjectAdapter extends BaseAdapter {
         mProjects = projects;
     }
 
+    public void setData(List<ClasFileProjectInfo> projects,int nSelect){
+        this.nSelect = nSelect;
+        this.mProjects = projects;
+        notifyDataSetChanged();
+    }
     public void setSelect(int nSelect) {
         this.nSelect = nSelect;
         this.notifyDataSetChanged();
@@ -34,26 +39,18 @@ public class ListProjectAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mProjects.size();
-    }        @Override
+        return null == mProjects ? 0 : mProjects.size();
+    }
+
+    @Override
     public Object getItem(int position) {
         return mProjects.get(position);
     }
 
-    class ViewHolder {
-        TextView m_TVProject;
-        LinearLayout m_LL;
-
-        public ViewHolder(View view) {
-            m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
-            m_LL = (LinearLayout) view.findViewById(R.id.ui_list_project);
-        }
-    }        @Override
+    @Override
     public long getItemId(int position) {
         return position;
     }
-
-
 
     @Override
     public View getView(final int position, View view, ViewGroup arg2) {
@@ -75,5 +72,15 @@ public class ListProjectAdapter extends BaseAdapter {
         holder.m_TVProject.setText(mProjects.get(position).mFileProjectName);
 
         return view;
+    }
+
+    class ViewHolder {
+        TextView m_TVProject;
+        LinearLayout m_LL;
+
+        public ViewHolder(View view) {
+            m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
+            m_LL = (LinearLayout) view.findViewById(R.id.ui_list_project);
+        }
     }
 }

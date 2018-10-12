@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="检定时间"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/settingCheck_checkTime_tv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:gravity="center"
+            android:text="2018-09-07"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="检定周期"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/settingCheck_checkCircle_tv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:gravity="center"
+            android:text="半年"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="检定提醒"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+            <CheckBox
+                android:id="@+id/settingCheck_checkNotice_cb"
+                android:layout_width="@dimen/xhdpi_90dp"
+                android:layout_height="@dimen/xhdpi_70dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/cb_switch_bt"
+                android:button="@null"
+                android:textColor="?attr/textColor" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

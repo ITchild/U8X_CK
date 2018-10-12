@@ -7,7 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.ck.adapter.HomeDisAdapter;
-import com.ck.collect.Ui_FileSelete;
+import com.ck.base.TitleBaseActivity;
 import com.hc.u8x_ck.R;
 
 import java.util.ArrayList;
@@ -19,14 +19,23 @@ public class HomeActivity extends TitleBaseActivity {
     private HomeDisAdapter mHomeDisAdapter;
     private List<String> homeDisData ;
     @Override
-    protected int setLayout() {
+    protected int initLayout() {
         return R.layout.ac_home;
+    }
+
+    @Override
+    protected boolean isBackshow() {
+        return false;
     }
 
     @Override
     protected void initView() {
         super.initView();
         home_display = findViewById(R.id.home_display);
+
+//        Log.i("fei", DisplayUtil.getScreenWidth(this)+"*" +
+//        DisplayUtil.getScreenHeight(this)+"  屏幕像素密度： "
+//                +DisplayUtil.getScreenDensity(this));
     }
 
     @Override
@@ -81,13 +90,14 @@ public class HomeActivity extends TitleBaseActivity {
      */
     private void jumpToCollect(){
         startActivity(new Intent(this, CollectActivity.class));
+//        startActivity(new Intent(this,USBCollectActivity.class));
     }
 
     /**
      * 跳转到文件管理界面
      */
     private void jumpToFileManger(){
-        startActivity(new Intent(this, Ui_FileSelete.class));
+        startActivity(new Intent(this, FileBowerActivity.class));
     }
 
     private void jumpToSetting(){
@@ -97,7 +107,6 @@ public class HomeActivity extends TitleBaseActivity {
     private void jumpToAbout(){
         startActivity(new Intent(this,AboutActivity.class));
     }
-
 
     /**
      * 显示的提示框

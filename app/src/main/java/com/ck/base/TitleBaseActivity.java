@@ -1,36 +1,22 @@
-package com.ck.activity;
+package com.ck.base;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
 
-import com.ck.main.BaseActivity;
 import com.hc.u8x_ck.R;
 
-public abstract class TitleBaseActivity extends BaseActivity {
+public abstract class TitleBaseActivity extends U8BaseAc {
 
     private TextClock baseTitle_clock_tc;
     private TextView baseTitle_title_tv;
     private ImageView baseTitle_power_iv;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(setLayout());
-        initView();
-        initData();
-        initListener();
-    }
-
-    protected abstract int setLayout();
-
 
     protected void initView(){
         baseTitle_clock_tc = findViewById(R.id.baseTitle_clock_tc);

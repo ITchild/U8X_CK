@@ -13,6 +13,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.Button;
 
+import com.ck.ui.CameraView;
 import com.ck.utils.FindLieFenUtils;
 
 /**

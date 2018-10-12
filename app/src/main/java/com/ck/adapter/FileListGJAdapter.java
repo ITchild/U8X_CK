@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -12,15 +13,16 @@ import com.ck.info.ClasFileProjectInfo;
 import com.ck.main.App_DataPara;
 import com.hc.u8x_ck.R;
 
-public class ListGJAdapter extends BaseAdapter {
+public class FileListGJAdapter extends BaseAdapter {
     public static final int File = 0;
     public static final int Folder = 0;
     ClasFileProjectInfo mProject;
     ViewHolder holder;
     private Context mContext;
-    private int nSelect = 0;
+    private int nSelect;
+    private OnFileGJItemClick mOnFileGJItemClick;
 
-    public ListGJAdapter(Context context, ClasFileProjectInfo project) {
+    public FileListGJAdapter(Context context, ClasFileProjectInfo project) {
         mContext = context;
         mProject = project;
     }
@@ -30,10 +32,14 @@ public class ListGJAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-    public void setData(ClasFileProjectInfo mProject,int nSelect){
-        this.mProject = mProject;
+    public void setData(ClasFileProjectInfo project, int nSelect) {
+        this.mProject = project;
         this.nSelect = nSelect;
-        this.notifyDataSetChanged();
+        notifyDataSetChanged();
+    }
+
+    public int getSelect() {
+        return this.nSelect;
     }
 
     public void setSelect(int nSelect) {
@@ -72,6 +78,24 @@ public class ListGJAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) view.getTag();
         }
+        holder.mCBNidx.setText(" " + (position + 1));
+        holder.mCBNidx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(null != mOnFileGJItemClick) {
+                    mOnFileGJItemClick.onGJSelect(true, position);
+                }
+            }
+        });
+        holder.gjBackGround_ll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(null != mOnFileGJItemClick) {
+                    mOnFileGJItemClick.onGJSelect(false, position);
+                }
+            }
+        });
+
         if (nSelect == position) {
             holder.m_LL.setBackgroundColor(Color.rgb(246, 184, 00));
         } else {
@@ -80,18 +104,46 @@ public class ListGJAdapter extends BaseAdapter {
             else
                 holder.m_LL.setBackgroundColor(Color.WHITE);
         }
+        holder.mCBNidx.setChecked(mProject.mstrArrFileGJ.get(position).bIsSelect);
         holder.m_TVProject.setText(mProject.mstrArrFileGJ.get(position).mFileGJName.substring(0, mProject.mstrArrFileGJ.get(position).mFileGJName.length() - 4));
+        holder.m_TVTime.setText("" + mProject.mstrArrFileGJ.get(position).mLastModifiedDate + "");
 
         return view;
     }
 
+    public void setOnFileGJItemClick(OnFileGJItemClick onFileGJItemClick) {
+        mOnFileGJItemClick = onFileGJItemClick;
+    }
+
+    public interface OnFileGJItemClick {
+        void onGJSelect(boolean isSelect, int position);
+    }
+
     class ViewHolder {
+        CheckBox mCBNidx;
         TextView m_TVProject;
+        TextView m_TVTime;
         LinearLayout m_LL;
+        LinearLayout gjBackGround_ll;
 
         public ViewHolder(View view) {
-            m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
-            m_LL = (LinearLayout) view.findViewById(R.id.ui_list_gj);
+            if(null == mCBNidx) {
+                mCBNidx = (CheckBox) view.findViewById(R.id.project_checkboxID);
+            }
+            if(null == m_TVProject) {
+                m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
+            }
+            if(null == m_TVTime) {
+                m_TVTime = (TextView) view.findViewById(R.id.tv_time);
+            }
+            mCBNidx.setVisibility(View.VISIBLE);
+            m_TVTime.setVisibility(View.VISIBLE);
+            if(null ==m_LL) {
+                m_LL = (LinearLayout) view.findViewById(R.id.ui_list_gj);
+            }
+            if(null == gjBackGround_ll){
+                gjBackGround_ll = view.findViewById(R.id.LinearLayout1);
+            }
         }
     }
 }

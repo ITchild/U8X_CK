@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="640dp"
+    android:layout_height="480dp">
+
+    <ImageView
+        android:id="@+id/showPic_back_iv"
+        android:layout_width="@dimen/xhdpi_70dp"
+        android:layout_height="@dimen/xhdpi_70dp"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/diss"/>
+
+    <ImageView
+        android:id="@+id/showPic_show_iv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_toLeftOf="@id/showPic_back_iv"
+        android:layout_below="@id/showPic_back_iv"
+        />
+
+
+</RelativeLayout>

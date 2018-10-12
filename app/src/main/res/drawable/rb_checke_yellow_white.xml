@@ -1,0 +1,6 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/btn_bkcolor_yellow" android:state_checked="true"/>
+    <item android:drawable="@drawable/btn_bkcolor_white" android:state_checked="false"/>
+    <!-- default -->
+    <item android:drawable="@drawable/btn_bkcolor_white"/>
+</selector>

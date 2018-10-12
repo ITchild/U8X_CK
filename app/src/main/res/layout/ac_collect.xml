@@ -36,7 +36,7 @@
                     android:layout_weight="1"
                     android:background="#00ffffff" />
 
-                <com.ck.collect.CameraView
+                <com.ck.ui.CameraView
                     android:id="@+id/collect_cameraView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -71,7 +71,7 @@
                     android:paddingLeft="@dimen/xhdpi_10dp"
                     android:text="工程列表"
                     android:textColor="#ffffff"
-                    android:textSize="20sp" />
+                    android:textSize="@dimen/xhdpi_27sp" />
 
                 <View
                     android:layout_width="wrap_content"
@@ -79,7 +79,7 @@
                     android:background="?attr/textColor" />
 
                 <ListView
-                    android:id="@+id/list_pro"
+                    android:id="@+id/collect_proList_lv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="3.5"
@@ -99,7 +99,7 @@
                     android:paddingLeft="@dimen/xhdpi_10dp"
                     android:text="文件列表"
                     android:textColor="#ffffff"
-                    android:textSize="20sp" />
+                    android:textSize="@dimen/xhdpi_27sp" />
 
                 <View
                     android:layout_width="wrap_content"
@@ -107,7 +107,7 @@
                     android:background="?attr/textColor" />
 
                 <ListView
-                    android:id="@+id/list_file"
+                    android:id="@+id/collect_fileList_lv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="5.5"
@@ -161,18 +161,6 @@
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_30sp" />
 
-        <!--<Button-->
-        <!--android:id="@+id/ButtonLayout2"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_weight="1"-->
-        <!--android:background="?attr/button"-->
-        <!--android:gravity="center"-->
-        <!--android:onClick="onOpenFile"-->
-        <!--android:text="文件"-->
-        <!--android:textColor="?attr/textColor"-->
-        <!--android:textSize="@dimen/xhdpi_30sp" />-->
-
         <Button
             android:id="@+id/collect_autoOrhand_bt"
             android:layout_width="0dp"
@@ -193,8 +181,8 @@
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_23sp" />
 
-        <com.ck.collect.View_LongButton
-            android:id="@+id/collect_left_lbt"
+        <Button
+            android:id="@+id/collect_left_bt"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -203,8 +191,8 @@
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_30sp" />
 
-        <com.ck.collect.View_LongButton
-            android:id="@+id/collect_right_lbt"
+        <Button
+            android:id="@+id/collect_right_bt"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

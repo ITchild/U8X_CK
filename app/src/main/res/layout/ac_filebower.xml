@@ -1,0 +1,198 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:orientation="vertical" >
+
+    <include layout="@layout/ac_basetitle"></include>
+
+    <LinearLayout
+        android:id="@+id/Layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:visibility="visible" >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xhdpi_40dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="@dimen/xhdpi_80dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/xhdpi_10dp"
+                    android:text="NO"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:layout_weight="4.5"
+                    android:gravity="center_vertical"
+                    android:text="工程名"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:layout_weight="2.5"
+                    android:gravity="center"
+                    android:text="文件数"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:layout_weight="3.5"
+                    android:gravity="center"
+                    android:text="更新日期"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="?attr/textColor" />
+
+            <ListView
+                android:id="@+id/fileBower_proList_lv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </ListView>
+        </LinearLayout>
+
+        <View
+            android:layout_width="@dimen/xhdpi_2dp"
+            android:layout_height="match_parent"
+            android:background="?attr/textColor" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xhdpi_40dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="@dimen/xhdpi_70dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/xhdpi_10dp"
+                    android:text="NO"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:layout_weight="6.5"
+                    android:gravity="center_vertical"
+                    android:text="文件"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:layout_weight="2.5"
+                    android:gravity="center"
+                    android:text="更新日期"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/xhdpi_2dp"
+                android:background="?attr/textColor" />
+
+            <ListView
+                android:id="@+id/fileBower_fileList_lv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </ListView>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/xhdpi_2dp"
+        android:background="?attr/textColor" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/background" >
+
+        <Button
+            android:id="@+id/Button01"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/fileBower_select_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text="@string/str_selectAll"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/fileBower_toUsb_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text="转U盘"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/fileBower_del_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text="删除"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/fileBower_back_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text="返回"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+    </LinearLayout>
+
+</LinearLayout>

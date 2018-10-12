@@ -1,6 +1,5 @@
 package com.ck.main;
 
-import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,16 +7,19 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.ck.netcloud.ClasSysPara;
 import com.ck.utils.DBService;
+import com.fei.feilibs_1_0_0.BaseApplication;
 import com.hc.u8x_ck.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class App_DataPara extends Application {
+public class App_DataPara extends BaseApplication {
 	/**
 	 * 屏幕密度
 	 */
@@ -58,6 +60,16 @@ public class App_DataPara extends Application {
 		RegistDiskReceiver();
 		initPro();
 		initRegisterTime();
+	}
+
+	/**
+	 * 崩溃文件的文件位置
+	 * @return
+	 */
+	@Override
+	protected String setErrorLogPath() {
+		return Environment.getExternalStorageDirectory().getAbsolutePath()+
+				"/"+getPackageName()+"/错误日志";
 	}
 
 	public static App_DataPara getApp(){
@@ -107,6 +119,7 @@ public class App_DataPara extends Application {
 
 			if (intent.getAction().equals(Intent.ACTION_MEDIA_MOUNTED)) {// 插入设备
 				m_strESDir = pathString;
+				Log.i("fei",pathString + "        "+ intent.getDataString());
 				Toast.makeText(context, "U盘已插入", Toast.LENGTH_SHORT).show();
 			} else if (intent.getAction().equals(Intent.ACTION_MEDIA_EJECT)) {
 				m_strESDir = null;

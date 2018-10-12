@@ -25,6 +25,7 @@ import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
 import com.ck.main.App_DataPara;
 import com.ck.main.BaseActivity;
+import com.ck.ui.CameraView;
 import com.ck.utils.FileUtil;
 import com.ck.utils.PathUtils;
 import com.ck.utils.PreferenceHelper;

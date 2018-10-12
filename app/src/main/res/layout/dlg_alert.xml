@@ -41,7 +41,7 @@
             android:layout_marginLeft="@dimen/xhdpi_15dp"
             android:layout_marginRight="@dimen/xhdpi_15dp"
             android:layout_weight="1"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:text="确定要删除选中仪器编号？\n删除后不能恢复。"
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_28sp" />

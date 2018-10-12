@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="蓝牙开关"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+            <CheckBox
+                android:id="@+id/settingPar_buleThooth_cb"
+                android:layout_width="@dimen/xhdpi_90dp"
+                android:layout_height="@dimen/xhdpi_70dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/cb_switch_bt"
+                android:button="@null"
+                android:textColor="?attr/textColor" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="按键声音"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+            <CheckBox
+                android:id="@+id/settingPar_keyVice_cb"
+                android:layout_width="@dimen/xhdpi_90dp"
+                android:layout_height="@dimen/xhdpi_70dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/cb_switch_bt"
+                android:button="@null"
+                android:textColor="?attr/textColor" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="背光亮度"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+            <SeekBar
+                android:id="@+id/settingPar_light_sb"
+                android:layout_width="@dimen/xhdpi_300dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:max="100" />
+
+            <TextView
+                android:id="@+id/settingPar_light_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/xhdpi_10dp"
+                android:layout_toRightOf="@id/settingPar_light_sb"
+                android:text="0"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/xhdpi_20sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="仪器编号"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/settingPar_devNum_tv"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:gravity="center"
+            android:text="123456789009876"
+            android:textColor="?attr/textColor" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_90dp"
+        android:background="@drawable/btn_bkcolor_white"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="操作密码"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/settingPar_pwd_tv"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:gravity="center"
+            android:text="00000"
+            android:textColor="?attr/textColor" />
+    </LinearLayout>
+
+</LinearLayout>
