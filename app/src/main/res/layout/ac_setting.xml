@@ -18,6 +18,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="right"
+            android:background="?attr/background"
             android:orientation="vertical">
 
             <RadioGroup
@@ -25,13 +26,14 @@
                 android:layout_width="@dimen/xhdpi_300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/xhdpi_2dp"
+                android:background="?attr/background"
                 android:orientation="vertical">
 
                 <RadioButton
                     android:id="@+id/setting_parm_rb"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/xhdpi_90dp"
-                    android:background="@drawable/rb_checke_yellow_white"
+                    android:background="?attr/checkBox"
                     android:button="@null"
                     android:checked="true"
                     android:gravity="center"
@@ -43,7 +45,7 @@
                     android:id="@+id/setting_time_rb"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/xhdpi_90dp"
-                    android:background="@drawable/rb_checke_yellow_white"
+                    android:background="?attr/checkBox"
                     android:button="@null"
                     android:gravity="center"
                     android:text="时间设置"
@@ -54,7 +56,7 @@
                     android:id="@+id/setting_check_rb"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/xhdpi_90dp"
-                    android:background="@drawable/rb_checke_yellow_white"
+                    android:background="?attr/checkBox"
                     android:button="@null"
                     android:gravity="center"
                     android:text="检定设置"
@@ -68,6 +70,7 @@
             android:layout_height="match_parent"
             android:layout_marginRight="@dimen/xhdpi_70dp"
             android:layout_weight="2"
+            android:background="?attr/background"
             android:orientation="vertical">
 
             <LinearLayout

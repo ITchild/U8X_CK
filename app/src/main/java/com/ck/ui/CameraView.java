@@ -46,6 +46,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public Camera m_Camera;
     public byte m_Buffer[];
     public int m_nTextureBuffer[];
+    private float m_unitWidth;
     public int m_nPreviewWidth, m_nPreviewHeight;
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
@@ -281,8 +282,8 @@ public class CameraView extends View implements Camera.PreviewCallback {
                 return; //防止异步线程中将m_DrawBitmap回收（在这里进行检测）
             }
             String str = "裂缝宽度检测";
-            Paint paint = getPaint(Style.FILL, 3, Color.RED,
-                    mContext.getResources().getDimension(R.dimen.xhdpi_40sp));
+            Paint paint = getPaint(Style.FILL, 5, Color.RED,
+                    mContext.getResources().getDimension(R.dimen.x50));
             float fWidth = paint.measureText(str);
             canvas.drawText(str, m_nScreenWidth / 2 - fWidth / 2, m_nScreenHeight / 2, paint);
             return;
@@ -304,11 +305,12 @@ public class CameraView extends View implements Camera.PreviewCallback {
         if (m_bOpenOldFile) {
             return;
         }
-        int nL = (int) ((float) FindLieFenUtils.m_nLLineSite / m_DrawBitmap.getWidth() * m_nScreenWidth);
-        int nR = (int) ((float) FindLieFenUtils.m_nRLineSite / m_DrawBitmap.getWidth() * m_nScreenWidth);
 
+        float nL = ( FindLieFenUtils.m_nLLineSite / m_DrawBitmap.getWidth()) * m_nScreenWidth;
+        float nR = (FindLieFenUtils.m_nRLineSite / m_DrawBitmap.getWidth()) * m_nScreenWidth;
         int nYMid = m_nScreenHeight / 2;
         m_PaintDrawLine.setColor(Color.RED);
+        m_PaintDrawLine.setStrokeWidth(2);
         if (m_nDrawFlag == 1) {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
@@ -326,6 +328,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         canvas.drawLine(nR + 20, nYMid + 20, nR, nYMid, m_PaintDrawLine);
 
         m_PaintDrawLine.setColor(Color.RED);
+        m_PaintDrawLine.setTextSize(30);
         String str = String.format("%.02f", (float) (Math.abs((nR - nL) / m_fXDensity) / 10.00000000)) + "mm";
         canvas.drawText(str, m_nScreenWidth - 50 - m_PaintDrawLine.measureText(str), 60, m_PaintDrawLine);
         if (m_YCanvas == null) {

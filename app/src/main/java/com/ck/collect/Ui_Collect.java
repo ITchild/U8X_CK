@@ -142,8 +142,8 @@ public class Ui_Collect extends BaseActivity {
     }
 
     private void initData() {
-        m_strSaveProName = PreferenceHelper.getProName(this);
-        m_strSaveGJName = PreferenceHelper.getGJName(this);
+        m_strSaveProName = PreferenceHelper.getProName();
+        m_strSaveGJName = PreferenceHelper.getGJName();
         m_ListProject = PathUtils.getProFileList();
 
         m_ProjectAdapter = new ListProjectAdapter(this, m_ListProject);
@@ -277,7 +277,7 @@ public class Ui_Collect extends BaseActivity {
         AppDatPara.m_nGJSeleteNidx = 0;
         initData();
         m_strSaveGJName = FileUtil.GetDigitalPile(m_strSaveGJName);
-        PreferenceHelper.setGJName(this, m_strSaveGJName);
+        PreferenceHelper.setGJName( m_strSaveGJName);
         m_CameraView.setDrawingCacheEnabled(false);
     }
 

@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener {
+public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener,SurfaceHolder.Callback{
 
     public String m_strSaveProName = "默认工程"; //保存图片的默认工程名称
     public String m_strSaveGJName = "默认构件1"; //保存图片的默认文件名称
@@ -92,20 +92,20 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     protected void initView() {
         super.initView();
-        collect_sfv = findViewById(R.id.collect_sfv);
-        collect_cameraView = findViewById(R.id.collect_cameraView);
-        collect_startStop_bt = findViewById(R.id.collect_startStop_bt);
-        collect_save_bt = findViewById(R.id.collect_save_bt);
-        collect_filelist_ll = findViewById(R.id.collect_filelist_ll);
-        collect_blackWrite_cb = findViewById(R.id.collect_blackWrite_cb);
-        collect_proName_et = findViewById(R.id.collect_proName_et);
-        collect_fileName_et = findViewById(R.id.collect_fileName_et);
-        collect_autoOrhand_bt = findViewById(R.id.collect_autoOrhand_bt);
-        collect_Cursor_bt = findViewById(R.id.collect_Cursor_bt);
-        collect_left_bt = findViewById(R.id.collect_left_bt);
-        collect_right_bt = findViewById(R.id.collect_right_bt);
-        collect_proList_lv = findViewById(R.id.collect_proList_lv);
-        collect_fileList_lv = findViewById(R.id.collect_fileList_lv);
+        collect_sfv = findView(R.id.collect_sfv);
+        collect_cameraView = findView(R.id.collect_cameraView);
+        collect_startStop_bt = findView(R.id.collect_startStop_bt);
+        collect_save_bt = findView(R.id.collect_save_bt);
+        collect_filelist_ll = findView(R.id.collect_filelist_ll);
+        collect_blackWrite_cb = findView(R.id.collect_blackWrite_cb);
+        collect_proName_et = findView(R.id.collect_proName_et);
+        collect_fileName_et = findView(R.id.collect_fileName_et);
+        collect_autoOrhand_bt = findView(R.id.collect_autoOrhand_bt);
+        collect_Cursor_bt = findView(R.id.collect_Cursor_bt);
+        collect_left_bt = findView(R.id.collect_left_bt);
+        collect_right_bt = findView(R.id.collect_right_bt);
+        collect_proList_lv = findView(R.id.collect_proList_lv);
+        collect_fileList_lv = findView(R.id.collect_fileList_lv);
         if (null == proData) {
             proData = new ArrayList<>();
         }
@@ -303,12 +303,15 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onCollectStart() {
         collect_cameraView.setStartView();
-        mHolder = collect_sfv.getHolder();
-        collect_cameraView.setHolder(mHolder);
         collect_cameraView.onenCamera(new OnOpenCameraListener() {
             @Override
             public void OnOpenCameraResultListener(boolean bResult) {
                 if (bResult) {
+                    if (null == mHolder){
+                        mHolder = collect_sfv.getHolder();
+                        mHolder.addCallback(CollectActivity.this);
+                    }
+                    collect_cameraView.setHolder(mHolder);
                     collect_cameraView.setCountMode(true);
                     collect_cameraView.setZY(0);
                     changeStartStopTakeView(Catition.CollectView.START);
@@ -413,17 +416,23 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private void onMoveLeftRight(boolean isToLeft, boolean isLongClick) {
         if (isToLeft) { //光标左移的处理
             if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
-                if (FindLieFenUtils.m_nLLineSite > 0)
-                    FindLieFenUtils.m_nLLineSite--;
+                if (FindLieFenUtils.m_nLLineSite > 0) {
+//                    FindLieFenUtils.m_nLLineSite--;
+                    FindLieFenUtils.LLineToLOrR(true);
+                }
             } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
-                if (FindLieFenUtils.m_nRLineSite > 0)
-                    FindLieFenUtils.m_nRLineSite--;
+                if (FindLieFenUtils.m_nRLineSite > 0) {
+//                    FindLieFenUtils.m_nRLineSite--;
+                    FindLieFenUtils.RLineToLOrR(true);
+                }
             }
         } else { //光标右移的处理
             if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
-                FindLieFenUtils.m_nLLineSite++;
+//                FindLieFenUtils.m_nLLineSite++;
+                FindLieFenUtils.LLineToLOrR(false);
             } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
-                FindLieFenUtils.m_nRLineSite++;
+//                FindLieFenUtils.m_nRLineSite++;
+                FindLieFenUtils.RLineToLOrR(false);
             }
         }
         collect_cameraView.onMove();
@@ -509,5 +518,22 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+        if(null != collect_cameraView.m_Camera) {
+            collect_cameraView.m_Camera.startPreview();
+        }
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
     }
 }

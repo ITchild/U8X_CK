@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,14 +18,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="8"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:visibility="visible">
 
             <RelativeLayout
                 android:id="@+id/collect_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/black"
+                android:background="?attr/background"
+                android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <SurfaceView
@@ -34,21 +34,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#00ffffff" />
+                    android:background="?attr/background" />
 
                 <com.ck.ui.CameraView
                     android:id="@+id/collect_cameraView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="?attr/background"
                     android:layout_weight="1" />
 
-                <View
-                    android:layout_width="@dimen/xhdpi_2dp"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentRight="true"
-                    android:background="?attr/textColor"
-                    android:visibility="gone" />
             </RelativeLayout>
+            <View
+                android:layout_width="@dimen/x2"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:background="?attr/textColor" />
         </LinearLayout>
 
         <LinearLayout
@@ -66,11 +66,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/xhdpi_45dp"
-                    android:background="#3d3b3b"
+                    android:background="?attr/background"
                     android:gravity="center_vertical"
                     android:paddingLeft="@dimen/xhdpi_10dp"
                     android:text="工程列表"
-                    android:textColor="#ffffff"
+                    android:textColor="?attr/textColor"
                     android:textSize="@dimen/xhdpi_27sp" />
 
                 <View
@@ -94,11 +94,11 @@
                     android:id="@+id/textView1"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/xhdpi_45dp"
-                    android:background="#3d3b3b"
+                    android:background="?attr/background"
                     android:gravity="center_vertical"
                     android:paddingLeft="@dimen/xhdpi_10dp"
                     android:text="文件列表"
-                    android:textColor="#ffffff"
+                    android:textColor="?attr/textColor"
                     android:textSize="@dimen/xhdpi_27sp" />
 
                 <View

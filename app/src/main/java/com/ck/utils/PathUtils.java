@@ -72,7 +72,7 @@ public class PathUtils {
         // File projectFile = new File(PathUtils.PROJECT_PATH);
         File[] proList = OrderByDate(PathUtils.PROJECT_PATH);
 
-        SimpleDateFormat format = new SimpleDateFormat("yy/MM/dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         ArrayList<ClasFileProjectInfo> m_ListProject = new ArrayList<ClasFileProjectInfo>();
         for (int i = 0; i < proList.length; i++) {
             ClasFileProjectInfo project = new ClasFileProjectInfo();

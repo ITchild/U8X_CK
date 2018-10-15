@@ -1,12 +1,16 @@
 package com.ck.activity;
 
+import android.content.Intent;
+import android.provider.Settings;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ck.base.TitleBaseActivity;
+import com.ck.utils.PreferenceHelper;
 import com.hc.u8x_ck.R;
 
 public class SettingActivity extends TitleBaseActivity {
@@ -17,6 +21,7 @@ public class SettingActivity extends TitleBaseActivity {
 
     private SeekBar settingPar_light_sb;//背光亮度
     private TextView settingPar_light_tv;//背光亮度数值显示
+    private CheckBox settingPar_theme_cb;//主题的选项
 
     @Override
     protected int initLayout() {
@@ -31,18 +36,25 @@ public class SettingActivity extends TitleBaseActivity {
     @Override
     protected void initView() {
         super.initView();
-        setting_tab_rg = findViewById(R.id.setting_tab_rg);
-        setting_parm_ll = findViewById(R.id.setting_parm_ll);
-        setting_time_ll = findViewById(R.id.setting_time_ll);
-        setting_check_ll = findViewById(R.id.setting_check_ll);
+        setting_tab_rg = findView(R.id.setting_tab_rg);
+        setting_parm_ll = findView(R.id.setting_parm_ll);
+        setting_time_ll = findView(R.id.setting_time_ll);
+        setting_check_ll = findView(R.id.setting_check_ll);
 
-        settingPar_light_sb = findViewById(R.id.settingPar_light_sb);
-        settingPar_light_tv = findViewById(R.id.settingPar_light_tv);
+        settingPar_light_sb = findView(R.id.settingPar_light_sb);
+        settingPar_light_tv = findView(R.id.settingPar_light_tv);
+        settingPar_theme_cb = findView(R.id.settingPar_theme_cb);
     }
 
     @Override
     protected void initData() {
         super.initData();
+        int theme = PreferenceHelper.getTheme();
+        settingPar_theme_cb.setChecked(theme == R.style.AppTheme_White
+                ? true : false);
+        int light = PreferenceHelper.getScreenLisght();
+        settingPar_light_sb.setProgress(light);
+        settingPar_light_tv.setText(light+"");
     }
 
     @Override
@@ -51,6 +63,7 @@ public class SettingActivity extends TitleBaseActivity {
         findViewById(R.id.setting_back_bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                startActivity(new Intent(SettingActivity.this,HomeActivity.class));
                 finish();
             }
         });
@@ -81,10 +94,31 @@ public class SettingActivity extends TitleBaseActivity {
             public void onStartTrackingTouch(SeekBar seekBar) {
 
             }
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                PreferenceHelper.setScreenLight(seekBar.getProgress());
+            }
+        });
+        findViewById(R.id.settingtime_date_bt).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+        settingPar_theme_cb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!settingPar_theme_cb.isChecked()){
+                    //日间
+                    PreferenceHelper.setTheme(R.style.AppTheme_Black);
+                    settingPar_theme_cb.setChecked(true);
+                }else{
+                    //夜间
+                    PreferenceHelper.setTheme(R.style.AppTheme_White);
+                    settingPar_theme_cb.setChecked(false);
+                }
+                recreate();
             }
         });
     }
@@ -111,6 +145,19 @@ public class SettingActivity extends TitleBaseActivity {
                 setting_check_ll.setVisibility(View.VISIBLE);
                 break;
         }
+    }
+
+    /**
+     * 监听Back键按下事件,方法1:
+     * 注意:
+     * super.onBackPressed()会自动调用finish()方法,关闭
+     * 当前Activity.
+     * 若要屏蔽Back键盘,注释该行代码即可
+     */
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(SettingActivity.this,HomeActivity.class));
+        super.onBackPressed();
     }
 
 }

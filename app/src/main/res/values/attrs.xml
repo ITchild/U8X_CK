@@ -2,6 +2,7 @@
 <resources>
 
     <attr name="button" format="reference" />
+    <attr name="checkBox" format="reference"/>
     <attr name="background" format="reference" />
     <attr name="textColor" format="reference" />
 

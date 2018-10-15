@@ -131,8 +131,8 @@ public class DLG_SetPar extends Dialog implements android.view.View.OnClickListe
 			}
 			File path = new File(PathUtils.PROJECT_PATH, m_Ui_Collect.m_strSaveProName);
 			path.mkdirs();
-			PreferenceHelper.setGJName(mContext, m_Ui_Collect.m_strSaveGJName);
-			PreferenceHelper.setProName(mContext, m_Ui_Collect.m_strSaveProName);
+			PreferenceHelper.setGJName( m_Ui_Collect.m_strSaveGJName);
+			PreferenceHelper.setProName( m_Ui_Collect.m_strSaveProName);
 			m_Ui_Collect.initView();
 			this.dismiss();
 			break;

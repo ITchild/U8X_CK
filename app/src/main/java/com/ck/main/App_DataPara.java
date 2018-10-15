@@ -1,5 +1,6 @@
 package com.ck.main;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +18,9 @@ import com.fei.feilibs_1_0_0.BaseApplication;
 import com.hc.u8x_ck.R;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class App_DataPara extends BaseApplication {
 	/**
@@ -52,6 +55,7 @@ public class App_DataPara extends BaseApplication {
 	 * 构件ListView选择item
 	 */
 	public int m_nGJSeleteNidx = -1;
+	private List<Activity> acList ;
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -60,6 +64,30 @@ public class App_DataPara extends BaseApplication {
 		RegistDiskReceiver();
 		initPro();
 		initRegisterTime();
+	}
+
+	public void addAcToList(Activity activity){
+		if(null == acList){
+			acList = new ArrayList<>();
+		}
+		acList.remove(activity);
+		acList.add(activity);
+	}
+	public void removeAcFromList(Activity activity){
+		if(null == acList || acList.size() <= 0){
+			return;
+		}
+		acList.remove(activity);
+	}
+
+	public void finishAll(){
+		if(null == acList){
+			return;
+		}
+		Log.i("fei",acList.size()+"");
+		for (Activity activity : acList){
+			activity.finish();
+		}
 	}
 
 	/**

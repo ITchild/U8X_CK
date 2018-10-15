@@ -11,8 +11,8 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/xhdpi_10dp"
-        android:format24Hour="yyyy-MM-dd hh:mm:ss"
-        android:textColor="@color/white"
+        android:format24Hour="yyyy-MM-dd HH:mm:ss"
+        android:textColor="?attr/textColor"
         android:textSize="@dimen/xhdpi_22sp" />
 
 
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="@string/str_acTitle"
-        android:textColor="@color/white"
+        android:textColor="?attr/textColor"
         android:textSize="@dimen/xhdpi_25sp" />
 
 

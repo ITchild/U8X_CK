@@ -16,13 +16,14 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/xhdpi_10dp"
             android:text="@string/str_proName"
-            android:textColor="@color/white"
+            android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_27sp" />
 
         <EditText
             android:id="@+id/collect_proName_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?attr/textColor"
             android:layout_margin="@dimen/xhdpi_10dp" />
 
         <TextView
@@ -30,13 +31,14 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/xhdpi_10dp"
             android:text="@string/str_fileName"
-            android:textColor="@color/white"
+            android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_27sp" />
 
         <EditText
             android:id="@+id/collect_fileName_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?attr/textColor"
             android:layout_margin="@dimen/xhdpi_10dp" />
     </LinearLayout>
 
@@ -52,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/str_blackWrite"
-            android:textColor="@color/white" />
+            android:textColor="?attr/textColor" />
 
         <Button
             android:id="@+id/collect_enlarge_bt"

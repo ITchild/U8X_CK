@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1.5"
             android:gravity="center"
-            android:text="日期设置"
+            android:text="日期/时间设置"
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_25sp" />
 
@@ -26,15 +26,30 @@
             android:layout_height="match_parent"
             android:layout_weight="5"
             android:gravity="center"
+            android:visibility="gone"
             android:text="2018-08-09"
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_23sp" />
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="5">
+
+            <Button
+                android:id="@+id/settingtime_date_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/black"
+                android:text="去设置"/>
+        </RelativeLayout>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <TextView
@@ -59,7 +74,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -85,7 +100,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -111,7 +126,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 

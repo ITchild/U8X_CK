@@ -88,9 +88,9 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         filter.addAction(BroadcastAction.UpdataProgress);
         registerReceiver(mReceiver, filter);
 
-        fileBower_select_bt = findViewById(R.id.fileBower_select_bt);
-        fileBower_proList_lv = findViewById(R.id.fileBower_proList_lv);
-        fileBower_fileList_lv = findViewById(R.id.fileBower_fileList_lv);
+        fileBower_select_bt = findView(R.id.fileBower_select_bt);
+        fileBower_proList_lv = findView(R.id.fileBower_proList_lv);
+        fileBower_fileList_lv = findView(R.id.fileBower_fileList_lv);
         if (null == proData) {
             proData = new ArrayList<>();
         }

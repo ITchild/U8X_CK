@@ -22,7 +22,7 @@ public class BaseActivity extends Activity {
 		AppDatPara = (App_DataPara) getApplicationContext();
 
 		if (savedInstanceState == null) {
-			AppDatPara.nTheme = PreferenceHelper.getTheme(this);
+			AppDatPara.nTheme = PreferenceHelper.getTheme();
 		} else {
 			AppDatPara.nTheme = savedInstanceState.getInt("theme");
 		}
@@ -35,7 +35,7 @@ public class BaseActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (AppDatPara.nTheme != PreferenceHelper.getTheme(this)) {
+		if (AppDatPara.nTheme != PreferenceHelper.getTheme()) {
 			reload();
 		}
 	}

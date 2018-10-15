@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -33,7 +33,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -60,7 +60,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/xhdpi_90dp"
-        android:background="@drawable/btn_bkcolor_white"
+        android:background="?attr/button"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 

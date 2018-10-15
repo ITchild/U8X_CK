@@ -29,7 +29,7 @@ public abstract class U8BaseAc extends BaseActivity {
         AppDatPara = (App_DataPara) getApplicationContext();
 
         if (savedInstanceState == null) {
-            AppDatPara.nTheme = PreferenceHelper.getTheme(this);
+            AppDatPara.nTheme = PreferenceHelper.getTheme();
         } else {
             AppDatPara.nTheme = savedInstanceState.getInt("theme");
         }
@@ -37,12 +37,19 @@ public abstract class U8BaseAc extends BaseActivity {
         setTheme(AppDatPara.nTheme);
     }
 
+
+
+    @Override
+    protected void initView() {
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        if (AppDatPara.nTheme != PreferenceHelper.getTheme(this)) {
+        if (AppDatPara.nTheme != PreferenceHelper.getTheme()) {
             reload();
         }
+        App_DataPara.getApp().addAcToList(this);
     }
 
     @Override
@@ -66,5 +73,12 @@ public abstract class U8BaseAc extends BaseActivity {
      */
     protected void showToast(String str){
         Toast.makeText(this,str,Toast.LENGTH_SHORT).show();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        App_DataPara.getApp().removeAcFromList(this);
     }
 }

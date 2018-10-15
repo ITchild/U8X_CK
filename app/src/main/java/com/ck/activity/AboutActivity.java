@@ -27,10 +27,10 @@ public class AboutActivity extends TitleBaseActivity {
     @Override
     protected void initView() {
         super.initView();
-        about_freeSpace_tv = findViewById(R.id.about_freeSpace_tv);
-        about_softVision_tv = findViewById(R.id.about_softVision_tv);
-        about_sysVision_tv = findViewById(R.id.about_sysVision_tv);
-        about_hardVision_tv = findViewById(R.id.about_hardVision_tv);
+        about_freeSpace_tv = findView(R.id.about_freeSpace_tv);
+        about_softVision_tv = findView(R.id.about_softVision_tv);
+        about_sysVision_tv = findView(R.id.about_sysVision_tv);
+        about_hardVision_tv = findView(R.id.about_hardVision_tv);
     }
 
     @Override

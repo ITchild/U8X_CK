@@ -1,13 +1,12 @@
 package com.ck.activity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.ck.adapter.HomeDisAdapter;
 import com.ck.base.TitleBaseActivity;
+import com.ck.dlg.SigleBtMsgDialog;
 import com.hc.u8x_ck.R;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class HomeActivity extends TitleBaseActivity {
     @Override
     protected void initView() {
         super.initView();
-        home_display = findViewById(R.id.home_display);
+        home_display = findView(R.id.home_display);
 
 //        Log.i("fei", DisplayUtil.getScreenWidth(this)+"*" +
 //        DisplayUtil.getScreenHeight(this)+"  屏幕像素密度： "
@@ -102,6 +101,7 @@ public class HomeActivity extends TitleBaseActivity {
 
     private void jumpToSetting(){
         startActivity(new Intent(this,SettingActivity.class));
+        finish();
     }
 
     private void jumpToAbout(){
@@ -112,16 +112,16 @@ public class HomeActivity extends TitleBaseActivity {
      * 显示的提示框
      */
     private void showMsgDialog(){
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle(getStr(R.string.str_prompt));
-        dialog.setMessage(getStr(R.string.str_noAc_msg));
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getStr(R.string.str_makeSure), new DialogInterface.OnClickListener() {
+        final SigleBtMsgDialog dialog = new SigleBtMsgDialog(this);
+        dialog.show();
+        dialog.setTitleMsg(getStr(R.string.str_prompt));
+        dialog.setMsg(getStr(R.string.str_noAc_msg));
+        dialog.setOnBtClickListener(new SigleBtMsgDialog.OnBtClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onBtClick() {
                 dialog.dismiss();
             }
         });
-        dialog.show();
     }
 
 }

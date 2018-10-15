@@ -3,7 +3,7 @@
     <!-- 连框颜色值 -->
     <item>
         <shape>
-            <solid android:color="#FFFFFF" />
+            <solid android:color="@color/white" />
         </shape>
     </item>
     <!-- 主体背景颜色值 -->
@@ -13,7 +13,7 @@
         android:right="1dp"
         android:top="1dp">
         <shape>
-            <solid android:color="#F6B800" />
+            <solid android:color="@color/yellow" />
         </shape>
     </item>
 </layer-list>

@@ -41,7 +41,7 @@ public class DLG_Alert extends Dialog {
 		setContentView(R.layout.dlg_alert);
 		super.onCreate(savedInstanceState);
 		InitView();
-	};
+	}
 
 	private void InitView() {
 		m_tv_title = (TextView) findViewById(R.id.tv_title);
