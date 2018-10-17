@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ck.info.ClasFileProjectInfo;
-import com.ck.main.App_DataPara;
+import com.ck.App_DataPara;
 import com.hc.u8x_ck.R;
 
 import java.util.List;

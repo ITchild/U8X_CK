@@ -1,4 +1,4 @@
-package com.ck.main;
+package com.ck;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -10,6 +10,7 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.ck.netcloud.ClasSysPara;
@@ -119,8 +120,6 @@ public class App_DataPara extends BaseApplication {
 		
 	}
 
-
-	
 	private IntentFilter mFilter;
 	private String m_strESDir = null;
 
@@ -209,5 +208,10 @@ public class App_DataPara extends BaseApplication {
 			break;
 		}
 		return 0;
+	}
+
+	private WindowManager.LayoutParams wmParams=new WindowManager.LayoutParams();
+	public WindowManager.LayoutParams getMywmParams(){
+		return wmParams;
 	}
 }

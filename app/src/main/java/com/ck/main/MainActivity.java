@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
+import com.ck.App_DataPara;
 import com.ck.collect.Ui_Collect;
 import com.ck.collect.Ui_FileSelete;
 import com.ck.dlg.DLG_Alert;

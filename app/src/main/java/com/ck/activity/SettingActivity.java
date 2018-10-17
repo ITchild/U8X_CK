@@ -9,6 +9,7 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.ck.activity_key.KeyHomeActivity;
 import com.ck.base.TitleBaseActivity;
 import com.ck.utils.PreferenceHelper;
 import com.hc.u8x_ck.R;
@@ -63,7 +64,9 @@ public class SettingActivity extends TitleBaseActivity {
         findViewById(R.id.setting_back_bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SettingActivity.this,HomeActivity.class));
+                Intent intent = new Intent(SettingActivity.this,KeyHomeActivity.class);
+                intent.putExtra("jump","setting");
+                startActivity(intent);
                 finish();
             }
         });

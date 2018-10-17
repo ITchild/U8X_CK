@@ -25,7 +25,7 @@ import android.widget.Toast;
 import com.ck.dlg.DLG_Alert;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
-import com.ck.main.App_DataPara;
+import com.ck.App_DataPara;
 import com.ck.main.BaseActivity;
 import com.ck.utils.BroadcastAction;
 import com.ck.utils.FileUtil;

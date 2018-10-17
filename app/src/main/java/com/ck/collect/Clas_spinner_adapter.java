@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.ck.main.App_DataPara;
+import com.ck.App_DataPara;
 
 public class Clas_spinner_adapter extends ArrayAdapter<String> {
 		private App_DataPara mApp;

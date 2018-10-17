@@ -7,7 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.ck.main.App_DataPara;
+import com.ck.App_DataPara;
 import com.ck.utils.PreferenceHelper;
 import com.fei.feilibs_1_0_0.base.ac.BaseActivity;
 
@@ -50,6 +50,11 @@ public abstract class U8BaseAc extends BaseActivity {
             reload();
         }
         App_DataPara.getApp().addAcToList(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override

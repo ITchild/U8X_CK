@@ -13,7 +13,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 
-import com.ck.main.App_DataPara;
+import com.ck.App_DataPara;
 import com.hc.u8x_ck.R;
 
 /**

@@ -25,7 +25,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ck.main.App_DataPara;
+import com.ck.App_DataPara;
 import com.ck.utils.PathUtils;
 import com.hc.u8x_ck.R;
 

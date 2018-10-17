@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-import com.ck.main.App_DataPara;
+import com.ck.App_DataPara;
 import com.hc.u8x_ck.R;
 
 public class PreferenceHelper {

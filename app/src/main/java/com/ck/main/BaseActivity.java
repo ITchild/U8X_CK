@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.ck.App_DataPara;
 import com.ck.utils.PreferenceHelper;
 
 public class BaseActivity extends Activity {

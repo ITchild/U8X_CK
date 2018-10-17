@@ -51,6 +51,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private EditText collect_proName_et;
     private EditText collect_fileName_et;
     private CheckBox collect_blackWrite_cb;// 是否显示黑白图
+    private Button collect_enlarge_bt; //放大
+    private Button collect_Lessen_bt; //缩小
 
     private ListView collect_proList_lv;//工程列表
     private ListProjectAdapter mProjectAdapter; //工程列表的Apapter
@@ -98,6 +100,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_save_bt = findView(R.id.collect_save_bt);
         collect_filelist_ll = findView(R.id.collect_filelist_ll);
         collect_blackWrite_cb = findView(R.id.collect_blackWrite_cb);
+        collect_enlarge_bt = findView(R.id.collect_enlarge_bt);
+        collect_Lessen_bt = findView(R.id.collect_Lessen_bt);
         collect_proName_et = findView(R.id.collect_proName_et);
         collect_fileName_et = findView(R.id.collect_fileName_et);
         collect_autoOrhand_bt = findView(R.id.collect_autoOrhand_bt);
@@ -170,6 +174,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 collect_cameraView.setBlackWrite(b);
             }
         });
+        collect_enlarge_bt.setOnClickListener(this);
+        collect_Lessen_bt.setOnClickListener(this);
         collect_proList_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -277,6 +283,16 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
             case R.id.collect_back_bt: //TODO: 返回
                 activityFinish(); //返回
+                break;
+            case R.id.collect_enlarge_bt : //TODO : 放大
+                if(!collect_cameraView.isToLarge) {
+                    collect_cameraView.setLargeOrSmall(true);
+                }
+                break;
+            case R.id.collect_Lessen_bt : //TODO : 缩小
+                if(collect_cameraView.isToLarge) {
+                    collect_cameraView.setLargeOrSmall(false);
+                }
                 break;
         }
     }

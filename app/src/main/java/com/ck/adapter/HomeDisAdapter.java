@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hc.u8x_ck.R;
@@ -17,10 +18,16 @@ public class HomeDisAdapter extends RecyclerView.Adapter<HomeDisAdapter.myViewHo
 
     private LayoutInflater mInflater;
     private List<String> data;
+    private int focusPosition = 0;
 
     public HomeDisAdapter(Context context, List<String> data) {
         mInflater = LayoutInflater.from(context);
         this.data = data;
+    }
+
+    public void setFocusPosition(int focusPosition){
+        this.focusPosition = focusPosition;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -43,6 +50,11 @@ public class HomeDisAdapter extends RecyclerView.Adapter<HomeDisAdapter.myViewHo
                 }
             }
         });
+        if(focusPosition == position){
+            holder.item_homedis_rl.setSelected(true);
+        }else{
+            holder.item_homedis_rl.setSelected(false);
+        }
     }
 
     @Override
@@ -54,11 +66,14 @@ public class HomeDisAdapter extends RecyclerView.Adapter<HomeDisAdapter.myViewHo
     class myViewHoder extends ViewHolder {
 
         TextView item_homedis_con_tv;
-
+        RelativeLayout item_homedis_rl;
         public myViewHoder(View itemView) {
             super(itemView);
             if(null == item_homedis_con_tv){
                 item_homedis_con_tv = itemView.findViewById(R.id.item_homedis_con_tv);
+            }
+            if(null == item_homedis_rl){
+                item_homedis_rl = itemView.findViewById(R.id.item_homedis_rl);
             }
         }
     }
