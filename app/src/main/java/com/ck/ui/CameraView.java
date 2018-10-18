@@ -43,9 +43,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public SurfaceTexture m_SurfaceTexture;
     public Camera m_Camera;
     public byte m_Buffer[];
+    public int maxSycTaskNum = 0;
     public int m_nTextureBuffer[];
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
+    private int m_DraBitMapWith = 0;
     public boolean isStart = false; //是否开始检测
     public boolean isToLarge = false; //是否要放大
     OnOpenCameraListener m_Listener;
@@ -164,6 +166,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
                 Log.i("fei", "我选择的" + size.width + "*" + size.height + "屏幕自己的" + m_nScreenWidth + "*" + m_nScreenHeight);
                 m_Parameters.setPreviewSize(size.width, size.height);
                 m_Camera.setParameters(m_Parameters);
+
                 m_nBufferSize = size.width * size.height;
                 m_nTextureBuffer = new int[m_nBufferSize];
                 m_nBufferSize = m_nBufferSize * ImageFormat.getBitsPerPixel(m_Parameters.getPreviewFormat()) / 8;
@@ -273,6 +276,8 @@ public class CameraView extends View implements Camera.PreviewCallback {
     protected void onDraw(Canvas canvas) {
         if (m_DrawBitmap == null || m_DrawBitmap.isRecycled()) {
             if (m_bTakePic || isStart) {
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                drawRuleAndFlag(canvas);//画刻度和标志
                 return; //防止异步线程中将m_DrawBitmap回收（在这里进行检测）
             }
             String str = "裂缝宽度检测";
@@ -307,8 +312,17 @@ public class CameraView extends View implements Camera.PreviewCallback {
         if (m_bOpenOldFile) {
             return;
         }
-        float nL = (FindLieFenUtils.m_nLLineSite / m_DrawBitmap.getWidth()) * m_nScreenWidth;
-        float nR = (FindLieFenUtils.m_nRLineSite / m_DrawBitmap.getWidth()) * m_nScreenWidth;
+        drawRuleAndFlag(canvas);//画刻度和标志
+
+    }
+
+    /**
+     * 画刻度和数据值以及标志
+     * @param canvas
+     */
+    private void drawRuleAndFlag(Canvas canvas){
+        float nL = (FindLieFenUtils.m_nLLineSite / m_DraBitMapWith) * m_nScreenWidth;
+        float nR = (FindLieFenUtils.m_nRLineSite / m_DraBitMapWith) * m_nScreenWidth;
         float mf_fXDensity = m_fXDensity;
         if (isToLarge && !isStart) {//放大
             nL = (toLargeSize * nL - ((toLargeSize - 1) * m_nScreenWidth / 2));
@@ -341,36 +355,27 @@ public class CameraView extends View implements Camera.PreviewCallback {
         m_PaintDrawLine.setTextSize(30);
         String str = String.format("%.02f", (float) (Math.abs((nR - nL) / mf_fXDensity) / 10.00000000)) + "mm";
         canvas.drawText(str, m_nScreenWidth - 50 - m_PaintDrawLine.measureText(str), 60, m_PaintDrawLine);
-        if (m_YCanvas == null) {
-            m_YCanvas = new Canvas();
-        }
-        if (null != m_YBitmap) {
-            m_YBitmap.recycle();
-            m_YBitmap = null;
-        }
-        m_YBitmap = Bitmap.createBitmap(m_nScreenWidth, m_nScreenHeight, Bitmap.Config.ARGB_4444);
-        m_YCanvas.setBitmap(m_YBitmap);
-        Paint paint = getPaint(Style.FILL, 3, Color.RED, 20);
-        int nKDY = nYMid + nYMid / 2;
 
-        m_YCanvas.drawLine(0, nKDY, m_nScreenWidth, nKDY, paint);//打底线
-        m_YCanvas.drawLine(1, nKDY, 1, nKDY - 60, paint); // 0刻度线
-        m_YCanvas.drawText("0", 1, nKDY + 40, paint);
+        m_PaintDrawLine.setTextSize(20);
+        m_PaintDrawLine.setStrokeWidth(3);
+        int nKDY = nYMid + nYMid / 2;
+        canvas.drawLine(0, nKDY, m_nScreenWidth, nKDY, m_PaintDrawLine);//打底线
+        canvas.drawLine(1, nKDY, 1, nKDY - 60, m_PaintDrawLine); // 0刻度线
+        canvas.drawText("0", 1, nKDY + 40, m_PaintDrawLine);
+
         float unit = 10;
         for (int i = 1; i <= max_X; i++) {
             if (i % unit == 0) {
-                m_YCanvas.drawLine(i * mf_fXDensity, nKDY, i * mf_fXDensity, nKDY - 60, paint);
+                canvas.drawLine(i * mf_fXDensity, nKDY, i * mf_fXDensity, nKDY - 60, m_PaintDrawLine);
                 if (i == 100) {
-                    m_YCanvas.drawText((i / unit) + "", i * mf_fXDensity - 20, nKDY + 40, paint);
+                    canvas.drawText((i / unit) + "", i * mf_fXDensity - 20, nKDY + 40, m_PaintDrawLine);
                 } else {
-                    m_YCanvas.drawText((i / unit) + "", i * mf_fXDensity - 15, nKDY + 40, paint);
+                    canvas.drawText((i / unit) + "", i * mf_fXDensity - 15, nKDY + 40, m_PaintDrawLine);
                 }
             } else {
-                m_YCanvas.drawLine(i * mf_fXDensity, nKDY, i * mf_fXDensity, nKDY - 30, paint);
+                canvas.drawLine(i * mf_fXDensity, nKDY, i * mf_fXDensity, nKDY - 30, m_PaintDrawLine);
             }
         }
-//        }
-        canvas.drawBitmap(m_YBitmap, null, rectF, null);
     }
 
     /**
@@ -416,9 +421,14 @@ public class CameraView extends View implements Camera.PreviewCallback {
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         // TODO Auto-generated method stub
+        byte[] copyData = new byte[bytes.length];
+        System.arraycopy(bytes, 0, copyData, 0, bytes.length);
+//        if(maxSycTaskNum <= 5) {
+            mCameraTask = new CameraTask(copyData);
+            mCameraTask.execute((Void) null);
+//            maxSycTaskNum ++;
+//        }
         camera.addCallbackBuffer(m_Buffer); // <----这句一点要加上.
-        mCameraTask = new CameraTask(bytes);
-        mCameraTask.execute((Void) null);
     }
 
     /*自定义的CameraTask类，开启一个线程分析数据*/
@@ -443,18 +453,19 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     if (null == m_Camera.getParameters()) {
                         return null;
                     }
-                    int w = m_Camera.getParameters().getPreviewSize().width;
+                    m_DraBitMapWith = m_Camera.getParameters().getPreviewSize().width;
                     int h = m_Camera.getParameters().getPreviewSize().height;
-                    int[] rgb = DecodeUtil.decodeYUV420SP(mData, w, h, m_nTextureBuffer);
+                    int[] rgb = DecodeUtil.decodeYUV420SP(mData, m_DraBitMapWith, h, m_nTextureBuffer);
                     if (null != m_DrawBitmap) {
                         m_DrawBitmap.recycle();
                         m_DrawBitmap = null;
                     }
-                    m_DrawBitmap = Bitmap.createBitmap(rgb, w, h, Bitmap.Config.RGB_565);
-                    FindLieFenUtils.findLieFen(rgb, w, h, m_bCountMode);
+                    m_DrawBitmap = Bitmap.createBitmap(rgb, m_DraBitMapWith, h, Bitmap.Config.RGB_565);
+                    FindLieFenUtils.findLieFen(rgb, m_DraBitMapWith, h, m_bCountMode);
                     if (!m_bTakePic) {
                         postInvalidate();
                     }
+//                    maxSycTaskNum --;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

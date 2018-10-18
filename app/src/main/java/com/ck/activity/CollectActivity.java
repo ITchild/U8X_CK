@@ -544,6 +544,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         if(null != collect_cameraView.m_Camera) {
+            collect_cameraView.m_Camera.addCallbackBuffer(collect_cameraView.m_Buffer);
+            collect_cameraView.m_Camera.setPreviewCallbackWithBuffer(collect_cameraView);
             collect_cameraView.m_Camera.startPreview();
         }
     }

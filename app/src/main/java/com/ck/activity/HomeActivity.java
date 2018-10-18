@@ -19,7 +19,7 @@ public class HomeActivity extends TitleBaseActivity {
 
     protected HomeDisAdapter mHomeDisAdapter;
     protected List<String> homeDisData;
-    protected int num = 3;
+    protected int num = 3; //RecycleView的gridLayout布局中的列数
     private RecyclerView home_display;
     @Override
     protected int initLayout() {
