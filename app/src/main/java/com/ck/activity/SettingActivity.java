@@ -1,7 +1,6 @@
 package com.ck.activity;
 
 import android.content.Intent;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -64,9 +63,7 @@ public class SettingActivity extends TitleBaseActivity {
         findViewById(R.id.setting_back_bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SettingActivity.this,KeyHomeActivity.class);
-                intent.putExtra("jump","setting");
-                startActivity(intent);
+                backToHome();
                 finish();
             }
         });
@@ -105,8 +102,9 @@ public class SettingActivity extends TitleBaseActivity {
         findViewById(R.id.settingtime_date_bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
-                startActivity(intent);
+//                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
+//                startActivity(intent);
+//                DateUtil.setDate(2018,10,24);
             }
         });
         settingPar_theme_cb.setOnClickListener(new View.OnClickListener() {
@@ -151,6 +149,15 @@ public class SettingActivity extends TitleBaseActivity {
     }
 
     /**
+     * 返回Home界面
+     */
+    private void backToHome(){
+        Intent intent = new Intent(SettingActivity.this,KeyHomeActivity.class);
+        intent.putExtra("jump","setting");
+        startActivity(intent);
+    }
+
+    /**
      * 监听Back键按下事件,方法1:
      * 注意:
      * super.onBackPressed()会自动调用finish()方法,关闭
@@ -159,7 +166,7 @@ public class SettingActivity extends TitleBaseActivity {
      */
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(SettingActivity.this,HomeActivity.class));
+        backToHome();
         super.onBackPressed();
     }
 

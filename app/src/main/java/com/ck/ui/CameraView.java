@@ -43,7 +43,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public SurfaceTexture m_SurfaceTexture;
     public Camera m_Camera;
     public byte m_Buffer[];
-    public int maxSycTaskNum = 0;
+    public int sycTaskNum = 0;  //监听摄像机是否运行
     public int m_nTextureBuffer[];
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
@@ -78,8 +78,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
     private Camera.Parameters m_Parameters;
     private float m_fDispDensity;
     private Paint m_PaintDrawLine;
-    private Canvas m_YCanvas;
-    private Bitmap m_YBitmap;
     private boolean isBlackWrite = false;
     private CameraTask mCameraTask;
     private Context mContext;
@@ -136,56 +134,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
         }
     }
 
-    private void carmeraThreadStart() {
-        carmeraThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (m_Camera == null) {
-                        m_Camera = Camera.open(0);
-                    }
-                    mHandler.sendEmptyMessage(OPEN_TRUE);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    mHandler.sendEmptyMessage(OPEN_FALSE);
-                    return;
-                }
-
-                try {
-                    m_Camera.setPreviewTexture(m_SurfaceTexture);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                m_Parameters = m_Camera.getParameters();
-                List<Size> preSize = m_Parameters.getSupportedPreviewSizes();
-                for (Size size : preSize) {
-                    Log.i("fei", size.width + "*" + size.height);
-                }
-                Camera.Size size = DecodeUtil.pickBestSizeCandidate(m_nScreenWidth, m_nScreenHeight, preSize);
-                Log.i("fei", "我选择的" + size.width + "*" + size.height + "屏幕自己的" + m_nScreenWidth + "*" + m_nScreenHeight);
-                m_Parameters.setPreviewSize(size.width, size.height);
-                m_Camera.setParameters(m_Parameters);
-
-                m_nBufferSize = size.width * size.height;
-                m_nTextureBuffer = new int[m_nBufferSize];
-                m_nBufferSize = m_nBufferSize * ImageFormat.getBitsPerPixel(m_Parameters.getPreviewFormat()) / 8;
-                m_Buffer = new byte[m_nBufferSize];
-                m_Camera.addCallbackBuffer(m_Buffer);
-                m_Camera.setPreviewCallbackWithBuffer(CameraView.this);
-                try {
-                    m_Camera.setPreviewDisplay(holder);
-                    m_Camera.startPreview();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    m_Camera.release();
-                    m_Camera = null;
-                }
-            }
-        });
-        carmeraThread.start();
-    }
-
     public void setHolder(SurfaceHolder holder) {
         this.holder = holder;
     }
@@ -199,6 +147,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
             return;
         }
         if (m_Camera != null) {
+            checkTaskHandler.removeCallbacks(checkTaskRunnable);
             m_Camera.setPreviewCallbackWithBuffer(null);
             m_Camera.stopPreview();
             m_Camera.release();
@@ -208,21 +157,22 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     /**
      * 拍照
-     *
      * @param bTakePic
      */
     public void onTakePic(boolean bTakePic) {
         m_bTakePic = bTakePic;
-        isToLarge = false;
+//        isToLarge = false;
     }
 
     public boolean getOnTakePic() {
         return m_bTakePic;
     }
 
-    public void setBlackWrite(boolean isBlackWrite) {
+    public void setBlackWrite(boolean isBlackWrite,boolean isRefresh) {
         this.isBlackWrite = isBlackWrite;
-        invalidate();
+        if(isRefresh) {
+            invalidate();
+        }
     }
 
     /**
@@ -305,15 +255,14 @@ public class CameraView extends View implements Camera.PreviewCallback {
                             : m_DrawBitmap)
                     , null, rectF, null);
         }
-        if (m_bTakePic) {
-            canvas.drawBitmap(m_DrawBitmap, null, rectF, null);
-            m_bTakePic = false;
-        }
+//        if (m_bTakePic) {
+//            canvas.drawBitmap(m_DrawBitmap, null, rectF, null);
+//            m_bTakePic = false;
+//        }
         if (m_bOpenOldFile) {
             return;
         }
         drawRuleAndFlag(canvas);//画刻度和标志
-
     }
 
     /**
@@ -334,7 +283,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
             m_PaintDrawLine = getPaint(Style.FILL, 3, Color.RED, 25);
         }
         m_PaintDrawLine.setColor(Color.RED);
-        m_PaintDrawLine.setStrokeWidth(2);
+        m_PaintDrawLine.setStrokeWidth(1);
         if (m_nDrawFlag == 1) {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
@@ -354,6 +303,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         m_PaintDrawLine.setColor(Color.RED);
         m_PaintDrawLine.setTextSize(30);
         String str = String.format("%.02f", (float) (Math.abs((nR - nL) / mf_fXDensity) / 10.00000000)) + "mm";
+        str = str.equals("NaNmm") ? "0.00mm" : str; //有时format的返回值为NaN
         canvas.drawText(str, m_nScreenWidth - 50 - m_PaintDrawLine.measureText(str), 60, m_PaintDrawLine);
 
         m_PaintDrawLine.setTextSize(20);
@@ -403,10 +353,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
      *
      * @param isToLarge
      */
-    public void setLargeOrSmall(boolean isToLarge) {
+    public void setLargeOrSmall(boolean isToLarge,boolean isRefresh) {
         this.isToLarge = isToLarge;
-        invalidate();
-
+        if(isRefresh) {
+            invalidate();
+        }
     }
 
     public void setStartView() {
@@ -418,15 +369,68 @@ public class CameraView extends View implements Camera.PreviewCallback {
         isStart = false;
     }
 
+    /**
+     * 开启摄像机的子线程
+     */
+    private void carmeraThreadStart() {
+        carmeraThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (m_Camera == null) {
+                        m_Camera = Camera.open(0);
+                    }
+                    mHandler.sendEmptyMessage(OPEN_TRUE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mHandler.sendEmptyMessage(OPEN_FALSE);
+                    return;
+                }
+                try {
+                    m_Camera.setPreviewTexture(m_SurfaceTexture);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                m_Parameters = m_Camera.getParameters();
+                List<Size> preSize = m_Parameters.getSupportedPreviewSizes();
+                for (Size size : preSize) {
+                    Log.i("fei", size.width + "*" + size.height);
+                }
+                Camera.Size size = DecodeUtil.pickBestSizeCandidate(m_nScreenWidth, m_nScreenHeight, preSize);
+                Log.i("fei", "我选择的" + size.width + "*" + size.height + "屏幕自己的" + m_nScreenWidth + "*" + m_nScreenHeight);
+                m_Parameters.setPreviewSize(size.width, size.height);
+                m_Camera.setParameters(m_Parameters);
+
+                m_nBufferSize = size.width * size.height;
+                m_nTextureBuffer = new int[m_nBufferSize];
+                m_nBufferSize = m_nBufferSize * ImageFormat.getBitsPerPixel(m_Parameters.getPreviewFormat()) / 8;
+                m_Buffer = new byte[m_nBufferSize];
+                m_Camera.addCallbackBuffer(m_Buffer);
+                m_Camera.setPreviewCallbackWithBuffer(CameraView.this);
+                try {
+                    m_Camera.setPreviewDisplay(holder);
+                    m_Camera.startPreview();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    m_Camera.release();
+                    m_Camera = null;
+                }
+            }
+        });
+        carmeraThread.start();
+        checkTaskHandler.postDelayed(checkTaskRunnable,5000);
+    }
+
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         // TODO Auto-generated method stub
-        byte[] copyData = new byte[bytes.length];
-        System.arraycopy(bytes, 0, copyData, 0, bytes.length);
+//        byte[] copyData = new byte[bytes.length];
+//        System.arraycopy(bytes, 0, copyData, 0, bytes.length);
 //        if(maxSycTaskNum <= 5) {
-            mCameraTask = new CameraTask(copyData);
-            mCameraTask.execute((Void) null);
-//            maxSycTaskNum ++;
+        mCameraTask = new CameraTask(bytes);
+        mCameraTask.execute((Void) null);
+        sycTaskNum ++;
 //        }
         camera.addCallbackBuffer(m_Buffer); // <----这句一点要加上.
     }
@@ -465,7 +469,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     if (!m_bTakePic) {
                         postInvalidate();
                     }
-//                    maxSycTaskNum --;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -473,4 +476,21 @@ public class CameraView extends View implements Camera.PreviewCallback {
             return null;
         }
     }
+
+    private Handler checkTaskHandler = new Handler();
+    private Runnable checkTaskRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(sycTaskNum != 0){
+                sycTaskNum = 0;
+                checkTaskHandler.postDelayed(checkTaskRunnable,500);
+                Log.i("select timeout","正常");
+            }else{
+                Log.i("select timeout","进行初始化相机");
+                if(null != m_Listener){
+                    m_Listener.onCarameError();
+                }
+            }
+        }
+    };
 }

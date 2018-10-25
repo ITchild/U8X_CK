@@ -17,4 +17,5 @@ package com.ck.collect;
  */
 public interface OnOpenCameraListener {
 	void OnOpenCameraResultListener(boolean bResult);
+	void onCarameError();
 }

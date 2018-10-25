@@ -114,7 +114,7 @@ public class Ui_Collect extends BaseActivity {
         uiCollect_blackWrite_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                m_CameraView.setBlackWrite(b);
+                m_CameraView.setBlackWrite(b,true);
             }
         });
     }
@@ -237,6 +237,11 @@ public class Ui_Collect extends BaseActivity {
                 } else {
                     Toast.makeText(Ui_Collect.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onCarameError() {
+
             }
         });
     }

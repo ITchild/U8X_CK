@@ -18,7 +18,7 @@ public class DateUtil {
      * @param month
      * @param day
      */
-    static void setDate(int year, int month, int day) {
+    public static void setDate(int year, int month, int day) {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.YEAR, year);
         c.set(Calendar.MONTH, month);
@@ -36,7 +36,7 @@ public class DateUtil {
      * @param hourOfDay
      * @param minute
      */
-    static void setTime(int hourOfDay, int minute) {
+    public static void setTime(int hourOfDay, int minute) {
         Calendar c = Calendar.getInstance();
 
         c.set(Calendar.HOUR_OF_DAY, hourOfDay);

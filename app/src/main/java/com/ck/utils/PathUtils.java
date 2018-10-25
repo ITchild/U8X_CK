@@ -9,6 +9,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 
 /**
@@ -69,7 +70,6 @@ public class PathUtils {
     }
 
     public static ArrayList<ClasFileProjectInfo> getProFileList() {
-        // File projectFile = new File(PathUtils.PROJECT_PATH);
         File[] proList = OrderByDate(PathUtils.PROJECT_PATH);
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
@@ -78,11 +78,7 @@ public class PathUtils {
             ClasFileProjectInfo project = new ClasFileProjectInfo();
             project.mFileProjectName = proList[i].getName();
             project.mLastModifiedDate = format.format(proList[i].lastModified());
-            // File gjFile = new File(PathUtils.PROJECT_PATH,
-            // project.mFileProjectName);
             File[] gjList = OrderByDate(PathUtils.PROJECT_PATH + File.separator + project.mFileProjectName);
-            // String[] arr = gjFile.list();
-
             for (int j = 0; j < gjList.length; j++) {
                 ClasFileGJInfo gj = new ClasFileGJInfo();
                 gj.mFileGJName = gjList[j].getName();
@@ -90,6 +86,7 @@ public class PathUtils {
                 gj.mLastModifiedDate = format.format(file.lastModified());
                 project.mstrArrFileGJ.add(gj);
             }
+            Collections.sort(project.mstrArrFileGJ);
             m_ListProject.add(project);
         }
         return m_ListProject;

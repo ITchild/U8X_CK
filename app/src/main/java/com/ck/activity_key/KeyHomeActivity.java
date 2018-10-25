@@ -53,16 +53,22 @@ public class KeyHomeActivity extends HomeActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void initData() {
+        super.initData();
         Intent intent = getIntent();
         if (null != intent) {
             String focus = intent.getStringExtra("jump");
             if (null != focus && focus.equals("setting")) {
+                Log.i("fei","setting界面的跳转");
                 focusPosition = 4;
                 mHomeDisAdapter.setFocusPosition(focusPosition);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         subScribeRxbus(this);
     }
 

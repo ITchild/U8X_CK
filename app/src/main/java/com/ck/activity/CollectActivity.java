@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -19,10 +18,10 @@ import android.widget.Toast;
 import com.ck.adapter.ListGJAdapter;
 import com.ck.adapter.ListProjectAdapter;
 import com.ck.base.TitleBaseActivity;
-import com.ck.ui.CameraView;
 import com.ck.collect.OnOpenCameraListener;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
+import com.ck.ui.CameraView;
 import com.ck.utils.Catition;
 import com.ck.utils.FileUtil;
 import com.ck.utils.FindLieFenUtils;
@@ -127,7 +126,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         super.initData();
         refreshProListData(AppDatPara.m_nProjectSeleteNidx);
         refreshFileListData(AppDatPara.m_nProjectSeleteNidx);
-        getSaveProFileName(AppDatPara.m_nProjectSeleteNidx);
     }
 
     @Override
@@ -137,7 +135,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             @Override
             public void run() {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(400);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -168,10 +166,12 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_left_bt.setOnLongClickListener(this);
         collect_right_bt.setOnClickListener(this);
         collect_right_bt.setOnLongClickListener(this);
-        collect_blackWrite_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        collect_blackWrite_cb.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                collect_cameraView.setBlackWrite(b);
+            public void onClick(View view) {
+                boolean isChecked = collect_blackWrite_cb.isChecked();
+                collect_blackWrite_cb.setChecked(isChecked);
+                collect_cameraView.setBlackWrite(isChecked,true);
             }
         });
         collect_enlarge_bt.setOnClickListener(this);
@@ -286,12 +286,12 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
             case R.id.collect_enlarge_bt : //TODO : 放大
                 if(!collect_cameraView.isToLarge) {
-                    collect_cameraView.setLargeOrSmall(true);
+                    collect_cameraView.setLargeOrSmall(true,true);
                 }
                 break;
             case R.id.collect_Lessen_bt : //TODO : 缩小
                 if(collect_cameraView.isToLarge) {
-                    collect_cameraView.setLargeOrSmall(false);
+                    collect_cameraView.setLargeOrSmall(false,true);
                 }
                 break;
         }
@@ -335,6 +335,12 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                     Toast.makeText(CollectActivity.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
                 }
             }
+
+            @Override
+            public void onCarameError() {
+                stopCameraView(); // 停止进行检测
+                onCollectStart();
+            }
         });
     }
 
@@ -353,6 +359,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private void onBeforTakePic() {
         stopCameraView();
         collect_cameraView.setZY(1);
+        getSaveProFileName(AppDatPara.m_nProjectSeleteNidx);
         changeStartStopTakeView(Catition.CollectView.TAKEPHOTO);
     }
 
@@ -377,13 +384,15 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_cameraView.onTakePic(false);
         collect_cameraView.setDrawingCacheEnabled(false);
         //刷新列表
+        onCollectStart();//保存成功之后继续进行检测
         refreshProListData(AppDatPara.m_nProjectSeleteNidx);
         refreshFileListData(AppDatPara.m_nProjectSeleteNidx);
         if(collect_blackWrite_cb.isChecked()) {
             collect_blackWrite_cb.setChecked(false);
         }
+        collect_cameraView.setBlackWrite(false,false);
+        collect_cameraView.setLargeOrSmall(false,false);
         showToast(getStr(R.string.str_saveSuccess));
-        onCollectStart();//保存成功之后继续进行检测
     }
 
     /**
@@ -433,21 +442,17 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         if (isToLeft) { //光标左移的处理
             if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
                 if (FindLieFenUtils.m_nLLineSite > 0) {
-//                    FindLieFenUtils.m_nLLineSite--;
                     FindLieFenUtils.LLineToLOrR(true);
                 }
             } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
                 if (FindLieFenUtils.m_nRLineSite > 0) {
-//                    FindLieFenUtils.m_nRLineSite--;
                     FindLieFenUtils.RLineToLOrR(true);
                 }
             }
         } else { //光标右移的处理
             if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
-//                FindLieFenUtils.m_nLLineSite++;
                 FindLieFenUtils.LLineToLOrR(false);
             } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
-//                FindLieFenUtils.m_nRLineSite++;
                 FindLieFenUtils.RLineToLOrR(false);
             }
         }
@@ -464,9 +469,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      * 退出Activity
      */
     private void activityFinish() {
-        collect_cameraView.closeCamera();
+        stopCameraView();
         this.finish();
     }
+
 
     /**
      * 人为移动光标的时候，左右两个裂缝标志的切换
