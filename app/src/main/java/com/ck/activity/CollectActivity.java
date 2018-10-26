@@ -376,13 +376,13 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             showToast("构件名不能为空");
             return;
         }
-        collect_cameraView.setDrawingCacheEnabled(true);
+//        collect_cameraView.setDrawingCacheEnabled(true);
         collect_cameraView.onTakePic(true);
-        collect_cameraView.buildDrawingCache();
-        Bitmap drawingCache = collect_cameraView.getDrawingCache();
-        FileUtil.saveBmpImageFile(drawingCache, proName, fileName, "%s.bmp");
+//        collect_cameraView.buildDrawingCache();
+//        Bitmap drawingCache = collect_cameraView.getDrawingCache();
+        FileUtil.saveBmpImageFile(collect_cameraView.takeBackBitmap, proName, fileName, "%s.bmp");
         collect_cameraView.onTakePic(false);
-        collect_cameraView.setDrawingCacheEnabled(false);
+//        collect_cameraView.setDrawingCacheEnabled(false);
         //刷新列表
         onCollectStart();//保存成功之后继续进行检测
         refreshProListData(AppDatPara.m_nProjectSeleteNidx);
@@ -472,7 +472,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         stopCameraView();
         this.finish();
     }
-
 
     /**
      * 人为移动光标的时候，左右两个裂缝标志的切换

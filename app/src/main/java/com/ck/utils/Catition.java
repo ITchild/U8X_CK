@@ -16,8 +16,8 @@ public class Catition {
         public static final int TO_LEFT = 100003;
         public static final int TO_RIGHT = 100004;
         public static final int OK = 100005;
-        public static final int CHANGE = 100006;
 
+        public static final int CHANGE = 100006;
 
     }
 

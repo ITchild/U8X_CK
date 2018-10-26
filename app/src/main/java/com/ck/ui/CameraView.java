@@ -47,6 +47,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public int m_nTextureBuffer[];
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
+    public Bitmap takeBackBitmap;
     private int m_DraBitMapWith = 0;
     public boolean isStart = false; //是否开始检测
     public boolean isToLarge = false; //是否要放大
@@ -114,7 +115,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     /**
      * 打开相机
-     *
      * @param listener
      */
     public void onenCamera(OnOpenCameraListener listener) {
@@ -248,12 +248,12 @@ public class CameraView extends View implements Camera.PreviewCallback {
                 x = width - (width / 2);
                 y = hight - (hight / 2);
             }
-            canvas.drawBitmap(isBlackWrite ?
-                            (isToLarge ? Bitmap.createBitmap(DecodeUtil.convertToBlackWhite(m_DrawBitmap), x, y, width, hight)
-                                    : DecodeUtil.convertToBlackWhite(m_DrawBitmap))
-                            : (isToLarge ? Bitmap.createBitmap(m_DrawBitmap, x, y, width, hight)
-                            : m_DrawBitmap)
-                    , null, rectF, null);
+            takeBackBitmap = isBlackWrite ?
+                    (isToLarge ? Bitmap.createBitmap(DecodeUtil.convertToBlackWhite(m_DrawBitmap), x, y, width, hight)
+                            : DecodeUtil.convertToBlackWhite(m_DrawBitmap))
+                    : (isToLarge ? Bitmap.createBitmap(m_DrawBitmap, x, y, width, hight)
+                    : m_DrawBitmap);
+            canvas.drawBitmap(takeBackBitmap, null, rectF, null);
         }
 //        if (m_bTakePic) {
 //            canvas.drawBitmap(m_DrawBitmap, null, rectF, null);

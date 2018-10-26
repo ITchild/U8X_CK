@@ -1,7 +1,5 @@
 package com.ck.activity_key;
 
-import android.util.Log;
-
 import com.ck.activity.FileBowerActivity;
 import com.ck.utils.Catition;
 import com.fei.feilibs_1_0_0.bean.RxBusMsgBean;
@@ -30,7 +28,6 @@ public class KeyFileBowerActivity extends FileBowerActivity {
     protected void doRxBus(RxBusMsgBean bean) {
         super.doRxBus(bean);
         if(bean.getWhat() == Catition.Key.KEY){
-            Log.i(TAG,"有值");
             switch (Integer.parseInt(bean.getMsg())){
                 case Catition.Key.TO_UP :
                     activityUp();
