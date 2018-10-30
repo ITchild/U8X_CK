@@ -368,9 +368,7 @@ public class DatabaseOperation {
 	}
 
 	/**
-	 * 
 	 * {功能}<-检查服务器返回数据是否正确>
-	 * 
 	 * @throw
 	 * @return boolean
 	 */

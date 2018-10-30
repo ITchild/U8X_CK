@@ -36,7 +36,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.ck.netcloud.ClasSysPara;
-import com.ck.utils.DBService;
+import com.ck.db.DBService;
 import com.fei.feilibs_1_0_0.BaseApplication;
 import com.hc.u8x_ck.R;
 

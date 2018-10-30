@@ -47,7 +47,8 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public int m_nTextureBuffer[];
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
-    public Bitmap takeBackBitmap;
+    public Bitmap showBitmap;
+    public Bitmap blackWriteBitmap;
     private int m_DraBitMapWith = 0;
     public boolean isStart = false; //是否开始检测
     public boolean isToLarge = false; //是否要放大
@@ -73,7 +74,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
     };
     private int max_X = 100;
     float m_fXDensity = (float) (m_nScreenWidth / (max_X * 1.0));
-    private boolean m_bTakePic = false;
     private SurfaceHolder holder;
     private int m_nBufferSize;
     private Camera.Parameters m_Parameters;
@@ -84,6 +84,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     private Context mContext;
     private float toLargeSize = 2;//放大系数
     private Thread carmeraThread;
+    public float width = 0;
 
     public CameraView(Context context, int screenWidth, int screenHeight) {
         super(context);
@@ -156,18 +157,22 @@ public class CameraView extends View implements Camera.PreviewCallback {
     }
 
     /**
-     * 拍照
-     * @param bTakePic
+     * 进行预拍处理
      */
-    public void onTakePic(boolean bTakePic) {
-        m_bTakePic = bTakePic;
-//        isToLarge = false;
+    public void onBeforTakePic(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                blackWriteBitmap = DecodeUtil.convertToBlackWhite(m_DrawBitmap);
+            }
+        }).start();
     }
 
-    public boolean getOnTakePic() {
-        return m_bTakePic;
-    }
-
+    /**
+     * 设置黑白图
+     * @param isBlackWrite
+     * @param isRefresh
+     */
     public void setBlackWrite(boolean isBlackWrite,boolean isRefresh) {
         this.isBlackWrite = isBlackWrite;
         if(isRefresh) {
@@ -225,7 +230,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     @Override
     protected void onDraw(Canvas canvas) {
         if (m_DrawBitmap == null || m_DrawBitmap.isRecycled()) {
-            if (m_bTakePic || isStart) {
+            if (isStart) {
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                 drawRuleAndFlag(canvas);//画刻度和标志
                 return; //防止异步线程中将m_DrawBitmap回收（在这里进行检测）
@@ -248,17 +253,13 @@ public class CameraView extends View implements Camera.PreviewCallback {
                 x = width - (width / 2);
                 y = hight - (hight / 2);
             }
-            takeBackBitmap = isBlackWrite ?
-                    (isToLarge ? Bitmap.createBitmap(DecodeUtil.convertToBlackWhite(m_DrawBitmap), x, y, width, hight)
-                            : DecodeUtil.convertToBlackWhite(m_DrawBitmap))
+            showBitmap = isBlackWrite ?
+                    (isToLarge ? Bitmap.createBitmap(blackWriteBitmap, x, y, width, hight)
+                            : blackWriteBitmap)
                     : (isToLarge ? Bitmap.createBitmap(m_DrawBitmap, x, y, width, hight)
                     : m_DrawBitmap);
-            canvas.drawBitmap(takeBackBitmap, null, rectF, null);
+            canvas.drawBitmap(showBitmap, null, rectF, null);
         }
-//        if (m_bTakePic) {
-//            canvas.drawBitmap(m_DrawBitmap, null, rectF, null);
-//            m_bTakePic = false;
-//        }
         if (m_bOpenOldFile) {
             return;
         }
@@ -305,7 +306,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         String str = String.format("%.02f", (float) (Math.abs((nR - nL) / mf_fXDensity) / 10.00000000)) + "mm";
         str = str.equals("NaNmm") ? "0.00mm" : str; //有时format的返回值为NaN
         canvas.drawText(str, m_nScreenWidth - 50 - m_PaintDrawLine.measureText(str), 60, m_PaintDrawLine);
-
+        width = Float.valueOf(str.replace("mm",""));
         m_PaintDrawLine.setTextSize(20);
         m_PaintDrawLine.setStrokeWidth(3);
         int nKDY = nYMid + nYMid / 2;
@@ -330,7 +331,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     /**
      * 获得画笔
-     *
      * @param style
      * @param size
      * @param color
@@ -397,7 +397,8 @@ public class CameraView extends View implements Camera.PreviewCallback {
                 for (Size size : preSize) {
                     Log.i("fei", size.width + "*" + size.height);
                 }
-                Camera.Size size = DecodeUtil.pickBestSizeCandidate(m_nScreenWidth, m_nScreenHeight, preSize);
+//                Camera.Size size = DecodeUtil.pickBestSizeCandidate(m_nScreenWidth, m_nScreenHeight, preSize);
+                Camera.Size size = DecodeUtil.pickBestSizeCandidate(640, 480, preSize);
                 Log.i("fei", "我选择的" + size.width + "*" + size.height + "屏幕自己的" + m_nScreenWidth + "*" + m_nScreenHeight);
                 m_Parameters.setPreviewSize(size.width, size.height);
                 m_Camera.setParameters(m_Parameters);
@@ -460,15 +461,9 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     m_DraBitMapWith = m_Camera.getParameters().getPreviewSize().width;
                     int h = m_Camera.getParameters().getPreviewSize().height;
                     int[] rgb = DecodeUtil.decodeYUV420SP(mData, m_DraBitMapWith, h, m_nTextureBuffer);
-                    if (null != m_DrawBitmap) {
-                        m_DrawBitmap.recycle();
-                        m_DrawBitmap = null;
-                    }
                     m_DrawBitmap = Bitmap.createBitmap(rgb, m_DraBitMapWith, h, Bitmap.Config.RGB_565);
                     FindLieFenUtils.findLieFen(rgb, m_DraBitMapWith, h, m_bCountMode);
-                    if (!m_bTakePic) {
-                        postInvalidate();
-                    }
+                    postInvalidate();//刷新OnDraw，重新绘图
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

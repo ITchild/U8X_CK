@@ -2,7 +2,9 @@ package com.ck.utils;
 
 import android.os.SystemClock;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author fei
@@ -50,5 +52,15 @@ public class DateUtil {
         }
     }
 
+    /**
+     * 根据传入的日期格式返回日期
+     * @param format
+     * @return
+     */
+    public static String getDate(String format){
+        SimpleDateFormat formatter = new SimpleDateFormat (format);
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        return  formatter.format(curDate);
+    }
 
 }

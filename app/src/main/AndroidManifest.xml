@@ -42,17 +42,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.ck.collect.Ui_FileSelete"
-            android:label="@string/title_activity_ui__file_selete"
-            android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
-        <activity
-            android:name="com.ck.collect.Ui_Collect"
-            android:hardwareAccelerated="true"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
 
         <activity
             android:name="com.ck.activity_key.KeyCollectActivity"

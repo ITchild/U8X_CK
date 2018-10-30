@@ -97,26 +97,25 @@ public class DecodeUtil {
         return candidate;
     }
 
-
     /**
      * 将彩色图转换为纯黑白二色	* 	* @param 位图	* @return 返回转换好的位图
      */
     public static Bitmap convertToBlackWhite(Bitmap bmp) {
         int width = bmp.getWidth(); // 获取位图的宽
         int height = bmp.getHeight(); // 获取位图的高
-        int[] pixels = new int[width * height]; // 通过位图的大小创建像素点数组
-        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
-        int alpha = 0xFF << 24;
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                int grey = pixels[width * i + j];          //分离三原色
-                int red = ((grey & 0x00FF0000) >> 16);
-                int green = ((grey & 0x0000FF00) >> 8);
-                int blue = (grey & 0x000000FF);            //转化成灰度像素
-                grey = (int) (red * 0.3 + green * 0.59 + blue * 0.11);
-                grey = alpha | (grey << 16) | (grey << 8) | grey;
-                pixels[width * i + j] = grey;
+        int[] pixels = bitmap2RGB(bmp);
+        long avage = 0;
+        long bytGrayMin = 0;
+        for (int p : pixels){
+            avage = avage + p;
+            if (bytGrayMin > p) {
+                bytGrayMin = p;//灰度最小值
             }
+        }
+        avage = avage/pixels.length;
+        avage = avage - (avage-bytGrayMin)/2;
+        for (int i=0;i<pixels.length;i++){
+            pixels[i] = pixels[i]<avage? 0x00:0xFFFFFF;
         }
         //新建图片
         Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);

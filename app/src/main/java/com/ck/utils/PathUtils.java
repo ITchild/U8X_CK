@@ -2,6 +2,7 @@ package com.ck.utils;
 
 import android.os.Environment;
 
+import com.ck.App_DataPara;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
 
@@ -9,7 +10,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 
 /**
@@ -25,7 +25,7 @@ public class PathUtils {
     /**
      * 软件文件夹
      */
-    public static final String SYS_PATH = ExtSD_PATH + "/HC-U8X";
+    public static final String SYS_PATH = ExtSD_PATH + "/"+App_DataPara.getApp().getPackageName();
     /**
      * 工程目录
      */
@@ -38,6 +38,7 @@ public class PathUtils {
     public static final String DB_PATH_NAME = DB_PATH + "/user.db";
 
     public static final String FILE_PATH = SYS_PATH + "/测宽/FILE";
+
     public static final String NET_SOFT_UPDATE_PATH = "UpdateFile\\PhoneUpdate\\HCDT5X\\";
 
     static {
@@ -71,7 +72,6 @@ public class PathUtils {
 
     public static ArrayList<ClasFileProjectInfo> getProFileList() {
         File[] proList = OrderByDate(PathUtils.PROJECT_PATH);
-
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         ArrayList<ClasFileProjectInfo> m_ListProject = new ArrayList<ClasFileProjectInfo>();
         for (int i = 0; i < proList.length; i++) {
@@ -86,7 +86,7 @@ public class PathUtils {
                 gj.mLastModifiedDate = format.format(file.lastModified());
                 project.mstrArrFileGJ.add(gj);
             }
-            Collections.sort(project.mstrArrFileGJ);
+//            Collections.sort(project.mstrArrFileGJ);
             m_ListProject.add(project);
         }
         return m_ListProject;

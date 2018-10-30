@@ -7,67 +7,185 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/xhdpi_10dp"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginLeft="@dimen/x5"
             android:text="@string/str_proName"
             android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_27sp" />
+            android:textSize="@dimen/x20" />
 
         <EditText
             android:id="@+id/collect_proName_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?attr/textColor"
-            android:layout_margin="@dimen/xhdpi_10dp" />
-
+            android:textColor="@color/black"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginRight="@dimen/x5"
+            android:background="@color/white"
+            android:textSize="@dimen/x20"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/xhdpi_10dp"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginLeft="@dimen/x5"
+            android:text="@string/str_gjName"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/x20" />
+
+        <EditText
+            android:id="@+id/collect_gjName_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginRight="@dimen/x5"
+            android:background="@color/white"
+            android:textSize="@dimen/x20"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginLeft="@dimen/x5"
             android:text="@string/str_fileName"
             android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_27sp" />
+            android:textSize="@dimen/x20" />
 
         <EditText
             android:id="@+id/collect_fileName_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?attr/textColor"
-            android:layout_margin="@dimen/xhdpi_10dp" />
+            android:textColor="@color/black"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginRight="@dimen/x5"
+            android:background="@color/white"
+            android:textSize="@dimen/x20"/>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginLeft="@dimen/x5"
+            android:text="@string/str_adjueStyle"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/x20" />
 
+        <Spinner
+            android:id="@+id/collect_adjue_sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/textColor"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginRight="@dimen/x5"
+            android:background="@color/white"
+            android:entries="@array/adjueSytle"
+            android:textSize="@dimen/x20"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_marginBottom="@dimen/x5"
+            android:layout_marginLeft="@dimen/x5"
+            android:text="@string/str_checkStyle"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/x20" />
+            <Spinner
+                android:id="@+id/collect_check_sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/textColor"
+                android:layout_marginTop="@dimen/x10"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginRight="@dimen/x5"
+                android:background="@color/white"
+                android:entries="@array/checkSytle"
+                android:textSize="@dimen/x20"/>
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="1"
+        android:layout_marginTop="@dimen/x20"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <CheckBox
-            android:id="@+id/collect_blackWrite_cb"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/x28"
+            android:layout_marginLeft="@dimen/x10"
+            android:layout_marginTop="@dimen/x20"
+            android:text="照片调整："/>
+
+        <Button
+            android:id="@+id/collect_blackWrite_bt"
+            android:layout_width="@dimen/x120"
             android:layout_height="wrap_content"
             android:text="@string/str_blackWrite"
-            android:checked="false"
-            android:textColor="?attr/textColor" />
+            android:textSize="@dimen/x25"
+            android:background="@drawable/selector_btn"
+            android:textColor="@color/black" />
+
+        <Button
+            android:id="@+id/collect_pic_bt"
+            android:layout_width="@dimen/x120"
+            android:layout_height="wrap_content"
+            android:text="@string/str_pic"
+            android:textSize="@dimen/x25"
+            android:background="@drawable/selector_btn"
+            android:textColor="@color/black" />
 
         <Button
             android:id="@+id/collect_enlarge_bt"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/x120"
             android:layout_height="wrap_content"
-            android:text="@string/str_enlarge" />
+            android:text="@string/str_enlarge"
+            android:textSize="@dimen/x25"
+            android:background="@drawable/selector_btn"
+            android:textColor="@color/black" />
 
         <Button
             android:id="@+id/collect_Lessen_bt"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/x120"
             android:layout_height="wrap_content"
-            android:text="@string/str_lessen" />
+            android:text="@string/str_lessen"
+            android:textSize="@dimen/x25"
+            android:background="@drawable/selector_btn"
+            android:textColor="@color/black" />
     </LinearLayout>
 
 </LinearLayout>

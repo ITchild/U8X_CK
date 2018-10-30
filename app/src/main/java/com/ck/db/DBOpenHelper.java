@@ -6,13 +6,15 @@
  * @data:  2015-9-17 下午4:41:05 
  * @version:  V1.0 
  */
-package com.ck.utils;
+package com.ck.db;
 
 
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.ck.utils.PathUtils;
 
 /**
  * TODO<请描述这个类是干什么的>
@@ -35,6 +37,26 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				+ "strdevno nvarchar," 
 				+ "strusername nvarchar," 
 				+ "strpassword nvarchar)");
+
+		db.execSQL("CREATE TABLE IF NOT EXISTS MeasureData(" +
+				"id integer PRIMARY KEY AUTOINCREMENT," +
+				"objName nvarchar," +   //工程名称
+				"gjName nvarchar," +    //构件名称
+				"fileName nvarchar," +   // 文件名称
+				"objCreateDate nvarchar," +  //工程创建时间
+				"gjCreateDate nvarchar," +   // 构件创建时间
+				"fileCreateDate nvarchar," +  //文件创建时间
+				"judgeStyle nvarchar," + //判别方式 (中间水平上判别   全自动判别)
+				"measureDate nvarchar," +  //测量时间
+				"width float," +  // 缝宽
+				"leftX float," +  // 左侧X坐标
+				"leftY float," +  // 左侧Y坐标
+				"rightX float," +  // 右侧X坐标
+				"rightY float," +  // 右侧Y坐标
+				"checkStyle nvarvhar," +  // 检测类型 (宽度检测   实时检测)
+				"fileState nvarvhar," +  //  文件状态
+				"fileSize float," +  //  文件大小
+				"delDate nvarchar)");  // 删除时间
 	}
 
 	@Override

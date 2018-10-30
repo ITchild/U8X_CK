@@ -58,63 +58,6 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/collect_filelist_ll"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/xhdpi_45dp"
-                    android:background="?attr/background"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="@dimen/xhdpi_10dp"
-                    android:text="工程列表"
-                    android:textColor="?attr/textColor"
-                    android:textSize="@dimen/xhdpi_27sp" />
-
-                <View
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/xhdpi_2dp"
-                    android:background="?attr/textColor" />
-
-                <ListView
-                    android:id="@+id/collect_proList_lv"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="3.5"
-                    android:divider="?attr/background"></ListView>
-
-                <View
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/xhdpi_2dp"
-                    android:background="?attr/textColor" />
-
-                <TextView
-                    android:id="@+id/textView1"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/xhdpi_45dp"
-                    android:background="?attr/background"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="@dimen/xhdpi_10dp"
-                    android:text="文件列表"
-                    android:textColor="?attr/textColor"
-                    android:textSize="@dimen/xhdpi_27sp" />
-
-                <View
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/xhdpi_2dp"
-                    android:background="?attr/textColor" />
-
-                <ListView
-                    android:id="@+id/collect_fileList_lv"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="5.5"
-                    android:divider="?attr/background"></ListView>
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/collect_opr_ll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">

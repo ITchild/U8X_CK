@@ -168,8 +168,10 @@ public class FileUtil {
         }
         File path = null;
         File imageFile = null;
-        path = new File(PathUtils.PROJECT_PATH, m_strSaveProName);
-        path.mkdirs();
+        path = new File(PathUtils.PROJECT_PATH + m_strSaveProName);
+        if(!path.exists()) {
+            path.mkdirs();
+        }
 
         String fileName = String.format(style, m_strSaveGJName);
 

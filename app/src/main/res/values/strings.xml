@@ -12,6 +12,7 @@
 
 
     <string name="str_blackWrite">黑白图</string>
+    <string name="str_pic">原  图</string>
     <string name="str_enlarge">放  大</string>
     <string name="str_lessen">缩  小</string>
     <string name="str_acTitle">海创高科裂缝测宽仪</string>
@@ -37,7 +38,10 @@
     <string name="str_saveSuccess">保存成功</string>
 
     <string name="str_proName">工程名称：</string>
-    <string name="str_fileName">构件名称</string>
+    <string name="str_gjName">构件名称：</string>
+    <string name="str_fileName">文件名称：</string>
+    <string name="str_adjueStyle">判别方式：</string>
+    <string name="str_checkStyle">检测方式：</string>
     <string name="str_Auto">●自动计算\n  手动计算</string>
     <string name="str_Hand">  自动计算\n●手动计算</string>
 
@@ -73,5 +77,14 @@
     <string name="str_SysVision">系统版本</string>
     <string name="str_lastVision">软件版本</string>
     <string name="str_freeSpace">剩余空间</string>
+
+    <string-array name="adjueSytle">
+        <item>中间水平判别</item>
+        <item>全自动判别</item>
+    </string-array>
+    <string-array name="checkSytle">
+        <item>手动</item>
+        <item>自动</item>
+    </string-array>
 
 </resources>

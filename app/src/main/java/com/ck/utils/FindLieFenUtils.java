@@ -18,6 +18,7 @@ package com.ck.utils;
 public class FindLieFenUtils {
     public static float m_nLLineSite = 0;
     public static float m_nRLineSite = 0;
+    public static int m_nY = 0;
     public static float unitF;
     static boolean m_bCursorFlag = true;
     static int GRAY_DIF = 50;
@@ -29,12 +30,12 @@ public class FindLieFenUtils {
         int nLeft = -1, nRight = -1, nError = 0;
         int bytGrayMax = 0, bytGrayMin = 0x7fffffFF, bytGrayAve;
         int bytTemp[] = new int[nWidth];
-        int nYSite = nHeight / 2;
+        m_nY = nHeight / 2;
         long byteValueAll = 0;
 
         if (m_bCursorFlag) {    // 手动还是自动
             m_nLLineSite = m_nRLineSite = 0;  ///左右两侧位置的初始化
-            for (int i = 0, j = nWidth * nYSite; i < nWidth; i++, j++) {
+            for (int i = 0, j = nWidth * m_nY; i < nWidth; i++, j++) {
                 bytTemp[i] = (((((m_lpBaseBuf[j] >> 16) & 0xFF) * 30) + (((m_lpBaseBuf[j] >> 8) & 0xFF) * 59)
                         + ((m_lpBaseBuf[j] >> 0) & 0xFF) * 11) / 100); // 颜色灰度化  (R*30 + G*59 +B*11)/100
                 if (bytGrayMax < bytTemp[i]) {

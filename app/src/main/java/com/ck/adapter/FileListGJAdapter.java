@@ -9,9 +9,14 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ck.info.ClasFileProjectInfo;
 import com.ck.App_DataPara;
+import com.ck.bean.MeasureDataBean;
+import com.ck.db.DBService;
+import com.ck.info.ClasFileProjectInfo;
 import com.hc.u8x_ck.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileListGJAdapter extends BaseAdapter {
     public static final int File = 0;
@@ -105,7 +110,18 @@ public class FileListGJAdapter extends BaseAdapter {
                 holder.m_LL.setBackgroundColor(Color.WHITE);
         }
         holder.mCBNidx.setChecked(mProject.mstrArrFileGJ.get(position).bIsSelect);
-        holder.m_TVProject.setText(mProject.mstrArrFileGJ.get(position).mFileGJName.substring(0, mProject.mstrArrFileGJ.get(position).mFileGJName.length() - 4));
+        holder.tv_gjName.setText(mProject.mstrArrFileGJ.get(position).mFileGJName);
+        List<MeasureDataBean> dataBeans =  new ArrayList<>();
+        dataBeans = DBService.getInstence(mContext).getMeasureData(mProject.mFileProjectName,
+                mProject.mstrArrFileGJ.get(position).mFileGJName,null,MeasureDataBean.FILESTATE_USERING);
+        float max = 0;
+        for (MeasureDataBean bean : dataBeans){
+            if(bean.getWidth() > max){
+                max = bean.getWidth();
+            }
+        }
+        holder.tv_maxLf.setText(max + "mm");
+        holder.tv_num.setText(dataBeans.size()+"");
         holder.m_TVTime.setText("" + mProject.mstrArrFileGJ.get(position).mLastModifiedDate + "");
 
         return view;
@@ -121,7 +137,9 @@ public class FileListGJAdapter extends BaseAdapter {
 
     class ViewHolder {
         CheckBox mCBNidx;
-        TextView m_TVProject;
+        TextView tv_gjName;
+        TextView tv_maxLf;
+        TextView tv_num;
         TextView m_TVTime;
         LinearLayout m_LL;
         LinearLayout gjBackGround_ll;
@@ -130,8 +148,14 @@ public class FileListGJAdapter extends BaseAdapter {
             if(null == mCBNidx) {
                 mCBNidx = (CheckBox) view.findViewById(R.id.project_checkboxID);
             }
-            if(null == m_TVProject) {
-                m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
+            if(null == tv_gjName) {
+                tv_gjName = (TextView) view.findViewById(R.id.tv_gjName);
+            }
+            if(null == tv_maxLf){
+                tv_maxLf = (TextView) view.findViewById(R.id.tv_maxLf);
+            }
+            if(null == tv_num){
+                tv_num = (TextView) view.findViewById(R.id.tv_num);
             }
             if(null == m_TVTime) {
                 m_TVTime = (TextView) view.findViewById(R.id.tv_time);

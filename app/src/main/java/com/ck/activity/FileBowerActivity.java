@@ -6,12 +6,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.ck.activity_key.KeyCollectActivity;
 import com.ck.adapter.FileListGJAdapter;
 import com.ck.adapter.FileListProjectAdapter;
 import com.ck.base.TitleBaseActivity;
@@ -38,6 +38,8 @@ import java.util.List;
 public class FileBowerActivity extends TitleBaseActivity implements View.OnClickListener {
 
     protected List<ClasFileProjectInfo> proData;
+    private TextView fileBower_objName_tv;
+    private TextView fileBower_gjName_tv;
     protected ClasFileProjectInfo fileData;
     private ListView fileBower_proList_lv;
     private FileListProjectAdapter mProjectAdapter;
@@ -88,7 +90,8 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.UpdataProgress);
         registerReceiver(mReceiver, filter);
-
+        fileBower_objName_tv = findView(R.id.fileBower_objName_tv);
+        fileBower_gjName_tv = findView(R.id.fileBower_gjName_tv);
         fileBower_select_bt = findView(R.id.fileBower_select_bt);
         fileBower_toUsb_bt = findView(R.id.fileBower_toUsb_bt);
         fileBower_del_bt = findView(R.id.fileBower_del_bt);
@@ -121,6 +124,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     private void refreshProListData(int position) {
         proData = PathUtils.getProFileList();
         if (null != proData && proData.size() > position) {
+            fileBower_objName_tv.setText("工程名称("+proData.size()+")");
             mProjectAdapter.setData(proData, position);
         }
     }
@@ -132,6 +136,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         if (null != proData && proData.size() > 0 && proData.size() > position) {
             fileData = proData.get(position);
         }
+        fileBower_gjName_tv.setText("构件名称("+fileData.mstrArrFileGJ.size()+")");
         mGJAdapter.setData(fileData, backgroundPosition);
     }
 
@@ -201,14 +206,19 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      */
     protected void cilickFileObjList(int position, boolean isShowPic) {
         mGJAdapter.setSelect(position);
-        if (null != picDialog && !picDialog.isShowing() && isShowPic) {
-            String path = PathUtils.PROJECT_PATH + File.separator
-                    + proData.get(mProjectAdapter.getSelect()).mFileProjectName
-                    + File.separator + fileData.mstrArrFileGJ.get(position).mFileGJName;
-            Bitmap bmp = BitmapFactory.decodeFile(path);
-            picDialog.show();
-            picDialog.showPicBmp(bmp);
-        }
+//        if (null != picDialog && !picDialog.isShowing() && isShowPic) {
+//            String path = PathUtils.PROJECT_PATH + File.separator
+//                    + proData.get(mProjectAdapter.getSelect()).mFileProjectName
+//                    + File.separator + fileData.mstrArrFileGJ.get(position).mFileGJName;
+//            Bitmap bmp = BitmapFactory.decodeFile(path);
+//            picDialog.show();
+//            picDialog.showPicBmp(bmp);
+//        }
+        Intent intent = new Intent(this,KeyCollectActivity.class);
+        intent.putExtra("objName",proData.get(mProjectAdapter.getSelect()).mFileProjectName);
+        intent.putExtra("gjName",fileData.mstrArrFileGJ.get(mGJAdapter.getSelect()).mFileGJName);
+        startActivity(intent);
+        finish();
     }
 
     protected void choiceFileList(int position) {

@@ -1,42 +1,38 @@
 package com.ck.activity;
 
-import android.graphics.Bitmap;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.ck.adapter.ListGJAdapter;
-import com.ck.adapter.ListProjectAdapter;
 import com.ck.base.TitleBaseActivity;
+import com.ck.bean.MeasureDataBean;
 import com.ck.collect.OnOpenCameraListener;
-import com.ck.info.ClasFileGJInfo;
-import com.ck.info.ClasFileProjectInfo;
+import com.ck.db.DBService;
 import com.ck.ui.CameraView;
 import com.ck.utils.Catition;
+import com.ck.utils.DateUtil;
 import com.ck.utils.FileUtil;
 import com.ck.utils.FindLieFenUtils;
 import com.ck.utils.PathUtils;
 import com.hc.u8x_ck.R;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
 
 
 public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener,SurfaceHolder.Callback{
 
     public String m_strSaveProName = "默认工程"; //保存图片的默认工程名称
-    public String m_strSaveGJName = "默认构件1"; //保存图片的默认文件名称
+    public String m_strSaveGJName = "默认构件"; //保存图片的默认文件名称
     private SurfaceView collect_sfv;
     private SurfaceHolder mHolder;
     private CameraView collect_cameraView;
@@ -46,21 +42,13 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private Button collect_Cursor_bt;//选择检测光标
     private Button collect_left_bt;//光标向左移
     private Button collect_right_bt;//光标向右移
-    private LinearLayout collect_filelist_ll; //文件列表的布局
     private EditText collect_proName_et;
+    private EditText collect_gjName_et;
     private EditText collect_fileName_et;
-    private CheckBox collect_blackWrite_cb;// 是否显示黑白图
+    private Button collect_blackWrite_bt;// 是否显示黑白图
+    private Button collect_pic_bt;
     private Button collect_enlarge_bt; //放大
     private Button collect_Lessen_bt; //缩小
-
-    private ListView collect_proList_lv;//工程列表
-    private ListProjectAdapter mProjectAdapter; //工程列表的Apapter
-    private List<ClasFileProjectInfo> proData; //工程列表的数据源
-
-    private ListView collect_fileList_lv;//工程中的文件列表
-    private ListGJAdapter mGJAdapter; //工程中文件列表的Adapter
-    private ClasFileProjectInfo fileData;//工程中文件列表的数据源
-    private int filePosition = -1; //文件列表的选择位置
 
     private Handler mHandler = new Handler() {
         @Override
@@ -97,35 +85,39 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_cameraView = findView(R.id.collect_cameraView);
         collect_startStop_bt = findView(R.id.collect_startStop_bt);
         collect_save_bt = findView(R.id.collect_save_bt);
-        collect_filelist_ll = findView(R.id.collect_filelist_ll);
-        collect_blackWrite_cb = findView(R.id.collect_blackWrite_cb);
+        collect_blackWrite_bt = findView(R.id.collect_blackWrite_bt);
+        collect_pic_bt = findView(R.id.collect_pic_bt);
         collect_enlarge_bt = findView(R.id.collect_enlarge_bt);
         collect_Lessen_bt = findView(R.id.collect_Lessen_bt);
         collect_proName_et = findView(R.id.collect_proName_et);
+        collect_gjName_et = findView(R.id.collect_gjName_et);
         collect_fileName_et = findView(R.id.collect_fileName_et);
         collect_autoOrhand_bt = findView(R.id.collect_autoOrhand_bt);
         collect_Cursor_bt = findView(R.id.collect_Cursor_bt);
         collect_left_bt = findView(R.id.collect_left_bt);
         collect_right_bt = findView(R.id.collect_right_bt);
-        collect_proList_lv = findView(R.id.collect_proList_lv);
-        collect_fileList_lv = findView(R.id.collect_fileList_lv);
-        if (null == proData) {
-            proData = new ArrayList<>();
-        }
-        mProjectAdapter = new ListProjectAdapter(this, proData);
-        collect_proList_lv.setAdapter(mProjectAdapter);
-        if (null == fileData) {
-            fileData = new ClasFileProjectInfo();
-        }
-        mGJAdapter = new ListGJAdapter(this, fileData);
-        collect_fileList_lv.setAdapter(mGJAdapter);
     }
 
     @Override
     protected void initData() {
         super.initData();
-        refreshProListData(AppDatPara.m_nProjectSeleteNidx);
-        refreshFileListData(AppDatPara.m_nProjectSeleteNidx);
+        Intent intent = getIntent();
+        if(null == intent){
+            return;
+        }
+        String objName = intent.getStringExtra("objName");
+        String gjName = intent.getStringExtra("gjName");
+        if(!isStrEmpty(objName) && !isStrEmpty(gjName)){//从文件管理界面跳转过来
+            File file = new File(PathUtils.PROJECT_PATH+"/"+objName+"/"+gjName);
+            File[] files = file.listFiles();
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(files[0].getAbsolutePath());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            collect_cameraView.setBitmap(BitmapFactory.decodeStream(fis));
+        }
     }
 
     @Override
@@ -166,86 +158,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_left_bt.setOnLongClickListener(this);
         collect_right_bt.setOnClickListener(this);
         collect_right_bt.setOnLongClickListener(this);
-        collect_blackWrite_cb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean isChecked = collect_blackWrite_cb.isChecked();
-                collect_blackWrite_cb.setChecked(isChecked);
-                collect_cameraView.setBlackWrite(isChecked,true);
-            }
-        });
+        collect_blackWrite_bt.setOnClickListener(this);
+        collect_pic_bt.setOnClickListener(this);
         collect_enlarge_bt.setOnClickListener(this);
         collect_Lessen_bt.setOnClickListener(this);
-        collect_proList_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //获取工程列表的选中位置
-                if (collect_cameraView.isStart) {
-                    return;
-                }
-                if (AppDatPara.m_nProjectSeleteNidx == i) {
-                    return;
-                }
-                mProjectAdapter.setSelect(i);
-                getSaveProFileName(i);
-                AppDatPara.m_nProjectSeleteNidx = i;
-                filePosition = -1;
-                refreshFileListData(AppDatPara.m_nProjectSeleteNidx);
-                showPic();
-            }
-        });
-        collect_fileList_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (collect_cameraView.isStart) {
-                    return;
-                }
-                if (filePosition == i) {
-                    return;
-                }
-                filePosition = i;
-                mGJAdapter.setSelect(i);
-                showPic();
-            }
-        });
-    }
-
-    /**
-     * 刷新工程列表的数据
-     */
-    private void refreshProListData(int position) {
-        proData = PathUtils.getProFileList();
-        if (null != proData && proData.size() > position) {
-            mProjectAdapter.setData(proData, position);
-        }
-    }
-
-    /**
-     * 刷新文件列表数据
-     */
-    private void refreshFileListData(int position) {
-        if (null != proData && proData.size() > 0 && proData.size() > position) {
-            fileData = proData.get(position);
-        }
-        mGJAdapter.setData(fileData, filePosition);
-    }
-
-    /**
-     * 获取存储照片时工程名称和文件名称
-     * @param position 工程列表数据的位置
-     */
-    private void getSaveProFileName(int position) {
-        if (position < 0 || null == proData || proData.size() == 0 || proData.size() <= position) {
-            return;
-        }
-        String proName = proData.get(position).mFileProjectName;
-        m_strSaveProName = isStrEmpty(proName) ? "" : proName;
-        List<ClasFileGJInfo> mstrArrFileGJ = proData.get(position).mstrArrFileGJ;
-        if (null != mstrArrFileGJ && mstrArrFileGJ.size() > 0) {
-            String fileName = mstrArrFileGJ.get(mstrArrFileGJ.size() - 1).mFileGJName;
-            m_strSaveGJName = isStrEmpty(fileName) ? "" : fileName.substring(0,fileName.length()-4);
-            m_strSaveGJName = FileUtil.GetDigitalPile(m_strSaveGJName);
-        }
     }
 
     @Override
@@ -294,6 +210,12 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                     collect_cameraView.setLargeOrSmall(false,true);
                 }
                 break;
+            case R.id.collect_blackWrite_bt : //TODO : 黑白图
+                collect_cameraView.setBlackWrite(true,true);
+                break;
+            case R.id.collect_pic_bt :  // TODO : 原图
+                collect_cameraView.setBlackWrite(false,true);
+                break;
         }
     }
 
@@ -313,7 +235,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         }
         return false;
     }
-
     /**
      * 开始进行测量
      */
@@ -343,7 +264,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             }
         });
     }
-
     /**
      * 停止测量
      */
@@ -352,15 +272,14 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         changeStartStopTakeView(Catition.CollectView.STOP);
         collect_cameraView.showOriginalView();
     }
-
     /**
      * 进行预拍
      */
     private void onBeforTakePic() {
         stopCameraView();
         collect_cameraView.setZY(1);
-        getSaveProFileName(AppDatPara.m_nProjectSeleteNidx);
         changeStartStopTakeView(Catition.CollectView.TAKEPHOTO);
+        collect_cameraView.onBeforTakePic();//预拍之后的预处理
     }
 
     /**
@@ -368,50 +287,46 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onTakePic() {
         String proName = collect_proName_et.getText().toString();
+        String gjName = collect_gjName_et.getText().toString();
         String fileName = collect_fileName_et.getText().toString();
         if (isStrEmpty(proName)) {
             showToast("工程名不能为空");
             return;
-        } else if (isStrEmpty(fileName)) {
+        } else if (isStrEmpty(gjName)) {
             showToast("构件名不能为空");
             return;
+        }else if (isStrEmpty(fileName)){
+            showToast("文件名不能为空");
+            return;
         }
-//        collect_cameraView.setDrawingCacheEnabled(true);
-        collect_cameraView.onTakePic(true);
-//        collect_cameraView.buildDrawingCache();
-//        Bitmap drawingCache = collect_cameraView.getDrawingCache();
-        FileUtil.saveBmpImageFile(collect_cameraView.takeBackBitmap, proName, fileName, "%s.bmp");
-        collect_cameraView.onTakePic(false);
-//        collect_cameraView.setDrawingCacheEnabled(false);
+        FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
+                "/"+proName+"/"+gjName, fileName, "%s.bmp");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        MeasureDataBean dataBean = new MeasureDataBean();
+        dataBean.setObjName(proName);
+        dataBean.setGjName(gjName);
+        dataBean.setFileName(fileName);
+        dataBean.setObjCreateDate(format.format(new File(PathUtils.PROJECT_PATH+"/"+proName).lastModified()));
+        dataBean.setGjCreateDate(format.format(new File(PathUtils.PROJECT_PATH+"/"+proName+"/"+gjName).lastModified()));
+        File file = new File(PathUtils.PROJECT_PATH+"/"+proName+"/"+gjName+"/"+fileName + ".bmp");
+        dataBean.setFileCreateDate(format.format(file.lastModified()));
+        dataBean.setJudgeStyle(MeasureDataBean.JUDGESTYLE_HORIZ);
+        dataBean.setMeasureDate(DateUtil.getDate("yyyy/MM/dd"));
+        dataBean.setWidth(collect_cameraView.width);
+        dataBean.setLeftY(FindLieFenUtils.m_nY);
+        dataBean.setLeftX(FindLieFenUtils.m_nLLineSite);
+        dataBean.setRightY(FindLieFenUtils.m_nY);
+        dataBean.setRightX(FindLieFenUtils.m_nRLineSite);
+        dataBean.setCheckStyle(MeasureDataBean.CHECKSTYLE_WIDTH);
+        dataBean.setFileState(MeasureDataBean.FILESTATE_USERING);
+        dataBean.setFileSize(file.getTotalSpace());
+        dataBean.setDelDate("0000/00/00");
+        DBService.getInstence(this).SetMeasureData(dataBean);
         //刷新列表
         onCollectStart();//保存成功之后继续进行检测
-        refreshProListData(AppDatPara.m_nProjectSeleteNidx);
-        refreshFileListData(AppDatPara.m_nProjectSeleteNidx);
-        if(collect_blackWrite_cb.isChecked()) {
-            collect_blackWrite_cb.setChecked(false);
-        }
         collect_cameraView.setBlackWrite(false,false);
         collect_cameraView.setLargeOrSmall(false,false);
         showToast(getStr(R.string.str_saveSuccess));
-    }
-
-    /**
-     * 显示图片
-     */
-    public void showPic() {
-        if (AppDatPara.m_nProjectSeleteNidx < 0 || proData.size() <= AppDatPara.m_nProjectSeleteNidx) {
-            collect_cameraView.showOriginalView();
-            return;  //判断工程list有没有被选中
-        }
-        ClasFileProjectInfo pro = proData.get(AppDatPara.m_nProjectSeleteNidx);
-        if (filePosition < 0 || pro.mstrArrFileGJ.size() <= filePosition) {
-            collect_cameraView.showOriginalView();
-            return;//判断工程中的构件List有没有被选中
-        }
-        ClasFileGJInfo file = pro.mstrArrFileGJ.get(filePosition);
-        String path = PathUtils.PROJECT_PATH + File.separator + pro.mFileProjectName + File.separator + file.mFileGJName;
-        Bitmap bmp = BitmapFactory.decodeFile(path);
-        collect_cameraView.setBitmap(bmp);  //正常图像
     }
 
     /**
@@ -495,7 +410,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         switch (type) {
             case Catition.CollectView.START:
                 collect_sfv.setVisibility(View.VISIBLE);
-                collect_filelist_ll.setVisibility(View.VISIBLE);
                 collect_startStop_bt.setText(getStr(R.string.str_stopCollect));
                 collect_save_bt.setText(getStr(R.string.str_takePhoto));
                 collect_autoOrhand_bt.setText(getStr(R.string.str_Auto));
@@ -505,7 +419,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
             case Catition.CollectView.STOP:
                 collect_sfv.setVisibility(View.GONE);
-                collect_filelist_ll.setVisibility(View.VISIBLE);
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_save_bt.setText("");
                 collect_autoOrhand_bt.setText("");
@@ -515,9 +428,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
             case Catition.CollectView.TAKEPHOTO:
                 collect_sfv.setVisibility(View.GONE);
-                collect_filelist_ll.setVisibility(View.GONE);
                 collect_proName_et.setText(m_strSaveProName);
-                collect_fileName_et.setText(m_strSaveGJName);
+                collect_gjName_et.setText(m_strSaveGJName);
                 collect_autoOrhand_bt.setText("");
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_save_bt.setText(getStr(R.string.str_save));

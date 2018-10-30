@@ -30,17 +30,18 @@
                     android:layout_width="@dimen/xhdpi_80dp"
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:gravity="center_vertical"
-                    android:paddingLeft="@dimen/xhdpi_10dp"
-                    android:text="NO"
+                    android:paddingLeft="@dimen/x13"
+                    android:text="序号"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
 
                 <TextView
+                    android:id="@+id/fileBower_objName_tv"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:layout_weight="4.5"
                     android:gravity="center_vertical"
-                    android:text="工程名"
+                    android:text="工程名称(3)"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
 
@@ -49,7 +50,7 @@
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:layout_weight="2.5"
                     android:gravity="center"
-                    android:text="文件数"
+                    android:text="构件数量"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
 
@@ -58,7 +59,7 @@
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:layout_weight="3.5"
                     android:gravity="center"
-                    android:text="更新日期"
+                    android:text="创建时间"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
             </LinearLayout>
@@ -95,27 +96,44 @@
                     android:layout_width="@dimen/xhdpi_70dp"
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/xhdpi_10dp"
-                    android:text="NO"
+                    android:layout_marginLeft="@dimen/x13"
+                    android:text="序号"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
+
+                <TextView
+                    android:id="@+id/fileBower_gjName_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:layout_weight="2.5"
+                    android:gravity="center_vertical"
+                    android:text="构件名称(3)"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="@dimen/xhdpi_40dp"
-                    android:layout_weight="6.5"
+                    android:layout_weight="2"
                     android:gravity="center_vertical"
-                    android:text="文件"
+                    android:text="最大缝宽"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
-
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/xhdpi_40dp"
+                    android:layout_weight="2"
+                    android:gravity="center_vertical"
+                    android:text="裂缝数量"
+                    android:textColor="@color/yellow"
+                    android:textSize="@dimen/xhdpi_20sp" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:layout_weight="2.5"
                     android:gravity="center"
-                    android:text="更新日期"
+                    android:text="创建时间"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
             </LinearLayout>
