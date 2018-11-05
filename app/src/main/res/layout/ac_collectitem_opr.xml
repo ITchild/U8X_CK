@@ -1,191 +1,233 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/background"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginLeft="@dimen/x5"
-            android:text="@string/str_proName"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/x20" />
+        android:layout_height="match_parent"
+        android:background="?attr/background"
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/collect_proName_et"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginRight="@dimen/x5"
-            android:background="@color/white"
-            android:textSize="@dimen/x20"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginLeft="@dimen/x5"
-            android:text="@string/str_gjName"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/x20" />
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/collect_gjName_et"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginLeft="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:text="@string/str_proName"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x14" />
+
+            <EditText
+                android:id="@+id/collect_proName_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginRight="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginRight="@dimen/x5"
-            android:background="@color/white"
-            android:textSize="@dimen/x20"/>
-    </LinearLayout>
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginLeft="@dimen/x5"
-            android:text="@string/str_fileName"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/x20" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginLeft="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:text="@string/str_gjName"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x14" />
 
-        <EditText
-            android:id="@+id/collect_fileName_et"
+            <EditText
+                android:id="@+id/collect_gjName_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginRight="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginRight="@dimen/x5"
-            android:background="@color/white"
-            android:textSize="@dimen/x20"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginLeft="@dimen/x5"
-            android:text="@string/str_adjueStyle"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/x20" />
+            android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/collect_adjue_sp"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginLeft="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:text="@string/str_fileName"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x14" />
+
+            <EditText
+                android:id="@+id/collect_fileName_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginRight="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?attr/textColor"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginRight="@dimen/x5"
-            android:background="@color/white"
-            android:entries="@array/adjueSytle"
-            android:textSize="@dimen/x20"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginLeft="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:text="@string/str_adjueStyle"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x14" />
+
+            <Spinner
+                android:id="@+id/collect_adjue_sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginRight="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:background="@color/white"
+                android:entries="@array/adjueSytle"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x14" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/x10"
-            android:layout_marginBottom="@dimen/x5"
-            android:layout_marginLeft="@dimen/x5"
-            android:text="@string/str_checkStyle"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/x20" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/x5"
+                android:layout_marginLeft="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
+                android:text="@string/str_checkStyle"
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x14" />
+
             <Spinner
                 android:id="@+id/collect_check_sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/textColor"
-                android:layout_marginTop="@dimen/x10"
                 android:layout_marginBottom="@dimen/x5"
                 android:layout_marginRight="@dimen/x5"
+                android:layout_marginTop="@dimen/x10"
                 android:background="@color/white"
                 android:entries="@array/checkSytle"
-                android:textSize="@dimen/x20"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:layout_marginTop="@dimen/x20"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x14" />
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/x28"
-            android:layout_marginLeft="@dimen/x10"
-            android:layout_marginTop="@dimen/x20"
-            android:text="照片调整："/>
+            android:layout_height="0dip"
+            android:layout_marginTop="@dimen/x10"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/collect_blackWrite_bt"
-            android:layout_width="@dimen/x120"
-            android:layout_height="wrap_content"
-            android:text="@string/str_blackWrite"
-            android:textSize="@dimen/x25"
-            android:background="@drawable/selector_btn"
-            android:textColor="@color/black" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/x10"
+                android:layout_marginTop="@dimen/x20"
+                android:text="照片调整："
+                android:textColor="?attr/textColor"
+                android:textSize="@dimen/x15" />
 
-        <Button
-            android:id="@+id/collect_pic_bt"
-            android:layout_width="@dimen/x120"
-            android:layout_height="wrap_content"
-            android:text="@string/str_pic"
-            android:textSize="@dimen/x25"
-            android:background="@drawable/selector_btn"
-            android:textColor="@color/black" />
+            <Button
+                android:id="@+id/collect_blackWrite_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:text="@string/str_blackWrite"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
 
-        <Button
-            android:id="@+id/collect_enlarge_bt"
-            android:layout_width="@dimen/x120"
-            android:layout_height="wrap_content"
-            android:text="@string/str_enlarge"
-            android:textSize="@dimen/x25"
-            android:background="@drawable/selector_btn"
-            android:textColor="@color/black" />
+            <Button
+                android:id="@+id/collect_findBian_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:text="@string/str_findBian"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
 
-        <Button
-            android:id="@+id/collect_Lessen_bt"
-            android:layout_width="@dimen/x120"
-            android:layout_height="wrap_content"
-            android:text="@string/str_lessen"
-            android:textSize="@dimen/x25"
-            android:background="@drawable/selector_btn"
-            android:textColor="@color/black" />
+            <Button
+                android:id="@+id/collect_enlarge_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:text="@string/str_enlarge"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+
+            <Button
+                android:id="@+id/collect_Lessen_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:text="@string/str_lessen"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+
+            <Button
+                android:id="@+id/collect_morePic_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:text="@string/str_morePic"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+
+            <Button
+                android:id="@+id/collect_siglePic_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:text="@string/str_siglePic"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+
+            <Button
+                android:id="@+id/collect_Calibration_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:text="@string/str_calibration"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</ScrollView>

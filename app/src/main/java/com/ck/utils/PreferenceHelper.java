@@ -51,26 +51,22 @@ public class PreferenceHelper {
 		editor.putInt("light",light).commit();
 	}
 
+	/**
+	 * 保存标定完的数据
+	 * @param m_fXDensity
+	 */
+	public static void setFXDensity(float m_fXDensity){
+		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences("theme", Context.MODE_PRIVATE);
+		Editor editor = mdPreferences.edit();
+		editor.putFloat("Density",m_fXDensity).commit();
+	}
 
-	/*********************************************/
-	public static String getProName() {
-		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences("Pro", Context.MODE_PRIVATE);
-		return mdPreferences.getString("ProName", "默认工程");
-	}
-	public static void setProName(String pro) {
-		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences("Pro", Context.MODE_PRIVATE);
-		Editor mEditor = mdPreferences.edit();
-		mEditor.putString("ProName", pro).commit();
-	}
-	
-	/**********************************************/
-	public static String getGJName() {
-		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences("Pro", Context.MODE_PRIVATE);
-		return mdPreferences.getString("GJName", "默认构件1");
-	}
-	public static void setGJName(String gj) {
-		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences("Pro", Context.MODE_PRIVATE);
-		Editor mEditor = mdPreferences.edit();
-		mEditor.putString("GJName", gj).commit();
+	/**
+	 * 得到标定完的数据
+	 * @return
+	 */
+	public static float getFXDensity(){
+		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences("theme", Context.MODE_PRIVATE);
+		return mdPreferences.getFloat("Density", 0);
 	}
 }

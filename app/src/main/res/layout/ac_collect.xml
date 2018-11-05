@@ -44,6 +44,13 @@
                     android:layout_weight="1" />
 
             </RelativeLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/collect_morePic_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:layout_weight="1">
+            </android.support.v7.widget.RecyclerView>
             <View
                 android:layout_width="@dimen/x2"
                 android:layout_height="match_parent"
@@ -64,10 +71,7 @@
 
                 <include layout="@layout/ac_collectitem_opr" />
             </LinearLayout>
-
         </LinearLayout>
-
-
     </LinearLayout>
 
     <View

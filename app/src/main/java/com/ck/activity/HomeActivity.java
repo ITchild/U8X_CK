@@ -9,7 +9,7 @@ import com.ck.activity_key.KeyFileBowerActivity;
 import com.ck.adapter.HomeDisAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.dlg.SigleBtMsgDialog;
-import com.ck.service.SocketService;
+import com.ck.service.SerialService;
 import com.hc.u8x_ck.R;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class HomeActivity extends TitleBaseActivity {
     protected void initView() {
         super.initView();
         home_display = findView(R.id.home_display);
-        Intent intent = new Intent(this, SocketService.class);
+        Intent intent = new Intent(this, SerialService.class);
         startService(intent);
     }
 
@@ -83,7 +83,7 @@ public class HomeActivity extends TitleBaseActivity {
                 showMsgDialog();
                 break;
             case 3:
-                showMsgDialog();
+                jumpToCalibration();
                 break;
             case 4:
                 jumpToSetting();
@@ -100,6 +100,7 @@ public class HomeActivity extends TitleBaseActivity {
      */
     private void jumpToCollect() {
         startActivity(new Intent(this, KeyCollectActivity.class));
+//        startActivity(new Intent(this, USBCollectActivity.class));
     }
 
     /**
@@ -107,6 +108,13 @@ public class HomeActivity extends TitleBaseActivity {
      */
     private void jumpToFileManger() {
         startActivity(new Intent(this, KeyFileBowerActivity.class));
+    }
+
+    /**
+     * 跳转到标定界面
+     */
+    private void jumpToCalibration() {
+        startActivity(new Intent(this, CalibrationActivity.class));
     }
 
     private void jumpToSetting() {

@@ -1,33 +1,164 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/background"
     android:orientation="vertical">
 
-    <include layout="@layout/ac_basetitle"/>
+    <include layout="@layout/ac_basetitle" />
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
         android:orientation="horizontal">
 
-
-        <com.serenegiant.usb.widget.UVCCameraTextureView
-            android:id="@+id/camera_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <com.ck.ui.USBCarmeraView
-            android:id="@+id/usbcamera_view"
-            android:layout_width="640dp"
-            android:layout_height="480dp"
-            android:layout_weight="1"/>
-
-        <ImageView
-            android:id="@+id/usb_pic_iv"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/Layout"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="1dip"/>
+            android:layout_weight="8"
+            android:orientation="horizontal"
+            android:visibility="visible">
 
-    </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/collect_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/background"
+                android:orientation="horizontal">
+
+                <com.serenegiant.usb.widget.UVCCameraTextureView
+                    android:id="@+id/collect_uvcc"
+                    android:layout_width="2dp"
+                    android:layout_height="2dp"
+                    android:layout_centerInParent="true"
+                    android:layout_weight="1"
+                    android:background="?attr/background" />
+
+                <com.ck.ui.USBCameraView
+                    android:id="@+id/collect_USBcameraView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="?attr/background" />
+
+            </RelativeLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/collect_morePic_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:visibility="gone"></android.support.v7.widget.RecyclerView>
+
+            <View
+                android:layout_width="@dimen/x2"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:background="?attr/textColor" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/collect_opr_ll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include layout="@layout/ac_collectitem_opr" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/View2"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/xhdpi_2dp"
+        android:background="?attr/textColor" />
+
+    <LinearLayout
+        android:id="@+id/ui_collect_start"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/background">
+
+        <Button
+            android:id="@+id/collect_startStop_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:gravity="center"
+            android:text="@string/str_startCollect"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <Button
+            android:id="@+id/collect_save_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/collect_autoOrhand_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <Button
+            android:id="@+id/collect_Cursor_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_23sp" />
+
+        <Button
+            android:id="@+id/collect_left_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/collect_right_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text=""
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+
+        <Button
+            android:id="@+id/collect_back_bt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/button"
+            android:text="返回"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_30sp" />
+    </LinearLayout>
+
 </LinearLayout>

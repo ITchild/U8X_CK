@@ -7,7 +7,6 @@ import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,7 +18,7 @@ import com.ck.base.TitleBaseActivity;
 import com.ck.bean.MeasureDataBean;
 import com.ck.collect.OnOpenCameraListener;
 import com.ck.db.DBService;
-import com.ck.ui.CameraView;
+import com.ck.ui.USBCameraView;
 import com.ck.utils.Catition;
 import com.ck.utils.DateUtil;
 import com.ck.utils.FileUtil;
@@ -34,14 +33,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener, SurfaceHolder.Callback {
+/**
+ * @author fei
+ * @date on 2018/11/1 0001
+ * @describe TODO :
+ **/
+public class USBCollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener{
 
     public String m_strSaveProName = "默认工程"; //保存图片的默认工程名称
     public String m_strSaveGJName = "默认构件"; //保存图片的默认文件名称
-    private SurfaceView collect_sfv;
+    private View collect_uvcc;
     private SurfaceHolder mHolder;
-    private CameraView collect_cameraView;
+    private USBCameraView collect_USBcameraView;
     private Button collect_startStop_bt; //开始\停止 按钮
     private Button collect_save_bt; //预拍 \ 存储  按钮
     private Button collect_autoOrhand_bt;//自动计算或手动计算裂缝位置
@@ -52,21 +55,17 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private RelativeLayout collect_view;
 
     private RecyclerView collect_morePic_rv;//缩略图的布局
-    private List<MeasureDataBean> data;//缩略图的数据
+    private List<MeasureDataBean> data ;//缩略图的数据
     private MorePicAdapter mMorePicAdapter;//缩略图的adapter
 
     private EditText collect_proName_et;
     private EditText collect_gjName_et;
     private EditText collect_fileName_et;
     private Button collect_blackWrite_bt;// 是否显示黑白图
-    private Button collect_findBian_bt;//描边
     private Button collect_enlarge_bt; //放大
     private Button collect_Lessen_bt; //缩小
     private Button collect_morePic_bt; //缩略图
     private Button collect_siglePic_bt;//单幅图
-    private Button collect_Calibration_bt;//标定(2mm)
-
-    private int largeArrNum = 0;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -88,7 +87,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
 
     @Override
     protected int initLayout() {
-        return R.layout.ac_collect;
+        return R.layout.ac_usbcollect;
     }
 
     @Override
@@ -100,17 +99,15 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     protected void initView() {
         super.initView();
         collect_view = findView(R.id.collect_view);
-        collect_sfv = findView(R.id.collect_sfv);
-        collect_cameraView = findView(R.id.collect_cameraView);
+        collect_uvcc = findView(R.id.collect_uvcc);
+        collect_USBcameraView = findView(R.id.collect_USBcameraView);
         collect_startStop_bt = findView(R.id.collect_startStop_bt);
         collect_save_bt = findView(R.id.collect_save_bt);
         collect_blackWrite_bt = findView(R.id.collect_blackWrite_bt);
-        collect_findBian_bt = findView(R.id.collect_findBian_bt);
         collect_enlarge_bt = findView(R.id.collect_enlarge_bt);
         collect_Lessen_bt = findView(R.id.collect_Lessen_bt);
         collect_morePic_bt = findView(R.id.collect_morePic_bt);
         collect_siglePic_bt = findView(R.id.collect_siglePic_bt);
-        collect_Calibration_bt = findView(R.id.collect_Calibration_bt);
         collect_proName_et = findView(R.id.collect_proName_et);
         collect_gjName_et = findView(R.id.collect_gjName_et);
         collect_fileName_et = findView(R.id.collect_fileName_et);
@@ -119,11 +116,11 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_left_bt = findView(R.id.collect_left_bt);
         collect_right_bt = findView(R.id.collect_right_bt);
         collect_morePic_rv = findView(R.id.collect_morePic_rv);
-        collect_morePic_rv.setLayoutManager(new GridLayoutManager(this, 3));
-        if (null == data) {
+        collect_morePic_rv.setLayoutManager(new GridLayoutManager(this,3));
+        if(null == data){
             data = new ArrayList<>();
         }
-        mMorePicAdapter = new MorePicAdapter(this, data);
+        mMorePicAdapter = new MorePicAdapter(this,data);
         collect_morePic_rv.setAdapter(mMorePicAdapter);
 
     }
@@ -132,15 +129,15 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     protected void initData() {
         super.initData();
         Intent intent = getIntent();
-        if (null == intent) {
+        if(null == intent){
             return;
         }
         String objName = intent.getStringExtra("objName");
         String gjName = intent.getStringExtra("gjName");
-        if (!isStrEmpty(objName) && !isStrEmpty(gjName)) {//从文件管理界面跳转过来
-            List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName, gjName,
-                    null, MeasureDataBean.FILESTATE_USERING);
-            if (null != beans && beans.size() > 0) {
+        if(!isStrEmpty(objName) && !isStrEmpty(gjName)){//从文件管理界面跳转过来
+            List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName,gjName,
+                    null,MeasureDataBean.FILESTATE_USERING);
+            if(null != beans && beans.size()>0) {
                 data.clear();
                 data.addAll(beans);
                 changeCollectView(2);
@@ -152,27 +149,27 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(400);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (collect_cameraView.isStart) {
-                    onCollectStart();
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(400);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                if (collect_USBcameraView.isStart) {
+//                    onCollectStart();
+//                }
+//            }
+//        }).start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (collect_cameraView.isStart) {
-            collect_cameraView.closeCamera();
-        }
+//        if (collect_USBcameraView.isStart) {
+//            collect_USBcameraView.stopUsbCamera();
+//        }
     }
 
     @Override
@@ -188,19 +185,17 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_right_bt.setOnClickListener(this);
         collect_right_bt.setOnLongClickListener(this);
         collect_blackWrite_bt.setOnClickListener(this);
-        collect_findBian_bt.setOnClickListener(this);
         collect_enlarge_bt.setOnClickListener(this);
         collect_Lessen_bt.setOnClickListener(this);
         collect_morePic_bt.setOnClickListener(this);
         collect_siglePic_bt.setOnClickListener(this);
-        collect_Calibration_bt.setOnClickListener(this);
         mMorePicAdapter.setOnItemPicClickListener(new MorePicAdapter.OnItemPicClickListener() {
             @Override
             public void onPicClick(int position) {
                 String objName = data.get(position).getObjName();
                 String gjName = data.get(position).getGjName();
                 String fileName = data.get(position).getFileName();
-                String path = PathUtils.PROJECT_PATH + "/" + objName + "/" + gjName + "/" + fileName;
+                String path = PathUtils.PROJECT_PATH+"/"+objName+"/"+gjName+"/"+fileName;
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(path);
@@ -209,7 +204,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 }
                 FindLieFenUtils.m_nLLineSite = data.get(position).getLeftX();
                 FindLieFenUtils.m_nRLineSite = data.get(position).getRightX();
-                collect_cameraView.setBitmap(BitmapFactory.decodeStream(fis));
+                collect_USBcameraView.setBitmap(BitmapFactory.decodeStream(fis));
                 changeCollectView(1);
             }
         });
@@ -251,38 +246,26 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             case R.id.collect_back_bt: //TODO: 返回
                 activityFinish(); //返回
                 break;
-            case R.id.collect_enlarge_bt: //TODO : 放大
-                largeArrNum++;
-                largeArrNum = largeArrNum ==collect_cameraView.largeNumArr.length ? largeArrNum-1 : largeArrNum;
-                collect_cameraView.setLargeOrSmall(largeArrNum, true);
-                break;
-            case R.id.collect_Lessen_bt: //TODO : 缩小
-                largeArrNum--;
-                largeArrNum = largeArrNum == -1 ? 0 : largeArrNum;
-                collect_cameraView.setLargeOrSmall(largeArrNum, true);
-                break;
-            case R.id.collect_blackWrite_bt: //TODO : 黑白图
-                if (collect_cameraView.isBlackWrite) {
-                    collect_cameraView.setBlackWrite(false, true);
-                } else {
-                    collect_cameraView.setBlackWrite(true, true);
+            case R.id.collect_enlarge_bt : //TODO : 放大
+                if(!collect_USBcameraView.isToLarge) {
+                    collect_USBcameraView.setLargeOrSmall(true,true);
                 }
                 break;
-            case R.id.collect_findBian_bt: //TODO : 描边
-                if (collect_cameraView.isFindSide) {
-                    collect_cameraView.setFindSide(false, true);
-                } else {
-                    collect_cameraView.setFindSide(true, true);
+            case R.id.collect_Lessen_bt : //TODO : 缩小
+                if(collect_USBcameraView.isToLarge) {
+                    collect_USBcameraView.setLargeOrSmall(false,true);
                 }
                 break;
-            case R.id.collect_morePic_bt: //TODO : 缩略图
+            case R.id.collect_blackWrite_bt : //TODO : 黑白图
+                if (collect_USBcameraView.isBlackWrite) {
+                    collect_USBcameraView.setBlackWrite(false, true);
+                } else {
+                    collect_USBcameraView.setBlackWrite(true, true);
+                }
+            case R.id.collect_morePic_bt : //TODO : 缩略图
                 changeCollectView(2);
                 break;
-            case R.id.collect_siglePic_bt: //TODO：单幅图
-                changeCollectView(1);
-                break;
-            case R.id.collect_Calibration_bt: // TODO : 标定（2mm）
-                collect_cameraView.setCalibration(true);
+            case R.id.collect_siglePic_bt : //TODO：单幅图
                 break;
         }
     }
@@ -303,27 +286,21 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         }
         return false;
     }
-
     /**
      * 开始进行测量
      */
     private void onCollectStart() {
         changeCollectView(1);
-        collect_cameraView.setStartView();
-        collect_cameraView.onenCamera(new OnOpenCameraListener() {
+        collect_USBcameraView.setStartView();
+        collect_USBcameraView.openUsbCamera(collect_uvcc, this, new OnOpenCameraListener() {
             @Override
             public void OnOpenCameraResultListener(boolean bResult) {
                 if (bResult) {
-                    if (null == mHolder) {
-                        mHolder = collect_sfv.getHolder();
-                        mHolder.addCallback(CollectActivity.this);
-                    }
-                    collect_cameraView.setHolder(mHolder);
-                    collect_cameraView.setCountMode(true);
-                    collect_cameraView.setZY(0);
+                    collect_USBcameraView.setCountMode(true);
+                    collect_USBcameraView.setZY(0);
                     changeStartStopTakeView(Catition.CollectView.START);
                 } else {
-                    Toast.makeText(CollectActivity.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(USBCollectActivity.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -334,24 +311,22 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             }
         });
     }
-
     /**
      * 停止测量
      */
     private void onCollectStop() {
         stopCameraView();
         changeStartStopTakeView(Catition.CollectView.STOP);
-        collect_cameraView.showOriginalView();
+        collect_USBcameraView.showOriginalView();
     }
-
     /**
      * 进行预拍
      */
     private void onBeforTakePic() {
         stopCameraView();
-        collect_cameraView.setZY(1);
+        collect_USBcameraView.setZY(1);
         changeStartStopTakeView(Catition.CollectView.TAKEPHOTO);
-        collect_cameraView.onBeforTakePic();//预拍之后的预处理
+        collect_USBcameraView.onBeforTakePic();//预拍之后的预处理
     }
 
     /**
@@ -367,24 +342,24 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         } else if (isStrEmpty(gjName)) {
             showToast("构件名不能为空");
             return;
-        } else if (isStrEmpty(fileName)) {
+        }else if (isStrEmpty(fileName)){
             showToast("文件名不能为空");
             return;
         }
-        FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
-                "/" + proName + "/" + gjName, fileName, "%s.bmp");
+        FileUtil.saveBmpImageFile(collect_USBcameraView.m_DrawBitmap,
+                "/"+proName+"/"+gjName, fileName, "%s.bmp");
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         MeasureDataBean dataBean = new MeasureDataBean();
         dataBean.setObjName(proName);
         dataBean.setGjName(gjName);
-        dataBean.setFileName(fileName + ".bmp");
-        dataBean.setObjCreateDate(format.format(new File(PathUtils.PROJECT_PATH + "/" + proName).lastModified()));
-        dataBean.setGjCreateDate(format.format(new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + gjName).lastModified()));
-        File file = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + gjName + "/" + fileName + ".bmp");
+        dataBean.setFileName(fileName+".bmp");
+        dataBean.setObjCreateDate(format.format(new File(PathUtils.PROJECT_PATH+"/"+proName).lastModified()));
+        dataBean.setGjCreateDate(format.format(new File(PathUtils.PROJECT_PATH+"/"+proName+"/"+gjName).lastModified()));
+        File file = new File(PathUtils.PROJECT_PATH+"/"+proName+"/"+gjName+"/"+fileName + ".bmp");
         dataBean.setFileCreateDate(format.format(file.lastModified()));
         dataBean.setJudgeStyle(MeasureDataBean.JUDGESTYLE_HORIZ);
         dataBean.setMeasureDate(DateUtil.getDate("yyyy/MM/dd"));
-        dataBean.setWidth(collect_cameraView.width);
+        dataBean.setWidth(collect_USBcameraView.width);
         dataBean.setLeftY(FindLieFenUtils.m_nY);
         dataBean.setLeftX(FindLieFenUtils.m_nLLineSite);
         dataBean.setRightY(FindLieFenUtils.m_nY);
@@ -396,8 +371,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         DBService.getInstence(this).SetMeasureData(dataBean);
         //刷新列表
         onCollectStart();//保存成功之后继续进行检测
-        collect_cameraView.setBlackWrite(false, false);
-        collect_cameraView.setLargeOrSmall(1, false);
+        collect_USBcameraView.setBlackWrite(false,false);
+        collect_USBcameraView.setLargeOrSmall(false,false);
         showToast(getStr(R.string.str_saveSuccess));
     }
 
@@ -406,15 +381,15 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onCountMode() {
         if (collect_autoOrhand_bt.getText().toString().equals(getStr(R.string.str_Auto))) {
-            collect_cameraView.setCountMode(false);//手动计算
-            collect_cameraView.setZY(1);
+            collect_USBcameraView.setCountMode(false);//手动计算
+            collect_USBcameraView.setZY(1);
             collect_autoOrhand_bt.setText(getStr(R.string.str_Hand));
             collect_Cursor_bt.setText(getStr(R.string.str_leftCursor));
             collect_left_bt.setText(getStr(R.string.str_toLeft));
             collect_right_bt.setText(getStr(R.string.str_toRight));
         } else if (collect_autoOrhand_bt.getText().toString().equals(getStr(R.string.str_Hand))) {
-            collect_cameraView.setCountMode(true);//自动计算
-            collect_cameraView.setZY(0);
+            collect_USBcameraView.setCountMode(true);//自动计算
+            collect_USBcameraView.setZY(0);
             collect_autoOrhand_bt.setText(getStr(R.string.str_Auto));
             collect_Cursor_bt.setText("");
             collect_left_bt.setText("");
@@ -443,7 +418,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 FindLieFenUtils.RLineToLOrR(false);
             }
         }
-        collect_cameraView.onMove();
+        collect_USBcameraView.onMove();
         if (isLongClick) {
             Message msg = new Message();
             msg.what = 1000;
@@ -465,10 +440,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onSelectCursor() {
         if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
-            collect_cameraView.setZY(2);
+            collect_USBcameraView.setZY(2);
             collect_Cursor_bt.setText(getStr(R.string.str_rightCursor));
         } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
-            collect_cameraView.setZY(1);
+            collect_USBcameraView.setZY(1);
             collect_Cursor_bt.setText(getStr(R.string.str_leftCursor));
         }
     }
@@ -481,7 +456,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private void changeStartStopTakeView(int type) {
         switch (type) {
             case Catition.CollectView.START:
-                collect_sfv.setVisibility(View.VISIBLE);
+                collect_uvcc.setVisibility(View.VISIBLE);
                 collect_startStop_bt.setText(getStr(R.string.str_stopCollect));
                 collect_save_bt.setText(getStr(R.string.str_takePhoto));
                 collect_autoOrhand_bt.setText(getStr(R.string.str_Auto));
@@ -490,7 +465,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 collect_right_bt.setText("");
                 break;
             case Catition.CollectView.STOP:
-                collect_sfv.setVisibility(View.GONE);
+                collect_uvcc.setVisibility(View.GONE);
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_save_bt.setText("");
                 collect_autoOrhand_bt.setText("");
@@ -499,7 +474,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 collect_right_bt.setText("");
                 break;
             case Catition.CollectView.TAKEPHOTO:
-                collect_sfv.setVisibility(View.GONE);
+                collect_uvcc.setVisibility(View.GONE);
                 collect_proName_et.setText(m_strSaveProName);
                 collect_gjName_et.setText(m_strSaveGJName);
                 collect_autoOrhand_bt.setText("");
@@ -511,17 +486,15 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
         }
     }
-
     /**
      * 改变测量View处的布局
-     *
      * @param type 1：测量以及单幅图View  2：缩略图View
      */
-    private void changeCollectView(int type) {
-        if (type == 1) {
+    private void changeCollectView(int type){
+        if(type == 1){
             collect_view.setVisibility(View.VISIBLE);
             collect_morePic_rv.setVisibility(View.GONE);
-        } else if (type == 2) {
+        }else if(type == 2){
             collect_view.setVisibility(View.GONE);
             collect_morePic_rv.setVisibility(View.VISIBLE);
         }
@@ -531,8 +504,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      * 停止进行拍摄
      */
     private void stopCameraView() {
-        collect_cameraView.setStopView();
-        collect_cameraView.closeCamera();
+        collect_USBcameraView.stopUsbCamera();
+//        collect_cameraView.closeCamera();
     }
 
     @Override
@@ -540,22 +513,5 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         super.onDestroy();
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        if (null != collect_cameraView.m_Camera) {
-            collect_cameraView.m_Camera.addCallbackBuffer(collect_cameraView.m_Buffer);
-            collect_cameraView.m_Camera.setPreviewCallbackWithBuffer(collect_cameraView);
-            collect_cameraView.m_Camera.startPreview();
-        }
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
-    }
 }
+

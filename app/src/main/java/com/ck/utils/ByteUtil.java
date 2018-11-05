@@ -107,4 +107,30 @@ public class ByteUtil {
 	public static String getString(byte[] bytes) {
 		return getString(bytes, "GBK");
 	}
+
+	public static int byteArrayToInt(byte[] b, int offset) {
+		int value = 0;
+		for (int i = 0; i < 4; i++) {
+			value |= b[i];
+			value = value << 8;
+		}
+
+		return value;
+	}
+
+	public static String byte2String(byte[] buff, int size) {
+		StringBuffer sbuf = new StringBuffer();
+		// for (int i = 0; i < buff.length; i++)
+		for (int i = 0; i < size; i++) {
+			int tmp = buff[i] & 0XFF;
+			String str = Integer.toHexString(tmp);
+			if (str.length() == 1) {
+				sbuf.append("0" + str);
+			} else {
+				sbuf.append(str);
+			}
+		}
+
+		return sbuf.toString();
+	}
 }

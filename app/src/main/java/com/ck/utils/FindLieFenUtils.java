@@ -20,6 +20,7 @@ public class FindLieFenUtils {
     public static float m_nRLineSite = 0;
     public static int m_nY = 0;
     public static float unitF;
+    public static int bytGrayAve;
     static boolean m_bCursorFlag = true;
     static int GRAY_DIF = 50;
     static int ERROR_COUNT = 2;
@@ -28,7 +29,7 @@ public class FindLieFenUtils {
         m_bCursorFlag = mCountMode;
         unitF = (float) (nWidth * 1.0 / 1000);
         int nLeft = -1, nRight = -1, nError = 0;
-        int bytGrayMax = 0, bytGrayMin = 0x7fffffFF, bytGrayAve;
+        int bytGrayMax = 0, bytGrayMin = 0x7fffffFF;
         int bytTemp[] = new int[nWidth];
         m_nY = nHeight / 2;
         long byteValueAll = 0;
@@ -47,8 +48,27 @@ public class FindLieFenUtils {
                 byteValueAll += bytTemp[i]; //获取总的灰度值
             }
             if (bytGrayMax - bytGrayMin > GRAY_DIF) { //判断灰度最小值和最大值是否符合包含裂缝的标准
-                bytGrayAve = (int) byteValueAll / nWidth; //获取所有的灰度值的平均数
-                bytGrayAve = (3*bytGrayMin+bytGrayAve)/4; //(2018/10/25 新加判断）
+
+                bytGrayAve = (((bytGrayMax) + (bytGrayMin)) >> 1);// -
+                bytGrayAve = bytGrayMin + (bytGrayAve-bytGrayMin)/3;
+                // GRAY_DIF
+                // / 3;
+                // //设置阈值
+                int nMinAve = 0, nMaxAve = 0, nMinCnt = 0, nMaxCnt = 0;
+                for (int i = 0; i < nWidth; i++) // 计算最佳阈值
+                {
+                    if (bytTemp[i] < bytGrayAve) {
+                        nMinAve += (bytTemp[i] & 0xFF);
+                        nMinCnt++;
+                    } else {
+                        nMaxAve += (bytTemp[i] & 0xFF);
+                        nMaxCnt++;
+                    }
+                }
+                bytGrayAve = ((nMinAve / nMinCnt + nMaxAve / nMaxCnt) / 2);// /////
+
+//                bytGrayAve = (int) byteValueAll / nWidth; //获取所有的灰度值的平均数
+//                bytGrayAve = (3*bytGrayMin+bytGrayAve)/4; //(2018/10/25 新加判断）
                 for (int i = 0; i < nWidth; i++) {
                     bytTemp[i] = (bytTemp[i] <= bytGrayAve ? 0 : 0xFF);//转为黑白二值
                     if (bytTemp[i] == 0x00 && nLeft < 0) {
@@ -64,7 +84,7 @@ public class FindLieFenUtils {
                     if (nLeft >= 0 && nRight >= 0) {
                         if (nRight - nLeft >= 1 && nRight - nLeft >= m_nRLineSite - m_nLLineSite) {//过滤小范围值得波动
                             m_nLLineSite = nLeft;
-                            m_nRLineSite = nRight;
+                            m_nRLineSite = nRight-2;
                         }
                         nLeft = -1;
                         nRight = -1;

@@ -206,19 +206,11 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      */
     protected void cilickFileObjList(int position, boolean isShowPic) {
         mGJAdapter.setSelect(position);
-//        if (null != picDialog && !picDialog.isShowing() && isShowPic) {
-//            String path = PathUtils.PROJECT_PATH + File.separator
-//                    + proData.get(mProjectAdapter.getSelect()).mFileProjectName
-//                    + File.separator + fileData.mstrArrFileGJ.get(position).mFileGJName;
-//            Bitmap bmp = BitmapFactory.decodeFile(path);
-//            picDialog.show();
-//            picDialog.showPicBmp(bmp);
-//        }
         Intent intent = new Intent(this,KeyCollectActivity.class);
         intent.putExtra("objName",proData.get(mProjectAdapter.getSelect()).mFileProjectName);
         intent.putExtra("gjName",fileData.mstrArrFileGJ.get(mGJAdapter.getSelect()).mFileGJName);
         startActivity(intent);
-        finish();
+//        finish();
     }
 
     protected void choiceFileList(int position) {

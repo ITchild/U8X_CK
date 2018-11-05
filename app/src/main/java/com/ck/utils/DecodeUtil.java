@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.hardware.Camera;
 import android.media.ThumbnailUtils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -100,22 +101,26 @@ public class DecodeUtil {
     /**
      * 将彩色图转换为纯黑白二色	* 	* @param 位图	* @return 返回转换好的位图
      */
+    public static List<Integer> greenData = new ArrayList<>();
+    public static List<Integer> buleData = new ArrayList<>();
     public static Bitmap convertToBlackWhite(Bitmap bmp) {
         int width = bmp.getWidth(); // 获取位图的宽
         int height = bmp.getHeight(); // 获取位图的高
         int[] pixels = bitmap2RGB(bmp);
-        long avage = 0;
-        long bytGrayMin = 0;
-        for (int p : pixels){
-            avage = avage + p;
-            if (bytGrayMin > p) {
-                bytGrayMin = p;//灰度最小值
+        long avage = FindLieFenUtils.bytGrayAve;
+        greenData.clear();
+        buleData.clear();
+        for (int i = 0; i < pixels.length; i++) {
+            int allFlag = (((((pixels[i] >> 16) & 0xFF) * 30) + (((pixels[i] >> 8) & 0xFF) * 59)
+                    + ((pixels[i] >> 0) & 0xFF) * 11) / 100);
+            pixels[i] = allFlag < avage ? 0x00 : 0xFFFFFF;
+            if (i > 0) {
+                if (pixels[i - 1] > pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
+                    greenData.add(i);
+                } else if (pixels[i - 1] < pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
+                    buleData.add(i);
+                }
             }
-        }
-        avage = avage/pixels.length;
-        avage = avage - (avage-bytGrayMin)/2;
-        for (int i=0;i<pixels.length;i++){
-            pixels[i] = pixels[i]<avage? 0x00:0xFFFFFF;
         }
         //新建图片
         Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
@@ -188,6 +193,7 @@ public class DecodeUtil {
 
         return color;
     }
+
     // 将一个byte数转成int
     // 实现这个函数的目的是为了将byte数当成无符号的变量去转化成int
     public static int convertByteToInt(byte data) {

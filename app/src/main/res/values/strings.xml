@@ -13,8 +13,12 @@
 
     <string name="str_blackWrite">黑白图</string>
     <string name="str_pic">原  图</string>
+    <string name="str_findBian">描  边</string>
     <string name="str_enlarge">放  大</string>
     <string name="str_lessen">缩  小</string>
+    <string name="str_morePic">缩略图</string>
+    <string name="str_siglePic">单幅图</string>
+    <string name="str_calibration">标定(2mm)</string>
     <string name="str_acTitle">海创高科裂缝测宽仪</string>
     
     <string name="str_measureWide">测量缝宽</string>
