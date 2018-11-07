@@ -75,4 +75,12 @@ public class SerialService extends Service implements OnOpenSerialPortListener {
                 break;
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(null != mSerialPortManager) {
+            mSerialPortManager.closeSerialPort();
+        }
+    }
 }

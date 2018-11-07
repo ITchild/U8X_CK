@@ -60,6 +60,14 @@
         android:orientation="horizontal" >
 
         <Button
+            android:id="@+id/bt_sigleBtMsg_cancel"
+            style="@style/buttonStyle"
+            android:layout_width="0dp"
+            android:visibility="gone"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="取消" />
+        <Button
             android:id="@+id/bt_sigleBtMsg_yes"
             style="@style/buttonStyle"
             android:layout_width="0dp"

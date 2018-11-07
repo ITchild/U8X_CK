@@ -24,8 +24,8 @@
                 android:textColor="?attr/textColor"
                 android:textSize="@dimen/x14" />
 
-            <EditText
-                android:id="@+id/collect_proName_et"
+            <TextView
+                android:id="@+id/collect_proName_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/x5"
@@ -51,8 +51,8 @@
                 android:textColor="?attr/textColor"
                 android:textSize="@dimen/x14" />
 
-            <EditText
-                android:id="@+id/collect_gjName_et"
+            <TextView
+                android:id="@+id/collect_gjName_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/x5"
@@ -78,8 +78,8 @@
                 android:textColor="?attr/textColor"
                 android:textSize="@dimen/x14" />
 
-            <EditText
-                android:id="@+id/collect_fileName_et"
+            <TextView
+                android:id="@+id/collect_fileName_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/x5"

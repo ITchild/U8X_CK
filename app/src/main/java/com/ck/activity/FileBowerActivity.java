@@ -16,6 +16,7 @@ import com.ck.adapter.FileListGJAdapter;
 import com.ck.adapter.FileListProjectAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.collect.DLG_FileProgress;
+import com.ck.db.DBService;
 import com.ck.dlg.DLG_Alert;
 import com.ck.dlg.ShowPicDialog;
 import com.ck.info.ClasFileGJInfo;
@@ -123,10 +124,8 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      */
     private void refreshProListData(int position) {
         proData = PathUtils.getProFileList();
-        if (null != proData && proData.size() > position) {
-            fileBower_objName_tv.setText("工程名称("+proData.size()+")");
-            mProjectAdapter.setData(proData, position);
-        }
+        fileBower_objName_tv.setText("工程名称("+proData.size()+")");
+        mProjectAdapter.setData(proData, position);
     }
 
     /**
@@ -135,6 +134,8 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     private void refreshFileListData(int position, int backgroundPosition) {
         if (null != proData && proData.size() > 0 && proData.size() > position) {
             fileData = proData.get(position);
+        }else {
+            fileData = new ClasFileProjectInfo();
         }
         fileBower_gjName_tv.setText("构件名称("+fileData.mstrArrFileGJ.size()+")");
         mGJAdapter.setData(fileData, backgroundPosition);
@@ -187,6 +188,9 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      * @param position
      */
     protected void choiceObjList(int position) {
+        if(null == proData || proData.size() ==0){
+            return;
+        }
         int choiceState = proData.get(position).nIsSelect;
         if (choiceState == 0 || choiceState == 1) {//进行完全选中
             optFileListChoice(position, true);
@@ -333,10 +337,32 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      */
     private void delSelectFile() {
         FileUtil.delSeleceFile(proData);
+        delDbMeasure();
         refreshProListData(0);
         refreshFileListData(0, -1);
     }
 
+
+    /**
+     * 删除数据中的文件
+     */
+    private void delDbMeasure(){
+        for(ClasFileProjectInfo info : proData){
+            if(info.nIsSelect == 2){
+                DBService.getInstence(this).delMeasureData(
+                        info.mFileProjectName,null,null);
+            }else if(info.nIsSelect == 1){
+                List<ClasFileGJInfo> ArrFileGJ = info.mstrArrFileGJ;
+                for (int j = 0; j < ArrFileGJ.size(); j++) {
+                    ClasFileGJInfo clasFileGJInfo = ArrFileGJ.get(j);
+                    if (clasFileGJInfo.bIsSelect) {
+                        DBService.getInstence(this).delMeasureData(
+                                info.mFileProjectName,clasFileGJInfo.mFileGJName,null);
+                    }
+                }
+            }
+        }
+    }
     /**
      * 将文件转存的U盘
      */
@@ -377,6 +403,10 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         }
     }
 
+    /***
+     * 将文件保存到U盘
+     * @param targetDir
+     */
     private void copyFileToUPan(final String targetDir) {
         // 获取拷贝文件总共大小值 ，将值传入拷贝文件中
         long lTotalfileSize = FileUtil.GetFileSize(proData);

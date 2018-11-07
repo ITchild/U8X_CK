@@ -28,21 +28,17 @@
                 android:background="?attr/background"
                 android:layout_weight="1"
                 android:orientation="horizontal">
-
                 <SurfaceView
                     android:id="@+id/collect_sfv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:background="?attr/background" />
-
                 <com.ck.ui.CameraView
                     android:id="@+id/collect_cameraView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/background"
-                    android:layout_weight="1" />
-
+                    android:clickable="true"/>
             </RelativeLayout>
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/collect_morePic_rv"

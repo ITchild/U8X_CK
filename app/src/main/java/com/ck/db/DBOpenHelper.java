@@ -49,6 +49,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				"judgeStyle nvarchar," + //判别方式 (中间水平上判别   全自动判别)
 				"measureDate nvarchar," +  //测量时间
 				"width float," +  // 缝宽
+				"avage integer," + //测量的均值
 				"leftX float," +  // 左侧X坐标
 				"leftY float," +  // 左侧Y坐标
 				"rightX float," +  // 右侧X坐标

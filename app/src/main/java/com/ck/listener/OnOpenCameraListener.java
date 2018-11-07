@@ -7,7 +7,7 @@
  * @data:  2016-2-29 上午9:02:29 
  * @version:  V1.0 
  */ 
-package com.ck.collect;
+package com.ck.listener;
 
 /** 
  * TODO<请描述这个类是干什么的> 

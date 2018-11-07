@@ -164,6 +164,7 @@ public class App_DataPara extends BaseApplication {
     // U盘路径
     public String GetExternalStorageDirectory() {
         return m_strESDir;
+//        return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
     private void RegistDiskReceiver() {

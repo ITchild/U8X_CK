@@ -33,6 +33,7 @@
     <string name="str_noAc_msg">暂未开放，敬请期待</string>
 
     <string name="str_back">返回</string>
+    <string name="str_ok">确定</string>
 
     <string name="str_startCollect">   开始测量\n●停止测量</string>
     <string name="str_stopCollect">●开始测量\n   停止测量</string>
@@ -54,6 +55,10 @@
 
     <string name="str_toLeft">左移</string>
     <string name="str_toRight">右移</string>
+
+    <string name="str_ProNewName">选择或新建工程</string>
+    <string name="str_GjNewName">选择或新建构件</string>
+    <string name="str_FileNewName">新建文件</string>
 
     <string name="str_selectAll">全选</string>
     <string name="str_cancelAll">取消全选</string>

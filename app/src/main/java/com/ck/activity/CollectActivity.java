@@ -10,15 +10,18 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ck.adapter.MorePicAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.bean.MeasureDataBean;
-import com.ck.collect.OnOpenCameraListener;
 import com.ck.db.DBService;
+import com.ck.dlg.ShowObjGjFileListDialog;
+import com.ck.dlg.TwoBtMsgDialog;
+import com.ck.info.ClasFileProjectInfo;
+import com.ck.listener.OnOpenCameraListener;
 import com.ck.ui.CameraView;
 import com.ck.utils.Catition;
 import com.ck.utils.DateUtil;
@@ -37,8 +40,6 @@ import java.util.List;
 
 public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener, SurfaceHolder.Callback {
 
-    public String m_strSaveProName = "默认工程"; //保存图片的默认工程名称
-    public String m_strSaveGJName = "默认构件"; //保存图片的默认文件名称
     private SurfaceView collect_sfv;
     private SurfaceHolder mHolder;
     private CameraView collect_cameraView;
@@ -55,9 +56,9 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private List<MeasureDataBean> data;//缩略图的数据
     private MorePicAdapter mMorePicAdapter;//缩略图的adapter
 
-    private EditText collect_proName_et;
-    private EditText collect_gjName_et;
-    private EditText collect_fileName_et;
+    private TextView collect_proName_tv;
+    private TextView collect_gjName_tv;
+    private TextView collect_fileName_tv;
     private Button collect_blackWrite_bt;// 是否显示黑白图
     private Button collect_findBian_bt;//描边
     private Button collect_enlarge_bt; //放大
@@ -111,9 +112,9 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_morePic_bt = findView(R.id.collect_morePic_bt);
         collect_siglePic_bt = findView(R.id.collect_siglePic_bt);
         collect_Calibration_bt = findView(R.id.collect_Calibration_bt);
-        collect_proName_et = findView(R.id.collect_proName_et);
-        collect_gjName_et = findView(R.id.collect_gjName_et);
-        collect_fileName_et = findView(R.id.collect_fileName_et);
+        collect_proName_tv = findView(R.id.collect_proName_tv);
+        collect_gjName_tv = findView(R.id.collect_gjName_tv);
+        collect_fileName_tv = findView(R.id.collect_fileName_tv);
         collect_autoOrhand_bt = findView(R.id.collect_autoOrhand_bt);
         collect_Cursor_bt = findView(R.id.collect_Cursor_bt);
         collect_left_bt = findView(R.id.collect_left_bt);
@@ -125,7 +126,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         }
         mMorePicAdapter = new MorePicAdapter(this, data);
         collect_morePic_rv.setAdapter(mMorePicAdapter);
-
     }
 
     @Override
@@ -145,6 +145,25 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 data.addAll(beans);
                 changeCollectView(2);
                 mMorePicAdapter.setData(data);
+                collect_proName_tv.setText(objName);
+                collect_gjName_tv.setText(gjName);
+            }
+        }else{//直接点击进入界面的情况
+            List<ClasFileProjectInfo> fileData = PathUtils.getProFileList();
+            if(null != fileData && fileData.size()>0 && null != fileData.get(0).mstrArrFileGJ
+                    && fileData.get(0).mstrArrFileGJ.size()>0) {
+                objName = fileData.get(0).mFileProjectName;
+                gjName = fileData.get(0).mstrArrFileGJ.get(0).mFileGJName;
+                List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName, gjName,
+                        null, MeasureDataBean.FILESTATE_USERING);
+                if (null != beans && beans.size() > 0) {
+                    data.clear();
+                    data.addAll(beans);
+                    changeCollectView(2);
+                    mMorePicAdapter.setData(data);
+                    collect_proName_tv.setText(objName);
+                    collect_gjName_tv.setText(gjName);
+                }
             }
         }
     }
@@ -187,6 +206,9 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_left_bt.setOnLongClickListener(this);
         collect_right_bt.setOnClickListener(this);
         collect_right_bt.setOnLongClickListener(this);
+        collect_proName_tv.setOnClickListener(this);//工程名字
+        collect_gjName_tv.setOnClickListener(this);//构件名称
+        collect_fileName_tv.setOnClickListener(this);//文件名称
         collect_blackWrite_bt.setOnClickListener(this);
         collect_findBian_bt.setOnClickListener(this);
         collect_enlarge_bt.setOnClickListener(this);
@@ -207,10 +229,21 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
+                largeArrNum = 0;
+                collect_cameraView.setBlackWrite(false,false);
+                collect_cameraView.setFindSide(false,false);
+                collect_fileName_tv.setText(fileName.replace(".bmp",""));
                 FindLieFenUtils.m_nLLineSite = data.get(position).getLeftX();
                 FindLieFenUtils.m_nRLineSite = data.get(position).getRightX();
+                FindLieFenUtils.bytGrayAve = data.get(position).getAvage();
+                collect_cameraView.blackWriteBitmap = null;
                 collect_cameraView.setBitmap(BitmapFactory.decodeStream(fis));
                 changeCollectView(1);
+            }
+
+            @Override
+            public void onLongClick(int position) {
+                delFileDialog(position);
             }
         });
     }
@@ -276,13 +309,28 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 }
                 break;
             case R.id.collect_morePic_bt: //TODO : 缩略图
+                refreshMorePic();
+                largeArrNum = 0;
                 changeCollectView(2);
                 break;
             case R.id.collect_siglePic_bt: //TODO：单幅图
                 changeCollectView(1);
+                largeArrNum = 0;
                 break;
             case R.id.collect_Calibration_bt: // TODO : 标定（2mm）
                 collect_cameraView.setCalibration(true);
+                break;
+            case R.id.collect_proName_tv  : //TODO:  工程名字
+                showToast("显示新建以及工程列表");
+                showObj_Gj_FileListOrCreate(getStr(R.string.str_ProNewName));
+                break;
+            case R.id.collect_gjName_tv : // TODO :构件名称
+                showToast("显示新建以及构件列表");
+                showObj_Gj_FileListOrCreate(getStr(R.string.str_GjNewName));
+                break;
+            case R.id.collect_fileName_tv: //TODO :文件名称
+                showToast("显示新建以及文件列表");
+                showObj_Gj_FileListOrCreate(getStr(R.string.str_FileNewName));
                 break;
         }
     }
@@ -355,12 +403,49 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     }
 
     /**
+     * 长按删除文件的弹框
+     * @param position
+     */
+    private void delFileDialog(final int position){
+        final TwoBtMsgDialog twoBtMsgDialog = new TwoBtMsgDialog(this);
+        twoBtMsgDialog.show();
+        twoBtMsgDialog.setMsg("确定要删除文件“"+data.get(position).getFileName()+"”吗？");
+        twoBtMsgDialog.setOnBtClickListener(new TwoBtMsgDialog.OnBtClickListener() {
+            @Override
+            public void onBtClick(boolean isOk) {
+                if(isOk){
+                    delFile(position);
+                }
+                twoBtMsgDialog.dismiss();
+            }
+        });
+    }
+
+    private void delFile(int position){
+        String proName = data.get(position).getObjName();
+        String gjName = data.get(position).getGjName();
+        String fileName = data.get(position).getFileName();
+        File file = new File(PathUtils.PROJECT_PATH+
+                "/"+ proName + "/"+gjName+"/"+fileName);
+        boolean isdel = false;
+        if(file.exists()){
+            isdel = file.delete();
+        }
+        if(isdel){
+            DBService.getInstence(this).delMeasureData(proName,gjName,fileName);
+        }
+        data.remove(position);
+        showToast("删除成功");
+        mMorePicAdapter.setData(data);
+    }
+
+    /**
      * 进行保存
      */
     private void onTakePic() {
-        String proName = collect_proName_et.getText().toString();
-        String gjName = collect_gjName_et.getText().toString();
-        String fileName = collect_fileName_et.getText().toString();
+        String proName = collect_proName_tv.getText().toString();
+        String gjName = collect_gjName_tv.getText().toString();
+        String fileName = collect_fileName_tv.getText().toString();
         if (isStrEmpty(proName)) {
             showToast("工程名不能为空");
             return;
@@ -369,6 +454,17 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             return;
         } else if (isStrEmpty(fileName)) {
             showToast("文件名不能为空");
+            return;
+        }
+        File isHaveFile = new File(PathUtils.PROJECT_PATH+"/" + proName + "/" + gjName+"/"+fileName+".bmp");
+        if(isHaveFile.exists()){
+            showToast("文件名重复");
+            return;
+        }
+        List<MeasureDataBean> isHaveData = DBService.getInstence(this).
+                getMeasureData(proName,gjName,fileName,MeasureDataBean.FILESTATE_USERING);
+        if(null != isHaveData && isHaveData.size()>0){
+            showToast("文件名重复");
             return;
         }
         FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
@@ -385,13 +481,14 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         dataBean.setJudgeStyle(MeasureDataBean.JUDGESTYLE_HORIZ);
         dataBean.setMeasureDate(DateUtil.getDate("yyyy/MM/dd"));
         dataBean.setWidth(collect_cameraView.width);
+        dataBean.setAvage(FindLieFenUtils.bytGrayAve);
         dataBean.setLeftY(FindLieFenUtils.m_nY);
         dataBean.setLeftX(FindLieFenUtils.m_nLLineSite);
         dataBean.setRightY(FindLieFenUtils.m_nY);
         dataBean.setRightX(FindLieFenUtils.m_nRLineSite);
         dataBean.setCheckStyle(MeasureDataBean.CHECKSTYLE_WIDTH);
         dataBean.setFileState(MeasureDataBean.FILESTATE_USERING);
-        dataBean.setFileSize(file.getTotalSpace());
+        dataBean.setFileSize(file.length());
         dataBean.setDelDate("0000/00/00");
         DBService.getInstence(this).SetMeasureData(dataBean);
         //刷新列表
@@ -500,8 +597,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
             case Catition.CollectView.TAKEPHOTO:
                 collect_sfv.setVisibility(View.GONE);
-                collect_proName_et.setText(m_strSaveProName);
-                collect_gjName_et.setText(m_strSaveGJName);
                 collect_autoOrhand_bt.setText("");
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_save_bt.setText(getStr(R.string.str_save));
@@ -514,7 +609,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
 
     /**
      * 改变测量View处的布局
-     *
      * @param type 1：测量以及单幅图View  2：缩略图View
      */
     private void changeCollectView(int type) {
@@ -525,6 +619,57 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             collect_view.setVisibility(View.GONE);
             collect_morePic_rv.setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * 用于显示选择工程列表，构件列表，新建文件名称的Dialog
+     * @param title 1： 工程列表选择以及新建
+     *             2： 构件列表选择以及新建
+     *             3： 文件名称的新建
+     */
+    private void showObj_Gj_FileListOrCreate(final String title){
+        if(null == title){
+            return;
+        }
+        final ShowObjGjFileListDialog dialog = new ShowObjGjFileListDialog(this
+                ,title,collect_proName_tv.getText().toString()
+                ,collect_gjName_tv.getText().toString()
+                ,collect_fileName_tv.getText().toString());
+        dialog.setOnGetName(new ShowObjGjFileListDialog.OnChoiceOrCreateName() {
+            @Override
+            public void retrunName(String name) {
+                if(null == name || name.equals("")){
+                    showToast("请输入您要创建的名称");
+                }else{
+                    collect_fileName_tv.setText("");
+                    if(title.equals(getStr(R.string.str_ProNewName))){
+                        collect_proName_tv.setText(name);
+                        refreshMorePic();
+                    }else if(title.equals(getStr(R.string.str_GjNewName))){
+                        collect_gjName_tv.setText(name);
+                        refreshMorePic();
+                    }else if(title.equals(getStr(R.string.str_FileNewName))){
+                        collect_fileName_tv.setText(name);
+                    }
+                    dialog.dismiss();
+                }
+            }
+        });
+        dialog.show();
+    }
+
+    private void refreshMorePic(){
+        data.clear();
+        String objName = collect_proName_tv.getText().toString();
+        String gjName = collect_gjName_tv.getText().toString();
+        if (!isStrEmpty(objName) && !isStrEmpty(gjName)) {//从文件管理界面跳转过来
+            List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName, gjName,
+                    null, MeasureDataBean.FILESTATE_USERING);
+            if (null != beans && beans.size() > 0) {
+                data.addAll(beans);
+            }
+        }
+        mMorePicAdapter.setData(data);
     }
 
     /**

@@ -27,6 +27,7 @@ public class MeasureDataBean {
     private String judgeStyle;   //判别方式 (中间水平上判别   全自动判别)
     private String measureDate;   //测量时间
     private float width;   // 缝宽
+    private int avage;   // 检测到的平均颜色值
     private float leftX;    // 左侧X坐标
     private float leftY;     // 左侧Y坐标
     private float rightX;   // 右侧X坐标
@@ -71,6 +72,15 @@ public class MeasureDataBean {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public int getAvage() {
+        //其它类型返回字段值本身
+        return avage;
+    }
+
+    public void setAvage(int avage) {
+        this.avage = avage;
     }
 
     public String getObjCreateDate() {

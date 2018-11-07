@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/x260">
 
-    <ImageView
-        android:id="@+id/itemMorePic_iv"
+    <com.ck.ui.MorePicShowView
+        android:id="@+id/morePic_show_mpsv"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

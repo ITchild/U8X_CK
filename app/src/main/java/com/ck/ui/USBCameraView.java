@@ -20,7 +20,7 @@ import android.view.Surface;
 import android.view.View;
 import android.widget.Toast;
 
-import com.ck.collect.OnOpenCameraListener;
+import com.ck.listener.OnOpenCameraListener;
 import com.ck.utils.DecodeUtil;
 import com.ck.utils.FindLieFenUtils;
 import com.hc.u8x_ck.R;

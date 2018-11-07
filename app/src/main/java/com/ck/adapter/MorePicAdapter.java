@@ -8,9 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.ck.bean.MeasureDataBean;
+import com.ck.ui.MorePicShowView;
 import com.ck.utils.PathUtils;
 import com.hc.u8x_ck.R;
 
@@ -49,7 +49,7 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.MyViewHo
         MeasureDataBean bean = data.get(position);
         Bitmap bitmap = BitmapFactory.decodeFile(PathUtils.PROJECT_PATH+"/"+bean.getObjName()+
         "/"+bean.getGjName()+"/"+bean.getFileName());
-        holder.itemMorePic_iv.setImageBitmap(bitmap);
+        holder.morePic_show_mpsv.setBitmap(bitmap,bean.getLeftX(),bean.getRightX(),bean.getFileName());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +57,15 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.MyViewHo
                 if(null != mOnItemPicClickListener){
                     mOnItemPicClickListener.onPicClick(position);
                 }
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if(null != mOnItemPicClickListener){
+                    mOnItemPicClickListener.onLongClick(position);
+                }
+                return false;
             }
         });
     }
@@ -67,11 +76,11 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.MyViewHo
     }
 
     class MyViewHodler extends RecyclerView.ViewHolder {
-        ImageView  itemMorePic_iv;
+        MorePicShowView morePic_show_mpsv;
         public MyViewHodler(View itemView) {
             super(itemView);
-            if(null == itemMorePic_iv){
-                itemMorePic_iv = (ImageView) itemView.findViewById(R.id.itemMorePic_iv);
+            if(null == morePic_show_mpsv){
+                morePic_show_mpsv = (MorePicShowView) itemView.findViewById(R.id.morePic_show_mpsv);
             }
         }
     }
@@ -79,6 +88,7 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.MyViewHo
 
     public interface OnItemPicClickListener{
         void onPicClick(int position);
+        void onLongClick(int position);
     }
     private OnItemPicClickListener mOnItemPicClickListener;
 

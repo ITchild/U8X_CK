@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.ck.adapter.MorePicAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.bean.MeasureDataBean;
-import com.ck.collect.OnOpenCameraListener;
+import com.ck.listener.OnOpenCameraListener;
 import com.ck.db.DBService;
 import com.ck.ui.USBCameraView;
 import com.ck.utils.Catition;
@@ -58,9 +58,9 @@ public class USBCollectActivity extends TitleBaseActivity implements View.OnClic
     private List<MeasureDataBean> data ;//缩略图的数据
     private MorePicAdapter mMorePicAdapter;//缩略图的adapter
 
-    private EditText collect_proName_et;
-    private EditText collect_gjName_et;
-    private EditText collect_fileName_et;
+    private EditText collect_proName_tv;
+    private EditText collect_gjName_tv;
+    private EditText collect_fileName_tv;
     private Button collect_blackWrite_bt;// 是否显示黑白图
     private Button collect_enlarge_bt; //放大
     private Button collect_Lessen_bt; //缩小
@@ -108,9 +108,9 @@ public class USBCollectActivity extends TitleBaseActivity implements View.OnClic
         collect_Lessen_bt = findView(R.id.collect_Lessen_bt);
         collect_morePic_bt = findView(R.id.collect_morePic_bt);
         collect_siglePic_bt = findView(R.id.collect_siglePic_bt);
-        collect_proName_et = findView(R.id.collect_proName_et);
-        collect_gjName_et = findView(R.id.collect_gjName_et);
-        collect_fileName_et = findView(R.id.collect_fileName_et);
+        collect_proName_tv = findView(R.id.collect_proName_tv);
+        collect_gjName_tv = findView(R.id.collect_gjName_tv);
+        collect_fileName_tv = findView(R.id.collect_fileName_tv);
         collect_autoOrhand_bt = findView(R.id.collect_autoOrhand_bt);
         collect_Cursor_bt = findView(R.id.collect_Cursor_bt);
         collect_left_bt = findView(R.id.collect_left_bt);
@@ -206,6 +206,11 @@ public class USBCollectActivity extends TitleBaseActivity implements View.OnClic
                 FindLieFenUtils.m_nRLineSite = data.get(position).getRightX();
                 collect_USBcameraView.setBitmap(BitmapFactory.decodeStream(fis));
                 changeCollectView(1);
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
             }
         });
     }
@@ -333,9 +338,9 @@ public class USBCollectActivity extends TitleBaseActivity implements View.OnClic
      * 进行保存
      */
     private void onTakePic() {
-        String proName = collect_proName_et.getText().toString();
-        String gjName = collect_gjName_et.getText().toString();
-        String fileName = collect_fileName_et.getText().toString();
+        String proName = collect_proName_tv.getText().toString();
+        String gjName = collect_gjName_tv.getText().toString();
+        String fileName = collect_fileName_tv.getText().toString();
         if (isStrEmpty(proName)) {
             showToast("工程名不能为空");
             return;
@@ -475,8 +480,8 @@ public class USBCollectActivity extends TitleBaseActivity implements View.OnClic
                 break;
             case Catition.CollectView.TAKEPHOTO:
                 collect_uvcc.setVisibility(View.GONE);
-                collect_proName_et.setText(m_strSaveProName);
-                collect_gjName_et.setText(m_strSaveGJName);
+                collect_proName_tv.setText(m_strSaveProName);
+                collect_gjName_tv.setText(m_strSaveGJName);
                 collect_autoOrhand_bt.setText("");
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_save_bt.setText(getStr(R.string.str_save));

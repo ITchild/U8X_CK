@@ -6,10 +6,45 @@ import android.hardware.Camera;
 import android.media.ThumbnailUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class DecodeUtil {
+
+    /**
+     * 将彩色图转换为纯黑白二色	* 	* @param 位图	* @return 返回转换好的位图
+     */
+    public static List<Integer> greenData = new ArrayList<>();
+    public static List<Integer> buleData = new ArrayList<>();
+
+    public static Bitmap convertToBlackWhite(Bitmap bmp) {
+        int width = bmp.getWidth(); // 获取位图的宽
+        int height = bmp.getHeight(); // 获取位图的高
+        int[] pixels = bitmap2RGB(bmp);
+        int avage = FindLieFenUtils.bytGrayAve;
+        greenData.clear();
+        buleData.clear();
+        pixels = medianFiltering(pixels,width,height);
+        for (int i = 0; i < pixels.length; i++) {
+            int allFlag = (((((pixels[i] >> 16) & 0xFF) * 30) + (((pixels[i] >> 8) & 0xFF) * 59)
+                    + ((pixels[i] >> 0) & 0xFF) * 11) / 100);
+            pixels[i] = allFlag < avage ? 0x00 : 0xFFFFFF;
+            if (i > 0) {
+                if (pixels[i - 1] > pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
+                    greenData.add(i);
+                } else if (pixels[i - 1] < pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
+                    buleData.add(i);
+                }
+            }
+        }
+        //新建图片
+        Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        //设置图片数据
+        newBmp.setPixels(pixels, 0, width, 0, 0, width, height);
+        Bitmap resizeBmp = ThumbnailUtils.extractThumbnail(newBmp, width, height);
+        return resizeBmp;
+    }
 
     public static int[] decodeYUV420SP(byte[] yuv420sp, int width, int height, int[] m_nTextureBuffer) {
 
@@ -52,7 +87,6 @@ public class DecodeUtil {
         }
         return m_nTextureBuffer;
     }
-
 
     public static Camera.Size pickBestSizeCandidate(int targetWidth, int targetHeight, List<Camera.Size> sizeList) {
         Camera.Size candidate = null;
@@ -98,38 +132,41 @@ public class DecodeUtil {
         return candidate;
     }
 
+
     /**
-     * 将彩色图转换为纯黑白二色	* 	* @param 位图	* @return 返回转换好的位图
+     * 中值滤波
+     *
+     * @param pix 像素矩阵数组
+     * @param w   矩阵的宽
+     * @param h   矩阵的高
+     * @return 处理后的数组
      */
-    public static List<Integer> greenData = new ArrayList<>();
-    public static List<Integer> buleData = new ArrayList<>();
-    public static Bitmap convertToBlackWhite(Bitmap bmp) {
-        int width = bmp.getWidth(); // 获取位图的宽
-        int height = bmp.getHeight(); // 获取位图的高
-        int[] pixels = bitmap2RGB(bmp);
-        long avage = FindLieFenUtils.bytGrayAve;
-        greenData.clear();
-        buleData.clear();
-        for (int i = 0; i < pixels.length; i++) {
-            int allFlag = (((((pixels[i] >> 16) & 0xFF) * 30) + (((pixels[i] >> 8) & 0xFF) * 59)
-                    + ((pixels[i] >> 0) & 0xFF) * 11) / 100);
-            pixels[i] = allFlag < avage ? 0x00 : 0xFFFFFF;
-            if (i > 0) {
-                if (pixels[i - 1] > pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
-                    greenData.add(i);
-                } else if (pixels[i - 1] < pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
-                    buleData.add(i);
+    public static int[] medianFiltering(int pix[], int w, int h) {
+        int newpix[] = new int[w * h];
+        int[] temp = new int[9];
+        int r = 0;
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                if (x != 0 && x != w - 1 && y != 0 && y != h - 1) {
+                    temp[0] = (pix[x - 1 + (y - 1) * w] >> 16) & 0xFF;
+                    temp[1] = (pix[x + (y - 1) * w]>> 16) & 0xFF;
+                    temp[2] = (pix[x + 1 + (y - 1) * w]>> 16) & 0xFF;
+                    temp[3] = (pix[x - 1 + (y) * w]>> 16) & 0xFF;
+                    temp[4] = (pix[x + (y) * w]>> 16) & 0xFF;
+                    temp[5] = (pix[x + 1 + (y) * w]>> 16) & 0xFF;
+                    temp[6] = (pix[x - 1 + (y + 1) * w]>> 16) & 0xFF;
+                    temp[7] = (pix[x + (y + 1) * w]>> 16) & 0xFF;
+                    temp[8] = (pix[x + 1 + (y + 1) * w]>> 16) & 0xFF;
+                    Arrays.sort(temp);
+                    r = temp[4];
+                    newpix[y * w + x] = 255 << 24 | r << 16 | r << 8 | r;
+                } else {
+                    newpix[y * w + x] = pix[y * w + x];
                 }
             }
         }
-        //新建图片
-        Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-        //设置图片数据
-        newBmp.setPixels(pixels, 0, width, 0, 0, width, height);
-        Bitmap resizeBmp = ThumbnailUtils.extractThumbnail(newBmp, width, height);
-        return resizeBmp;
+        return newpix;
     }
-
 
     /**
      * @方法描述 Bitmap转int像素组

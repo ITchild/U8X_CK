@@ -32,7 +32,6 @@ public class FindLieFenUtils {
         int bytGrayMax = 0, bytGrayMin = 0x7fffffFF;
         int bytTemp[] = new int[nWidth];
         m_nY = nHeight / 2;
-        long byteValueAll = 0;
 
         if (m_bCursorFlag) {    // 手动还是自动
             m_nLLineSite = m_nRLineSite = 0;  ///左右两侧位置的初始化
@@ -45,7 +44,6 @@ public class FindLieFenUtils {
                 if (bytGrayMin > bytTemp[i]) {
                     bytGrayMin = bytTemp[i];//灰度最小值
                 }
-                byteValueAll += bytTemp[i]; //获取总的灰度值
             }
             if (bytGrayMax - bytGrayMin > GRAY_DIF) { //判断灰度最小值和最大值是否符合包含裂缝的标准
 
@@ -66,9 +64,7 @@ public class FindLieFenUtils {
                     }
                 }
                 bytGrayAve = ((nMinAve / nMinCnt + nMaxAve / nMaxCnt) / 2);// /////
-
-//                bytGrayAve = (int) byteValueAll / nWidth; //获取所有的灰度值的平均数
-//                bytGrayAve = (3*bytGrayMin+bytGrayAve)/4; //(2018/10/25 新加判断）
+                bytGrayAve = bytGrayAve - (bytGrayAve-bytGrayMin)/2;
                 for (int i = 0; i < nWidth; i++) {
                     bytTemp[i] = (bytTemp[i] <= bytGrayAve ? 0 : 0xFF);//转为黑白二值
                     if (bytTemp[i] == 0x00 && nLeft < 0) {

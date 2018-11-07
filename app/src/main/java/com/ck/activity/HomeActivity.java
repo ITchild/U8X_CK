@@ -9,7 +9,6 @@ import com.ck.activity_key.KeyFileBowerActivity;
 import com.ck.adapter.HomeDisAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.dlg.SigleBtMsgDialog;
-import com.ck.service.SerialService;
 import com.hc.u8x_ck.R;
 
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ public class HomeActivity extends TitleBaseActivity {
     protected List<String> homeDisData;
     protected int num = 3; //RecycleView的gridLayout布局中的列数
     private RecyclerView home_display;
+    private Intent serialIntent;
     @Override
     protected int initLayout() {
         return R.layout.ac_home;
@@ -35,8 +35,8 @@ public class HomeActivity extends TitleBaseActivity {
     protected void initView() {
         super.initView();
         home_display = findView(R.id.home_display);
-        Intent intent = new Intent(this, SerialService.class);
-        startService(intent);
+//        serialIntent = new Intent(this, SerialService.class);
+//        startService(serialIntent);  //开启串口服务
     }
 
     @Override
@@ -142,4 +142,11 @@ public class HomeActivity extends TitleBaseActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(null != serialIntent){
+            stopService(serialIntent);
+        }
+    }
 }
