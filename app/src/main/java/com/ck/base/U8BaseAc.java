@@ -23,7 +23,9 @@ public abstract class U8BaseAc extends BaseActivity {
     @Override
     protected void actionBeforSetContentView(Bundle savedInstanceState) {
         super.actionBeforSetContentView(savedInstanceState);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        Window window = this.getWindow();
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         AppDatPara = (App_DataPara) getApplicationContext();

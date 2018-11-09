@@ -1,14 +1,13 @@
 package com.ck.activity;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ck.activity_key.KeyCollectActivity;
@@ -18,7 +17,7 @@ import com.ck.base.TitleBaseActivity;
 import com.ck.collect.DLG_FileProgress;
 import com.ck.db.DBService;
 import com.ck.dlg.DLG_Alert;
-import com.ck.dlg.ShowPicDialog;
+import com.ck.dlg.SigleBtMsgDialog;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
 import com.ck.utils.BroadcastAction;
@@ -36,21 +35,16 @@ import java.util.List;
  * 为文件管理的Activity
  */
 
-public class FileBowerActivity extends TitleBaseActivity implements View.OnClickListener {
+public class FileBowerActivity extends TitleBaseActivity  {
 
     protected List<ClasFileProjectInfo> proData;
     private TextView fileBower_objName_tv;
     private TextView fileBower_gjName_tv;
     protected ClasFileProjectInfo fileData;
-    private ListView fileBower_proList_lv;
+    private RecyclerView fileBower_proList_rv;
     private FileListProjectAdapter mProjectAdapter;
-    private ListView fileBower_fileList_lv;
+    private RecyclerView fileBower_fileList_rv;
     private FileListGJAdapter mGJAdapter;
-    private Button fileBower_select_bt;
-    private Button fileBower_toUsb_bt;
-    private Button fileBower_del_bt;
-    private Button fileBower_back_bt;
-    private ShowPicDialog picDialog;
     private DLG_FileProgress m_ProgressDialog;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -93,23 +87,20 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         registerReceiver(mReceiver, filter);
         fileBower_objName_tv = findView(R.id.fileBower_objName_tv);
         fileBower_gjName_tv = findView(R.id.fileBower_gjName_tv);
-        fileBower_select_bt = findView(R.id.fileBower_select_bt);
-        fileBower_toUsb_bt = findView(R.id.fileBower_toUsb_bt);
-        fileBower_del_bt = findView(R.id.fileBower_del_bt);
-        fileBower_back_bt = findView(R.id.fileBower_back_bt);
-        fileBower_proList_lv = findView(R.id.fileBower_proList_lv);
-        fileBower_fileList_lv = findView(R.id.fileBower_fileList_lv);
+        fileBower_proList_rv = findView(R.id.fileBower_proList_rv);
+        fileBower_fileList_rv = findView(R.id.fileBower_fileList_rv);
         if (null == proData) {
             proData = new ArrayList<>();
         }
         mProjectAdapter = new FileListProjectAdapter(this, proData);
-        fileBower_proList_lv.setAdapter(mProjectAdapter);
+        fileBower_proList_rv.setLayoutManager(new LinearLayoutManager(this));
+        fileBower_proList_rv.setAdapter(mProjectAdapter);
         if (null == fileData) {
             fileData = new ClasFileProjectInfo();
         }
         mGJAdapter = new FileListGJAdapter(this, fileData);
-        fileBower_fileList_lv.setAdapter(mGJAdapter);
-        picDialog = new ShowPicDialog(this);
+        fileBower_fileList_rv.setLayoutManager(new LinearLayoutManager(this));
+        fileBower_fileList_rv.setAdapter(mGJAdapter);
     }
 
     @Override
@@ -118,7 +109,6 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         refreshProListData(0);
         refreshFileListData(0, -1);
     }
-
     /**
      * 刷新工程列表的数据
      */
@@ -144,10 +134,6 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     @Override
     protected void initListener() {
         super.initListener();
-        fileBower_select_bt.setOnClickListener(this);
-        fileBower_toUsb_bt.setOnClickListener(this);
-        fileBower_del_bt.setOnClickListener(this);
-        fileBower_back_bt.setOnClickListener(this);
         //TODO : 工程列表的监听
         mProjectAdapter.setOnFileProItemClick(new FileListProjectAdapter.OnFileProItemClick() {
             @Override
@@ -243,23 +229,42 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         isSelectAllObj();//改变全选按钮的提示
     }
 
+//    @Override
+//    public void onClick(View view) {
+//        switch (view.getId()) {
+//            case R.id.fileBower_select_bt: // TODO : 全选 / 取消全选
+//                selectAllOrCancel();
+//                break;
+//            case R.id.fileBower_toUsb_bt: //TODO : 转到U盘中
+//                onSaveSDcard();
+//                break;
+//            case R.id.fileBower_del_bt://TODO : 删除选中项
+//                onDelete();
+//                break;
+//            case R.id.fileBower_back_bt: //TODO ： 返回
+//                finish();
+//                break;
+//        }
+//    }
 
+    /**
+     * 按键的监听
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fileBower_select_bt: // TODO : 全选 / 取消全选
-                selectAllOrCancel();
-                break;
-            case R.id.fileBower_toUsb_bt: //TODO : 转到U盘中
-                onSaveSDcard();
-                break;
-            case R.id.fileBower_del_bt://TODO : 删除选中项
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_F1 ://切换按键，功能为删除
                 onDelete();
-                break;
-            case R.id.fileBower_back_bt: //TODO ： 返回
-                finish();
-                break;
+                return true;
+            case KeyEvent.KEYCODE_F2 : //存储按键,功能为转U盘
+                onSaveSDcard();
+                return true;
         }
+
+        return super.onKeyDown(keyCode, event);
     }
 
     /**
@@ -280,15 +285,14 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      * 判断是是否进行了全选
      * 主要用于改变全选按钮的提示
      */
-    private void isSelectAllObj() {
+    private boolean isSelectAllObj() {
         boolean isSelectAllObj = true;
         for (ClasFileProjectInfo projectInfo : proData) {
             if (projectInfo.nIsSelect != 2) {
                 isSelectAllObj = false;
             }
         }
-        fileBower_select_bt.setText(getStr(isSelectAllObj ?
-                R.string.str_cancelAll : R.string.str_selectAll));
+        return isSelectAllObj;
     }
 
     /**
@@ -298,16 +302,12 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         if (null == proData) {
             return;
         }
-        boolean isSelect = false;
-        if (fileBower_select_bt.getText().toString().equals(getStr(R.string.str_selectAll))) {
-            isSelect = true;
-        }
+        boolean isSelect = isSelectAllObj();
         for (int i = 0; i < proData.size(); i++) {
             optFileListChoice(i, isSelect);
         }
         mProjectAdapter.notifyDataSetChanged();
         mGJAdapter.notifyDataSetChanged();
-        fileBower_select_bt.setText(isSelect ? getStr(R.string.str_cancelAll) : getStr(R.string.str_selectAll));
     }
 
     /**
@@ -472,16 +472,17 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     }
 
     private void showMsgCon(String str) {
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle("提示");
-        dialog.setMessage(str);
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "我知道了", new DialogInterface.OnClickListener() {
+        final SigleBtMsgDialog alert = new SigleBtMsgDialog(this);
+        alert.show();
+        alert.setTitleMsg(getStr(R.string.str_prompt));
+        alert.setMsg(str);
+        alert.setBtTxt("我知道了");
+        alert.setOnBtClickListener(new SigleBtMsgDialog.OnBtClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialog.dismiss();
+            public void onBtClick() {
+                alert.dismiss();
             }
         });
-        dialog.show();
     }
 
 
@@ -503,45 +504,6 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
             return false;
         }
         return true;
-    }
-
-    /**
-     * 设置底部按钮的按键选中状态
-     *
-     * @param focusPosition
-     */
-    protected void changeBottomBtView(int focusPosition) {
-        switch (focusPosition) {
-            case 2:
-                fileBower_select_bt.setPressed(true);
-                fileBower_toUsb_bt.setPressed(false);
-                fileBower_del_bt.setPressed(false);
-                fileBower_back_bt.setPressed(false);
-                break;
-            case 3:
-                fileBower_select_bt.setPressed(false);
-                fileBower_toUsb_bt.setPressed(true);
-                fileBower_del_bt.setPressed(false);
-                fileBower_back_bt.setPressed(false);
-                break;
-            case 4:
-                fileBower_select_bt.setPressed(false);
-                fileBower_toUsb_bt.setPressed(false);
-                fileBower_del_bt.setPressed(true);
-                fileBower_back_bt.setPressed(false);
-                break;
-            case 5:
-                fileBower_select_bt.setPressed(false);
-                fileBower_toUsb_bt.setPressed(false);
-                fileBower_del_bt.setPressed(false);
-                fileBower_back_bt.setPressed(true);
-                break;
-            default:
-                fileBower_select_bt.setPressed(false);
-                fileBower_toUsb_bt.setPressed(false);
-                fileBower_del_bt.setPressed(false);
-                fileBower_back_bt.setPressed(false);
-        }
     }
 
     @Override

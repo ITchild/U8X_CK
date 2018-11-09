@@ -59,7 +59,7 @@
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:layout_weight="3.5"
                     android:gravity="center"
-                    android:text="创建时间"
+                    android:text="修改时间"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
             </LinearLayout>
@@ -69,11 +69,11 @@
                 android:layout_height="@dimen/xhdpi_2dp"
                 android:background="?attr/textColor" />
 
-            <ListView
-                android:id="@+id/fileBower_proList_lv"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/fileBower_proList_rv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-            </ListView>
+                android:layout_height="match_parent">
+            </android.support.v7.widget.RecyclerView>
         </LinearLayout>
 
         <View
@@ -86,7 +86,6 @@
             android:layout_height="match_parent"
             android:layout_weight="5"
             android:orientation="vertical" >
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/xhdpi_40dp"
@@ -133,7 +132,7 @@
                     android:layout_height="@dimen/xhdpi_40dp"
                     android:layout_weight="2.5"
                     android:gravity="center"
-                    android:text="创建时间"
+                    android:text="修改时间"
                     android:textColor="@color/yellow"
                     android:textSize="@dimen/xhdpi_20sp" />
             </LinearLayout>
@@ -143,74 +142,11 @@
                 android:layout_height="@dimen/xhdpi_2dp"
                 android:background="?attr/textColor" />
 
-            <ListView
-                android:id="@+id/fileBower_fileList_lv"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/fileBower_fileList_rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
-            </ListView>
+            </android.support.v7.widget.RecyclerView>
         </LinearLayout>
     </LinearLayout>
-
-    <View
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/xhdpi_2dp"
-        android:background="?attr/textColor" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="?attr/background" >
-
-        <Button
-            android:id="@+id/Button01"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/button"
-            android:text=""
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_30sp" />
-
-        <Button
-            android:id="@+id/fileBower_select_bt"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/button"
-            android:text="@string/str_selectAll"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_30sp" />
-
-        <Button
-            android:id="@+id/fileBower_toUsb_bt"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/button"
-            android:text="转U盘"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_30sp" />
-
-        <Button
-            android:id="@+id/fileBower_del_bt"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/button"
-            android:text="删除"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_30sp" />
-
-        <Button
-            android:id="@+id/fileBower_back_bt"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/button"
-            android:text="返回"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_30sp" />
-    </LinearLayout>
-
 </LinearLayout>

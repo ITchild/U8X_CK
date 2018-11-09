@@ -3,9 +3,9 @@ package com.ck.activity;
 import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 
 import com.ck.activity_key.KeyCollectActivity;
-import com.ck.activity_key.KeyFileBowerActivity;
 import com.ck.adapter.HomeDisAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.dlg.SigleBtMsgDialog;
@@ -107,7 +107,7 @@ public class HomeActivity extends TitleBaseActivity {
      * 跳转到文件管理界面
      */
     private void jumpToFileManger() {
-        startActivity(new Intent(this, KeyFileBowerActivity.class));
+        startActivity(new Intent(this, FileBowerActivity.class));
     }
 
     /**
@@ -140,6 +140,14 @@ public class HomeActivity extends TitleBaseActivity {
                 dialog.dismiss();
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+
+
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

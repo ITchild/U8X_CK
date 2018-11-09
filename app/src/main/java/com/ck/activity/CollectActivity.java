@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -66,8 +68,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private Button collect_morePic_bt; //缩略图
     private Button collect_siglePic_bt;//单幅图
     private Button collect_Calibration_bt;//标定(2mm)
-
-    private int largeArrNum = 0;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -229,14 +229,11 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                largeArrNum = 0;
-                collect_cameraView.setBlackWrite(false,false);
-                collect_cameraView.setFindSide(false,false);
                 collect_fileName_tv.setText(fileName.replace(".bmp",""));
                 FindLieFenUtils.m_nLLineSite = data.get(position).getLeftX();
                 FindLieFenUtils.m_nRLineSite = data.get(position).getRightX();
                 FindLieFenUtils.bytGrayAve = data.get(position).getAvage();
-                collect_cameraView.blackWriteBitmap = null;
+                collect_cameraView.makeInitSetting();
                 collect_cameraView.setBitmap(BitmapFactory.decodeStream(fis));
                 changeCollectView(1);
             }
@@ -285,14 +282,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 activityFinish(); //返回
                 break;
             case R.id.collect_enlarge_bt: //TODO : 放大
-                largeArrNum++;
-                largeArrNum = largeArrNum ==collect_cameraView.largeNumArr.length ? largeArrNum-1 : largeArrNum;
-                collect_cameraView.setLargeOrSmall(largeArrNum, true);
+                collect_cameraView.setLargeOrSmall(true, true);
                 break;
             case R.id.collect_Lessen_bt: //TODO : 缩小
-                largeArrNum--;
-                largeArrNum = largeArrNum == -1 ? 0 : largeArrNum;
-                collect_cameraView.setLargeOrSmall(largeArrNum, true);
+                collect_cameraView.setLargeOrSmall(false, true);
                 break;
             case R.id.collect_blackWrite_bt: //TODO : 黑白图
                 if (collect_cameraView.isBlackWrite) {
@@ -310,12 +303,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
             case R.id.collect_morePic_bt: //TODO : 缩略图
                 refreshMorePic();
-                largeArrNum = 0;
                 changeCollectView(2);
                 break;
             case R.id.collect_siglePic_bt: //TODO：单幅图
                 changeCollectView(1);
-                largeArrNum = 0;
                 break;
             case R.id.collect_Calibration_bt: // TODO : 标定（2mm）
                 collect_cameraView.setCalibration(true);
@@ -358,6 +349,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private void onCollectStart() {
         changeCollectView(1);
         collect_cameraView.setStartView();
+        changeStartStopTakeView(Catition.CollectView.START);
         collect_cameraView.onenCamera(new OnOpenCameraListener() {
             @Override
             public void OnOpenCameraResultListener(boolean bResult) {
@@ -369,12 +361,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                     collect_cameraView.setHolder(mHolder);
                     collect_cameraView.setCountMode(true);
                     collect_cameraView.setZY(0);
-                    changeStartStopTakeView(Catition.CollectView.START);
                 } else {
                     Toast.makeText(CollectActivity.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onCarameError() {
                 stopCameraView(); // 停止进行检测
@@ -494,7 +484,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         //刷新列表
         onCollectStart();//保存成功之后继续进行检测
         collect_cameraView.setBlackWrite(false, false);
-        collect_cameraView.setLargeOrSmall(1, false);
         showToast(getStr(R.string.str_saveSuccess));
     }
 
@@ -702,5 +691,18 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        Log.i("fei",""+event.getAction()+ "      " + keyCode);
+//        if(keyCode == KeyEvent.KEYCODE_DPAD_UP){
+//            return true;
+//        }else if(keyCode == KeyEvent.KEYCODE_DPAD_DOWN){
+//            return false;
+//        }
+        return super.onKeyDown(keyCode, event);
     }
 }

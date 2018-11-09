@@ -76,7 +76,7 @@
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
 
         <activity
-            android:name="com.ck.activity_key.KeyFileBowerActivity"
+            android:name="com.ck.activity.FileBowerActivity"
             android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:screenOrientation="landscape"

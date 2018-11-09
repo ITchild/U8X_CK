@@ -2,9 +2,11 @@ package com.ck.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,17 +20,19 @@ import com.hc.u8x_ck.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileListGJAdapter extends BaseAdapter {
+public class FileListGJAdapter extends RecyclerView.Adapter<FileListGJAdapter.ViewHolder> {
     public static final int File = 0;
     public static final int Folder = 0;
     ClasFileProjectInfo mProject;
     ViewHolder holder;
     private Context mContext;
     private int nSelect;
+    private LayoutInflater mInflater;
     private OnFileGJItemClick mOnFileGJItemClick;
 
     public FileListGJAdapter(Context context, ClasFileProjectInfo project) {
         mContext = context;
+        mInflater = LayoutInflater.from(mContext);
         mProject = project;
     }
 
@@ -59,30 +63,15 @@ public class FileListGJAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public int getCount() {
-        return mProject.mstrArrFileGJ.size();
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.ui_file_select_list_gj,parent,false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public Object getItem(int position) {
-        return mProject.mstrArrFileGJ.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(final int position, View view, ViewGroup arg2) {
-        if (view == null) {
-            view = View.inflate(mContext, R.layout.ui_file_select_list_gj, null);
-            holder = new ViewHolder(view);
-            view.setTag(holder);
-        } else {
-            holder = (ViewHolder) view.getTag();
-        }
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         holder.mCBNidx.setText(" " + (position + 1));
         holder.mCBNidx.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,8 +112,16 @@ public class FileListGJAdapter extends BaseAdapter {
         holder.tv_maxLf.setText(max + "mm");
         holder.tv_num.setText(dataBeans.size()+"");
         holder.m_TVTime.setText("" + mProject.mstrArrFileGJ.get(position).mLastModifiedDate + "");
+    }
 
-        return view;
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemCount() {
+        return mProject.mstrArrFileGJ.size();
     }
 
     public void setOnFileGJItemClick(OnFileGJItemClick onFileGJItemClick) {
@@ -135,7 +132,7 @@ public class FileListGJAdapter extends BaseAdapter {
         void onGJSelect(boolean isSelect, int position);
     }
 
-    class ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder{
         CheckBox mCBNidx;
         TextView tv_gjName;
         TextView tv_maxLf;
@@ -145,6 +142,7 @@ public class FileListGJAdapter extends BaseAdapter {
         LinearLayout gjBackGround_ll;
 
         public ViewHolder(View view) {
+            super(view);
             if(null == mCBNidx) {
                 mCBNidx = (CheckBox) view.findViewById(R.id.project_checkboxID);
             }

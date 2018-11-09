@@ -2,30 +2,32 @@ package com.ck.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ck.info.ClasFileProjectInfo;
 import com.ck.App_DataPara;
+import com.ck.info.ClasFileProjectInfo;
 import com.hc.u8x_ck.R;
 
 import java.util.List;
 
-public class FileListProjectAdapter extends BaseAdapter {
+public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProjectAdapter.ViewHolder> {
     public static final int File = 0;
-    public static final int Folder = 0;
-    ViewHolder holder;
     private Context mContext;
     private List<ClasFileProjectInfo> mProjects;
     private int nSelect;
     private OnFileProItemClick mOnFileProItemClick;
+    private LayoutInflater mInflater;
 
     public FileListProjectAdapter(Context context, List<ClasFileProjectInfo> projects) {
         mContext = context;
+        mInflater = LayoutInflater.from(mContext);
         mProjects = projects;
     }
 
@@ -44,30 +46,15 @@ public class FileListProjectAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public int getCount() {
-        return null == mProjects ? 0 : mProjects.size();
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.ui_file_select_list_project,parent,false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public Object getItem(int position) {
-        return mProjects.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(final int position, View view, ViewGroup arg2) {
-        if (view == null) {
-            view = View.inflate(mContext, R.layout.ui_file_select_list_project, null);
-            holder = new ViewHolder(view);
-            view.setTag(holder);
-        } else {
-            holder = (ViewHolder) view.getTag();
-        }
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         holder.mCBNidx.setText(" " + (position + 1));
         holder.mCBNidx.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +92,11 @@ public class FileListProjectAdapter extends BaseAdapter {
         holder.m_TVProject.setText(mProjects.get(position).mFileProjectName);
         holder.m_TVGJNum.setText(mProjects.get(position).mstrArrFileGJ.size() + "");
         holder.m_TVTime.setText(mProjects.get(position).mLastModifiedDate);
-        return view;
+    }
+
+    @Override
+    public int getItemCount() {
+        return null == mProjects ? 0 : mProjects.size();
     }
 
     public void setOnFileProItemClick(OnFileProItemClick onFileProItemClick) {
@@ -116,7 +107,7 @@ public class FileListProjectAdapter extends BaseAdapter {
         void onClickIsChoice(boolean isChoice, int position);
     }
 
-    class ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         CheckBox mCBNidx;
         TextView m_TVProject;
         TextView m_TVGJNum;
@@ -125,6 +116,7 @@ public class FileListProjectAdapter extends BaseAdapter {
         LinearLayout cilik_ll;
 
         public ViewHolder(View view) {
+            super(view);
             if (null == mCBNidx) {
                 mCBNidx = (CheckBox) view.findViewById(R.id.project_checkboxID);
             }

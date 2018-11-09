@@ -47,7 +47,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public byte m_Buffer[];
     public int sycTaskNum = 0;  //监听摄像机是否运行
     public int m_nTextureBuffer[];
-    public int m_nBaseScreenWidth, m_nBaseScreenHeight;
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
     public Bitmap showBitmap;
@@ -55,14 +54,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public boolean isBlackWrite = false;
     public boolean isFindSide = false;
     public boolean isStart = false; //是否开始检测
-    public boolean isToLarge = false; //是否要放大
     public float width = 0;
-    public float[] largeNumArr = {1f, 1.3f, 1.6f, 1.9f, 2.2f, 2.5f};
     boolean m_bCountMode = true; // 自动计算还是手动计算
     int m_nDrawFlag = 0; //0自动，左右线红色，1手动，左侧游标，2手动，右侧游标
     boolean m_bOpenOldFile = false;
-    private boolean isCalibration = false;
-    private float toLargeSize = 1f;//放大系数
+    private boolean isCalibration = false; //是否进行标定
     private OnOpenCameraListener m_Listener;
     private int m_DraBitMapWith = 0;
     private int m_DraBitMapHight = 0;
@@ -77,6 +73,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     private Context mContext;
     private Thread carmeraThread;
     private Handler checkTaskHandler = new Handler();
+    //开启一个线程  用来查询摄像机是否停止了
     private Runnable checkTaskRunnable = new Runnable() {
         @Override
         public void run() {
@@ -111,10 +108,15 @@ public class CameraView extends View implements Camera.PreviewCallback {
         }
     };
 
-    private float startX = 0;
-    private float startY = 0;
-    private int BaseX = 0, BaseY = 0;
-    private int x = 0, y = 0;
+    private float startX = 0 ,startY = 0; //拖动时单点按下时的坐标
+    private int BaseX = 0, BaseY = 0;  //完成一次拖动后需要保存的坐标
+    private int x = 0, y = 0;  //  实际拖动时的X,Y 轴的增量
+    private float baseSideLength = 0;  //双点触控的按下的两点距离
+    private boolean doublePoit = false; // 是否为双点触控
+    private float toLargeSize = 1f;//放大系数
+    private boolean isDoubleTwoLength = false; //是否为双点触控第二次
+    private float doubleFristLength = 0;//双点触控第一次的长度
+    private float doubleSecondLength = 0;//双点触控第二次的长度
 
     public CameraView(Context context, int screenWidth, int screenHeight) {
         super(context);
@@ -145,7 +147,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         float flag = PreferenceHelper.getFXDensity();
         if (flag != 0) {
             m_fXDensity = flag;
-            max_X = (int) (m_nBaseScreenWidth / m_fXDensity);
+            max_X = (int) (m_nScreenWidth / m_fXDensity);
         }
     }
 
@@ -157,17 +159,31 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public void onenCamera(OnOpenCameraListener listener) {
         m_bOpenOldFile = false;
         m_Listener = listener;
+        makeInitSetting();
+        initCarmera();
+    }
+
+    /**
+     * 回复一些控制的初始值
+     */
+    public void makeInitSetting(){
+        //移动量清空
         BaseX = 0;
         BaseY = 0;
         x = 0;
         y = 0;
         setScrollX(0);
         setScrollY(0);
-        largeSize = 1f;
-        setScaleX(largeSize);
-        setScaleY(largeSize);
+        //放大倍数清空
         toLargeSize = 1f;
-        initCarmera();
+        setScaleX(toLargeSize);
+        setScaleY(toLargeSize);
+        //黑白图清空
+        blackWriteBitmap = null;
+        //黑白图标志
+        isBlackWrite = false;
+        //描边的标志
+        isFindSide = false;
     }
 
     /**
@@ -298,26 +314,18 @@ public class CameraView extends View implements Camera.PreviewCallback {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        m_nBaseScreenHeight = h;
-        m_nBaseScreenWidth = w;
-        m_fXDensity = (float) (m_nBaseScreenWidth / (max_X * 1.0));
+        m_nScreenHeight = h;
+        m_nScreenWidth = w;
+        m_fXDensity = (float) (m_nScreenWidth / (max_X * 1.0));
         float flag = PreferenceHelper.getFXDensity();
         if (flag != 0) {
             m_fXDensity = flag;
-            max_X = (int) (m_nBaseScreenWidth / m_fXDensity);
+            max_X = (int) (m_nScreenWidth / m_fXDensity);
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (isToLarge) {
-            m_nScreenWidth = (int) (m_nBaseScreenWidth * toLargeSize);
-            m_nScreenHeight = (int) (m_nBaseScreenHeight * toLargeSize);
-//            isToLarge = false;
-        } else {
-            m_nScreenWidth = m_nBaseScreenWidth;
-            m_nScreenHeight = m_nBaseScreenHeight;
-        }
         if (m_DrawBitmap == null || m_DrawBitmap.isRecycled()) {
             if (isStart) {
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
@@ -335,19 +343,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         RectF rectF = new RectF(0, 0, m_nScreenWidth, m_nScreenHeight); // w和h分别是屏幕的宽和高，也就是你想让图片显示的宽和高
         if (!isStart) {
-            int x = 0, y = 0;
-            int width = 0, hight = 0;
-//            if (isToLarge) {
-//                width = (int) (m_DrawBitmap.getWidth() * (1.0 / toLargeSize));
-//                hight = (int) (m_DrawBitmap.getHeight() * (1.0 / toLargeSize));
-//                x = (int) (m_DrawBitmap.getWidth() * 1.0 / 2 - ((m_DrawBitmap.getWidth() * 1.0 / 2) * (1.0 / toLargeSize)));
-//                y = (int) (m_DrawBitmap.getHeight() * 1.0 / 2 - ((m_DrawBitmap.getHeight() * 1.0 / 2) * (1.0 / toLargeSize)));
-//            }
-//            showBitmap = isBlackWrite ?
-//                    (isToLarge ? Bitmap.createBitmap(blackWriteBitmap, x, y, width, hight)
-//                            : blackWriteBitmap)
-//                    : (isToLarge ? Bitmap.createBitmap(m_DrawBitmap, x, y, width, hight)
-//                    : m_DrawBitmap);
             showBitmap = isBlackWrite ? blackWriteBitmap : m_DrawBitmap;
             canvas.drawBitmap(showBitmap, null, rectF, null);
             if (isFindSide) { //描边
@@ -359,12 +354,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     float greenY = DecodeUtil.greenData.get(i) / m_DraBitMapWith + 1;
                     greenX = (float) (((greenX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
                     greenY = (float) (((greenY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-//                    if (isToLarge) {//放大
-//                        float midleX = (float) (m_nScreenWidth * 1.0 / 2);
-//                        float midleY = (float) (m_nScreenHeight * 1.0 / 2);
-//                        greenX = midleX - ((midleX - greenX) * toLargeSize);
-//                        greenY = midleY - ((midleY - greenY) * toLargeSize);
-//                    }
                     canvas.drawPoint(greenX, greenY, paint);
                 }
                 paint.setColor(Color.BLUE);
@@ -373,12 +362,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     float buleY = DecodeUtil.buleData.get(i) / m_DraBitMapWith + 1;
                     buleX = (float) (((buleX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
                     buleY = (float) (((buleY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-//                    if (isToLarge) {//放大
-//                        float midleX = (float) (m_nScreenWidth * 1.0 / 2);
-//                        float midleY = (float) (m_nScreenHeight * 1.0 / 2);
-//                        buleX = midleX - ((midleX - buleX) * toLargeSize);
-//                        buleY = midleY - ((midleY - buleY) * toLargeSize);
-//                    }
                     canvas.drawPoint(buleX, buleY, paint);
                 }
             }
@@ -401,13 +384,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
             PreferenceHelper.setFXDensity(m_fXDensity);
             max_X = (int) (m_nScreenWidth / m_fXDensity);
         }
-        if (isToLarge && !isStart) {//放大
-//            float midle = (float) (m_nScreenWidth * 1.0 / 2);
-//            nL = midle - ((midle - nL) * toLargeSize);
-//            nR = midle - ((midle - nR) * toLargeSize);
-            mf_fXDensity = mf_fXDensity * toLargeSize;
-//            isToLarge = false;
-        }
         int nYMid = m_nScreenHeight / 2;
         if (m_PaintDrawLine == null) {
             m_PaintDrawLine = getPaint(Style.FILL, 3, Color.RED, 25);
@@ -417,7 +393,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         if (m_nDrawFlag == 1) {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
-        canvas.drawLine(nL, nYMid - m_nScreenHeight / 20 /toLargeSize, nL, nYMid + m_nScreenHeight / 20 / toLargeSize, m_PaintDrawLine);
+        canvas.drawLine(nL, nYMid - m_nScreenHeight / 20, nL, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
         canvas.drawLine(nL - 50, nYMid, nL, nYMid, m_PaintDrawLine);
         canvas.drawLine(nL - 10, nYMid - 10, nL, nYMid, m_PaintDrawLine);
         canvas.drawLine(nL - 10, nYMid + 10, nL, nYMid, m_PaintDrawLine);
@@ -426,7 +402,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
         canvas.drawLine(nL, nYMid, nR, nYMid, m_PaintDrawLine);
-        canvas.drawLine(nR, nYMid - m_nScreenHeight / 20 / toLargeSize, nR, nYMid + m_nScreenHeight / 20 / toLargeSize, m_PaintDrawLine);
+        canvas.drawLine(nR, nYMid - m_nScreenHeight / 20, nR, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
         canvas.drawLine(nR + 50, nYMid, nR, nYMid, m_PaintDrawLine);
         canvas.drawLine(nR + 10, nYMid - 10, nR, nYMid, m_PaintDrawLine);
         canvas.drawLine(nR + 10, nYMid + 10, nR, nYMid, m_PaintDrawLine);
@@ -482,13 +458,27 @@ public class CameraView extends View implements Camera.PreviewCallback {
     /**
      * 图像的放大与缩小
      *
-     * @param toLargeSize
+     * @param isToLarge
      */
-    public void setLargeOrSmall(int toLargeSize, boolean isRefresh) {
-        this.toLargeSize = largeNumArr[toLargeSize];
-        isToLarge = this.toLargeSize == 1f ? false : true;
+    public void setLargeOrSmall(boolean isToLarge, boolean isRefresh) {
+        toLargeSize = isToLarge ? toLargeSize + 0.3f : toLargeSize-0.3f;
+        if(toLargeSize > 2.5f){
+            toLargeSize = 2.5f;
+        }else if(toLargeSize < 1f){
+            toLargeSize = 1f;
+        }
         if (isRefresh) {
-            invalidate();
+            float flagX = (FindLieFenUtils.m_nLLineSite + FindLieFenUtils.m_nRLineSite)/2;
+            flagX = (flagX / m_DraBitMapWith) * m_nScreenWidth ;
+            setScaleX(this.toLargeSize);
+            setScaleY(this.toLargeSize);
+            int centeryX = BaseX + (m_nScreenWidth/2) ;
+            if(!(centeryX <= flagX+2 && centeryX >= flagX-2)) {
+                BaseX = (int) (flagX - (m_nScreenWidth / 2) );
+                BaseY = 0;
+                setScrollX(BaseX);
+                setScrollY(BaseY);
+            }
         }
     }
 
@@ -504,7 +494,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     public void setStartView() {
         isStart = true;
-        isToLarge = false;//放大置位
     }
 
     public void setStopView() {
@@ -567,44 +556,12 @@ public class CameraView extends View implements Camera.PreviewCallback {
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         // TODO Auto-generated method stub
-//        byte[] copyData = new byte[bytes.length];
-//        System.arraycopy(bytes, 0, copyData, 0, bytes.length);
-//        if(maxSycTaskNum <= 5) {
         mCameraTask = new CameraTask(bytes);
         mCameraTask.execute((Void) null);
         sycTaskNum++;
         camera.addCallbackBuffer(m_Buffer);
-//        }
-        // <----这句一点要加上.
-//        synchronized (this) {
-//            try {
-//                if (!isStart) {
-//                    return ;
-//                }
-//                if (m_Camera == null) {
-//                    return ;
-//                }
-//                if (null == m_Camera.getParameters()) {
-//                    return ;
-//                }
-//                m_DraBitMapWith = m_Camera.getParameters().getPreviewSize().width;
-//                int h = m_Camera.getParameters().getPreviewSize().height;
-//                int[] rgb = DecodeUtil.decodeYUV420SP(bytes, m_DraBitMapWith, h, m_nTextureBuffer);
-//                m_DrawBitmap = Bitmap.createBitmap(rgb, m_DraBitMapWith, h, Bitmap.Config.RGB_565);
-//                FindLieFenUtils.findLieFen(rgb, m_DraBitMapWith, h, m_bCountMode);
-//                postInvalidate();//刷新OnDraw，重新绘图
-//                camera.addCallbackBuffer(m_Buffer);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
-    private float baseSideLength = 0;
-    private boolean doublePoit = false;
-    private boolean isDoubleTwoLength = false;
-    private float doubleFristLength = 0;
-    private float doubleSecondLength = 0;
-    private float largeSize = 1;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!isStart) {
@@ -615,7 +572,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
                         startY = event.getY();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if(!doublePoit) {
+                        if (!doublePoit) {
                             x = (int) (startX - event.getX()) + BaseX;
                             y = (int) (startY - event.getY()) + BaseY;
                             setScrollX(x);
@@ -628,14 +585,14 @@ public class CameraView extends View implements Camera.PreviewCallback {
                         doublePoit = false;
                         break;
                 }
-            } else if (event.getPointerCount() == 2 ) {
+            } else if (event.getPointerCount() == 2) {
                 switch (event.getAction() & MotionEvent.ACTION_MASK) {
                     case MotionEvent.ACTION_POINTER_DOWN:
                         float startX = Math.abs(event.getX(0) - event.getX(1));
                         float startY = Math.abs(event.getY(0) - event.getY(1));
-                        baseSideLength = (float) Math.sqrt(startX*startX+startY*startY);
-                        float doubleCenteryX = (event.getX(0) + event.getX(1))/2;
-                        float doubleCenteryY = (event.getY(0) + event.getY(1)) /2;
+                        baseSideLength = (float) Math.sqrt(startX * startX + startY * startY);
+                        float doubleCenteryX = (event.getX(0) + event.getX(1)) / 2;
+                        float doubleCenteryY = (event.getY(0) + event.getY(1)) / 2;
                         setPivotX(doubleCenteryX);
                         setPivotY(doubleCenteryY);
                         doublePoit = true;
@@ -643,31 +600,31 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     case MotionEvent.ACTION_MOVE:
                         float lengthX = Math.abs(event.getX(0) - event.getX(1));
                         float lengthY = Math.abs(event.getY(0) - event.getY(1));
-                        float side = (float) Math.sqrt(lengthX*lengthX+lengthY*lengthY);
-                        side = side-baseSideLength;
-                        Log.i("fei",side - baseSideLength+"");
-                        if(!isDoubleTwoLength){
+                        float side = (float) Math.sqrt(lengthX * lengthX + lengthY * lengthY);
+                        side = side - baseSideLength;
+                        Log.i("fei", side - baseSideLength + "");
+                        if (!isDoubleTwoLength) {
                             doubleFristLength = side;
                             isDoubleTwoLength = true;
-                        }else{
+                        } else {
                             doubleSecondLength = side;
                             isDoubleTwoLength = false;
-                            largeSize = largeSize + (doubleSecondLength - doubleFristLength)/500;
-                            if(largeSize <=0.8) {
-                                largeSize = 0.8f;
+                            toLargeSize = toLargeSize + (doubleSecondLength - doubleFristLength) / 500;
+                            if (toLargeSize <= 0.8) {
+                                toLargeSize = 0.8f;
                             }
-                            setScaleX(largeSize);
-                            setScaleY(largeSize);
+                            setScaleX(toLargeSize);
+                            setScaleY(toLargeSize);
                         }
                         break;
                     case MotionEvent.ACTION_POINTER_UP:
-                        if(largeSize <=1){
-                            largeSize = 1f;
-                        }else if(largeSize >= 2.5){
-                            largeSize = 2.5f;
+                        if (toLargeSize <= 1) {
+                            toLargeSize = 1f;
+                        } else if (toLargeSize >= 2.5) {
+                            toLargeSize = 2.5f;
                         }
-                        setScaleX(largeSize);
-                        setScaleY(largeSize);
+                        setScaleX(toLargeSize);
+                        setScaleY(toLargeSize);
                         isDoubleTwoLength = false;
                         doubleSecondLength = 0;
                         doubleFristLength = 0;
