@@ -20,23 +20,15 @@ public class HomeActivity extends TitleBaseActivity {
     protected List<String> homeDisData;
     protected int num = 3; //RecycleView的gridLayout布局中的列数
     private RecyclerView home_display;
-    private Intent serialIntent;
     @Override
     protected int initLayout() {
         return R.layout.ac_home;
     }
 
     @Override
-    protected boolean isBackshow() {
-        return false;
-    }
-
-    @Override
     protected void initView() {
         super.initView();
         home_display = findView(R.id.home_display);
-//        serialIntent = new Intent(this, SerialService.class);
-//        startService(serialIntent);  //开启串口服务
     }
 
     @Override
@@ -80,7 +72,7 @@ public class HomeActivity extends TitleBaseActivity {
                 jumpToFileManger();
                 break;
             case 2:
-                showMsgDialog();
+                jumpToOnTime();
                 break;
             case 3:
                 jumpToCalibration();
@@ -108,6 +100,12 @@ public class HomeActivity extends TitleBaseActivity {
      */
     private void jumpToFileManger() {
         startActivity(new Intent(this, FileBowerActivity.class));
+    }
+    /**
+     * 跳转到定时监测界面
+     */
+    private void jumpToOnTime() {
+        startActivity(new Intent(this, OnTimeCollectActivity.class));
     }
 
     /**
@@ -153,8 +151,5 @@ public class HomeActivity extends TitleBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(null != serialIntent){
-            stopService(serialIntent);
-        }
     }
 }

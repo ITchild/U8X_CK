@@ -87,6 +87,12 @@
     <string name="str_lastVision">软件版本</string>
     <string name="str_freeSpace">剩余空间</string>
 
+    <string name="str_calibrationMsg">标定方法：\n例如：使显微摄像头处于拍照状态，将摄像头对准尺的2毫米标线处，待图像稳定清晰后，选中拍照按钮，点击【确定】键进行拍照，自动进行标定，此时图像左上方出现2.mm，表示标定完毕；</string>
+
+    <string name="str_ontimeCollect_start">开始监测</string>
+    <string name="str_ontimeCpllect_stop">停止监测</string>
+
+
     <string-array name="adjueSytle">
         <item>中间水平判别</item>
         <item>全自动判别</item>

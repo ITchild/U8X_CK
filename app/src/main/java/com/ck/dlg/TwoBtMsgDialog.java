@@ -10,7 +10,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.fei.feilibs_1_0_0.base.dialog.BaseDialog;
+import com.ck.base.U8BaseDialog;
 import com.hc.u8x_ck.R;
 
 /**
@@ -18,7 +18,7 @@ import com.hc.u8x_ck.R;
  * @date on 2018/11/7 0007
  * @describe TODO :
  **/
-public class TwoBtMsgDialog extends BaseDialog {
+public class TwoBtMsgDialog extends U8BaseDialog {
     private TextView tv_sigleBtMsg_title;
     private TextView tv_sigleBtMsg_msg;
     private Button bt_sigleBtMsg_yes;

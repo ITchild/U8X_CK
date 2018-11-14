@@ -74,10 +74,6 @@ public class FileBowerActivity extends TitleBaseActivity  {
         return R.layout.ac_filebower;
     }
 
-    @Override
-    protected boolean isBackshow() {
-        return false;
-    }
 
     @Override
     protected void initView() {
@@ -108,6 +104,7 @@ public class FileBowerActivity extends TitleBaseActivity  {
         super.initData();
         refreshProListData(0);
         refreshFileListData(0, -1);
+        baseTitle_title_tv.setText("文件管理");
     }
     /**
      * 刷新工程列表的数据

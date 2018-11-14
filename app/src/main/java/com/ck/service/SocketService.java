@@ -7,9 +7,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.ck.base.RxBus;
+import com.ck.bean.RxBusMsgBean;
 import com.ck.utils.Catition;
-import com.fei.feilibs_1_0_0.bean.RxBusMsgBean;
-import com.fei.feilibs_1_0_0.rxbus.RxBus;
 
 import java.io.IOException;
 import java.io.InputStream;

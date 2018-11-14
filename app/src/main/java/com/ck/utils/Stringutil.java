@@ -1,7 +1,5 @@
 package com.ck.utils;
 
-import com.fei.feilibs_1_0_0.utils.StringUtil;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +8,33 @@ import java.util.regex.Pattern;
  * @date on 2018/10/25 0025
  * @describe TODO :
  **/
-public class Stringutil extends StringUtil {
+public class Stringutil{
+
+
+    /**
+     * 判断String字符串是否为null或者空字符串
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isEmpty(String str) {
+        if (!isNull(str) && !str.equals("")) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * 判断字符串是否为null
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isNull(String str) {
+        return (null == str);
+    }
+
     /**
      * 利用正则表达式判断字符串是否是数字
      *

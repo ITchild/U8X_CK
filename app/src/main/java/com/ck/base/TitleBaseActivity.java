@@ -15,13 +15,13 @@ import com.hc.u8x_ck.R;
 public abstract class TitleBaseActivity extends U8BaseAc {
 
     private TextClock baseTitle_clock_tc;
-    private TextView baseTitle_title_tv;
+    protected TextView baseTitle_title_tv;
     private ImageView baseTitle_power_iv;
 
     protected void initView(){
-        baseTitle_clock_tc = findViewById(R.id.baseTitle_clock_tc);
-        baseTitle_title_tv = findViewById(R.id.project_checkboxID);
-        baseTitle_power_iv = findViewById(R.id.baseTitle_power_iv);
+        baseTitle_clock_tc = findView(R.id.baseTitle_clock_tc);
+        baseTitle_title_tv = findView(R.id.baseTitle_title_tv);
+        baseTitle_power_iv = findView(R.id.baseTitle_power_iv);
     }
     protected void initListener(){
 
@@ -29,7 +29,6 @@ public abstract class TitleBaseActivity extends U8BaseAc {
     protected  void  initData (){
 
     }
-
     @Override
     protected void onResume() {
         super.onResume();

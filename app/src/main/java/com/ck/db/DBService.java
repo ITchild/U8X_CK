@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.ck.bean.MeasureDataBean;
 import com.ck.info.UserInfo;
-import com.fei.feilibs_1_0_0.utils.StringUtil;
+import com.ck.utils.Stringutil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,19 +182,19 @@ public class DBService {
      * @param fileName   可为空
      */
     public void delMeasureData(String proName,String gjName,String fileName){
-        if(StringUtil.isEmpty(proName)){
+        if(Stringutil.isEmpty(proName)){
             return;
         }
         SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
-        if(!StringUtil.isEmpty(proName) && StringUtil.isEmpty(gjName) && StringUtil.isEmpty(fileName)){
+        if(!Stringutil.isEmpty(proName) && Stringutil.isEmpty(gjName) && Stringutil.isEmpty(fileName)){
             //删除工程
             readableDatabase.delete("MeasureData",
                     "objName=?", new String[]{proName});
-        }else if (!StringUtil.isEmpty(proName) && !StringUtil.isEmpty(gjName) && StringUtil.isEmpty(fileName)){
+        }else if (!Stringutil.isEmpty(proName) && !Stringutil.isEmpty(gjName) && Stringutil.isEmpty(fileName)){
             //删除构件
             readableDatabase.delete("MeasureData",
                     "objName=? and gjName=?", new String[]{proName,gjName});
-        }else if (!StringUtil.isEmpty(proName) && !StringUtil.isEmpty(gjName) && !StringUtil.isEmpty(fileName)){
+        }else if (!Stringutil.isEmpty(proName) && !Stringutil.isEmpty(gjName) && !Stringutil.isEmpty(fileName)){
             //删除文件
             readableDatabase.delete("MeasureData",
                     "objName=? and gjName=? and fileName=?", new String[]{proName,gjName,fileName});

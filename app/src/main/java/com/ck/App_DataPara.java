@@ -1,5 +1,5 @@
 package com.ck;
-	/*
+/*
                            _ooOoo_
                           o8888888o
                           88" . "88
@@ -35,9 +35,10 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.ck.netcloud.ClasSysPara;
+import com.ck.base.BaseApplication;
 import com.ck.db.DBService;
-import com.fei.feilibs_1_0_0.BaseApplication;
+import com.ck.dimenUtil.RudenessScreenHelper;
+import com.ck.netcloud.ClasSysPara;
 import com.hc.u8x_ck.R;
 
 import java.text.SimpleDateFormat;
@@ -51,7 +52,7 @@ public class App_DataPara extends BaseApplication {
      * 屏幕密度
      */
     public float fDispDensity;
-    public int nTheme = R.style.AppTheme_White;
+    public int nTheme = R.style.AppTheme_Black;
     public ClasSysPara sysPara = new ClasSysPara();           //系统参数
     /**
      * 播放音乐标记位
@@ -98,10 +99,15 @@ public class App_DataPara extends BaseApplication {
         return app;
     }
 
+    //设计图标注的宽度
+    public int designWidth = 800;
+
     @Override
     public void onCreate() {
         super.onCreate();
         app = this;
+        //屏幕适配的代码
+        new RudenessScreenHelper(this, designWidth).activate();
         m_DbService = DBService.getInstence(this);
         RegistDiskReceiver();
         initPro();
@@ -236,4 +242,5 @@ public class App_DataPara extends BaseApplication {
     public WindowManager.LayoutParams getMywmParams() {
         return wmParams;
     }
+
 }

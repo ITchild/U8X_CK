@@ -53,6 +53,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public Bitmap blackWriteBitmap;
     public boolean isBlackWrite = false;
     public boolean isFindSide = false;
+    private boolean isHaveFindside = false;
     public boolean isStart = false; //是否开始检测
     public float width = 0;
     boolean m_bCountMode = true; // 自动计算还是手动计算
@@ -332,10 +333,10 @@ public class CameraView extends View implements Camera.PreviewCallback {
                 drawRuleAndFlag(canvas);//画刻度和标志
                 return; //防止异步线程中将m_DrawBitmap回收（在这里进行检测）
             }
-            canvas.drawColor(0xFF000000, PorterDuff.Mode.CLEAR);
+//            canvas.drawColor(0xFF000000, PorterDuff.Mode.CLEAR);
             String str = "裂缝宽度检测";
             Paint paint = getPaint(Style.FILL, 5, Color.RED,
-                    mContext.getResources().getDimension(R.dimen.x50));
+                    mContext.getResources().getDimension(R.dimen.carmeraStartText));
             float fWidth = paint.measureText(str);
             canvas.drawText(str, m_nScreenWidth / 2 - fWidth / 2, m_nScreenHeight / 2, paint);
             return;
@@ -564,6 +565,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(isFindSide) {
+            isHaveFindside = true;
+            isFindSide = false;
+            invalidate();
+        }
         if (!isStart) {
             if (event.getPointerCount() == 1) {
                 switch (event.getAction()) {
@@ -580,6 +586,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
                         }
                         break;
                     case MotionEvent.ACTION_UP:
+                        if(isHaveFindside){
+                            isFindSide = true;
+                            isHaveFindside = false;
+                            invalidate();
+                        }
                         BaseX = x;
                         BaseY = y;
                         doublePoit = false;

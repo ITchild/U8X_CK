@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/x35"
+    android:layout_height="35pt"
     android:background="@color/yellow">
 
     <TextClock
@@ -10,10 +10,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/x6"
+        android:layout_marginLeft="5pt"
         android:format24Hour="yyyy-MM-dd HH:mm:ss"
         android:textColor="?attr/textColor"
-        android:textSize="@dimen/x16" />
+        android:textSize="15pt" />
 
 
     <TextView
@@ -23,16 +23,16 @@
         android:layout_centerInParent="true"
         android:text="@string/str_acTitle"
         android:textColor="?attr/textColor"
-        android:textSize="@dimen/x18" />
+        android:textSize="17pt" />
 
 
     <ImageView
         android:id="@+id/baseTitle_power_iv"
-        android:layout_width="@dimen/x48"
-        android:layout_height="@dimen/x23"
+        android:layout_width="35pt"
+        android:layout_height="20pt"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/x6"
+        android:layout_marginRight="7pt"
         android:src="@drawable/power" />
 
 </RelativeLayout>

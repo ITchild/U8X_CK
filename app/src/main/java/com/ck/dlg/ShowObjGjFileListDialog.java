@@ -12,10 +12,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ck.adapter.ShowListOrCreateAdapter;
+import com.ck.base.U8BaseDialog;
 import com.ck.utils.FileUtil;
 import com.ck.utils.PathUtils;
-import com.fei.feilibs_1_0_0.base.dialog.BaseDialog;
-import com.fei.feilibs_1_0_0.utils.StringUtil;
+import com.ck.utils.Stringutil;
 import com.hc.u8x_ck.R;
 
 import java.io.File;
@@ -27,7 +27,7 @@ import java.util.List;
  * @date on 2018/11/5 0005
  * @describe TODO : 这个dialog用于显示工程 、构件 、 文件的列表的新建与选择
  **/
-public class ShowObjGjFileListDialog extends BaseDialog {
+public class ShowObjGjFileListDialog extends U8BaseDialog {
     private RecyclerView showList_list_rv;//文件列表
     private EditText showList_input_et; //新建的文件名称
     private TextView showlist_title_tv; // dialog标题
@@ -100,7 +100,7 @@ public class ShowObjGjFileListDialog extends BaseDialog {
             adapter.setData(showData);
             showList_input_et.setText(proName);
         }else if (title.equals(getStr(R.string.str_GjNewName))){
-            if(!StringUtil.isEmpty(proName)){
+            if(!Stringutil.isEmpty(proName)){
                 File[] dataFile = new File(PathUtils.PROJECT_PATH+"/"+proName).listFiles();
                 if(null != dataFile){
                     for (File file : dataFile){
@@ -112,7 +112,7 @@ public class ShowObjGjFileListDialog extends BaseDialog {
                 showList_input_et.setText(gjName);
             }
         }else if (title.equals(getStr(R.string.str_FileNewName))){
-            if(!StringUtil.isEmpty(proName) && !StringUtil.isEmpty(gjName)) {
+            if(!Stringutil.isEmpty(proName) && !Stringutil.isEmpty(gjName)) {
                 File[] dataFile = new File(PathUtils.PROJECT_PATH + "/" + proName+"/"+gjName).listFiles();
                 if (null != dataFile) {
                     for (File file : dataFile) {
@@ -122,7 +122,7 @@ public class ShowObjGjFileListDialog extends BaseDialog {
                 showData.addAll(data);
                 adapter.setData(showData);
             }
-            if(StringUtil.isEmpty(fileName) && showData.size()>0){
+            if(Stringutil.isEmpty(fileName) && showData.size()>0){
                 fileName = showData.get(showData.size()-1);
                 showList_input_et.setText(FileUtil.GetDigitalPile(fileName));
             }else{

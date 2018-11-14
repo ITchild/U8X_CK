@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ck.activity.HomeActivity;
+import com.ck.bean.RxBusMsgBean;
 import com.ck.utils.Catition;
-import com.fei.feilibs_1_0_0.bean.RxBusMsgBean;
 
 /**
  * @author fei

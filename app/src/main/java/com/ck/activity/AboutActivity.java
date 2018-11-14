@@ -20,11 +20,6 @@ public class AboutActivity extends TitleBaseActivity {
     }
 
     @Override
-    protected boolean isBackshow() {
-        return false;
-    }
-
-    @Override
     protected void initView() {
         super.initView();
         about_freeSpace_tv = findView(R.id.about_freeSpace_tv);
@@ -40,6 +35,7 @@ public class AboutActivity extends TitleBaseActivity {
         about_softVision_tv.setText(PackageUtil.getVersion(this));
         about_sysVision_tv.setText("Android "+PackageUtil.getSystemVersion());
         about_hardVision_tv.setText("V 1.2.0");
+        baseTitle_title_tv.setText("关于仪器");
     }
 
     @Override

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:orientation="vertical">
+
+    <include layout="@layout/ac_basetitle"></include>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="3">
+
+            <SurfaceView
+                android:id="@+id/ontime_sfv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/background" />
+
+            <com.ck.ui.CameraView
+                android:id="@+id/ontime_cameraView_cv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </RelativeLayout>
+        <View
+            android:layout_width="1pt"
+            android:layout_height="match_parent"
+            android:background="?attr/textColor"></View>
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginLeft="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="@string/str_proName"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:id="@+id/collect_proName_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="5pt"
+                    android:layout_marginTop="7pt"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:text="定时监测工程"
+                    android:textSize="14pt" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginLeft="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="@string/str_gjName"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:id="@+id/collect_gjName_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="5pt"
+                    android:layout_marginTop="7pt"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:text="定时监测构件"
+                    android:textSize="14pt" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginLeft="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="@string/str_fileName"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:id="@+id/collect_fileName_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="5pt"
+                    android:layout_marginTop="7pt"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:text="文件1"
+                    android:textSize="14pt" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginLeft="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="监测状态："
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:id="@+id/ontime_state_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="未开启"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:textSize="14pt" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginLeft="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="已测试间："
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:id="@+id/ontime_alreadtime_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="5pt"
+                    android:layout_marginTop="7pt"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:text="0分0秒"
+                    android:textSize="14pt" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginLeft="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="监测时长："
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:id="@+id/ontime_alltimeMin_tv"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginTop="7pt"
+                    android:layout_marginRight="3pt"
+                    android:gravity="center"
+                    android:text="5"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:textSize="14pt" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginTop="7pt"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt"
+                    android:text="分" />
+                <TextView
+                    android:id="@+id/ontime_alltimeSec_tv"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginTop="7pt"
+                    android:layout_marginRight="3pt"
+                    android:layout_marginLeft="3pt"
+                    android:gravity="center"
+                    android:text="30"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:textSize="14pt" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="5pt"
+                    android:layout_marginTop="7pt"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt"
+                    android:text="秒" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginLeft="5pt"
+                    android:layout_marginTop="7pt"
+                    android:text="监测间隔："
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:id="@+id/ontime_oneTimeMin_tv"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="3pt"
+                    android:layout_marginTop="7pt"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:gravity="center"
+                    android:text="00"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginTop="7pt"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt"
+                    android:text="分" />
+
+                <TextView
+                    android:id="@+id/ontime_oneTimeSec_tv"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="3pt"
+                    android:layout_marginLeft="3pt"
+                    android:layout_marginTop="7pt"
+                    android:gravity="center"
+                    android:text="30"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:textSize="14pt" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5pt"
+                    android:layout_marginRight="5pt"
+                    android:layout_marginTop="7pt"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14pt"
+                    android:text="秒" />
+            </LinearLayout>
+            <Button
+                android:id="@+id/ontime_startOrEnd_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_ontimeCollect_start"
+                android:textColor="?attr/background" />
+
+            <com.ck.ui.WheelView
+                android:id="@+id/ontime_wheel_wv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

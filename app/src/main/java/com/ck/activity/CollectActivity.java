@@ -39,7 +39,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener, SurfaceHolder.Callback {
 
     private SurfaceView collect_sfv;
@@ -93,11 +92,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     }
 
     @Override
-    protected boolean isBackshow() {
-        return false;
-    }
-
-    @Override
     protected void initView() {
         super.initView();
         collect_view = findView(R.id.collect_view);
@@ -131,6 +125,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     protected void initData() {
         super.initData();
+        baseTitle_title_tv.setText("测量缝宽");
         Intent intent = getIntent();
         if (null == intent) {
             return;

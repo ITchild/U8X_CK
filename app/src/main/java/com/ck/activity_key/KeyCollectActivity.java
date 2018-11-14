@@ -3,7 +3,7 @@ package com.ck.activity_key;
 import android.util.Log;
 
 import com.ck.activity.CollectActivity;
-import com.fei.feilibs_1_0_0.bean.RxBusMsgBean;
+import com.ck.bean.RxBusMsgBean;
 
 /**
  * @author fei

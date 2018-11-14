@@ -29,11 +29,6 @@ public class SettingActivity extends TitleBaseActivity {
     }
 
     @Override
-    protected boolean isBackshow() {
-        return false;
-    }
-
-    @Override
     protected void initView() {
         super.initView();
         setting_tab_rg = findView(R.id.setting_tab_rg);
@@ -55,6 +50,7 @@ public class SettingActivity extends TitleBaseActivity {
         int light = PreferenceHelper.getScreenLisght();
         settingPar_light_sb.setProgress(light);
         settingPar_light_tv.setText(light+"");
+        baseTitle_title_tv.setText("设置");
     }
 
     @Override
