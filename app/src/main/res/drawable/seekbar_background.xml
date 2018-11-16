@@ -2,7 +2,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@android:id/background"
-        android:height="@dimen/x10">
+        android:height="@dimen/x10"
+        android:gravity="center_vertical">
         <shape>
             <corners android:radius="@dimen/x20" />
             <solid android:color="@color/gray" />
@@ -10,6 +11,7 @@
     </item>
     <item
         android:id="@android:id/progress"
+        android:gravity="center_vertical"
         android:height="@dimen/x10">
         <clip>
             <shape>

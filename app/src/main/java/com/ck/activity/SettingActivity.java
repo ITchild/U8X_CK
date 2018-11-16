@@ -23,6 +23,8 @@ public class SettingActivity extends TitleBaseActivity {
     private TextView settingPar_light_tv;//背光亮度数值显示
     private CheckBox settingPar_theme_cb;//主题的选项
 
+    public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
+
     @Override
     protected int initLayout() {
         return R.layout.ac_setting;
@@ -101,6 +103,11 @@ public class SettingActivity extends TitleBaseActivity {
 //                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
 //                startActivity(intent);
 //                DateUtil.setDate(2018,10,24);
+
+//                Intent intent = new Intent("android.intent.action.ACTION_REQUEST_SHUTDOWN");
+//                intent.putExtra("android.intent.extra.KEY_CONFIRM", false);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                sendBroadcast(intent);
             }
         });
         settingPar_theme_cb.setOnClickListener(new View.OnClickListener() {

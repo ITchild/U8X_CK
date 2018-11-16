@@ -25,15 +25,15 @@ public class DecodeUtil {
         int avage = FindLieFenUtils.bytGrayAve;
         greenData.clear();
         buleData.clear();
-        pixels = medianFiltering(pixels,width,height);
+//        pixels = medianFiltering(pixels,width,height);
         for (int i = 0; i < pixels.length; i++) {
             int allFlag = (((((pixels[i] >> 16) & 0xFF) * 30) + (((pixels[i] >> 8) & 0xFF) * 59)
                     + ((pixels[i] >> 0) & 0xFF) * 11) / 100);
             pixels[i] = allFlag < avage ? 0x00 : 0xFFFFFF;
             if (i > 0) {
-                if (pixels[i - 1] > pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
+                if (pixels[i - 1] > pixels[i]) {
                     greenData.add(i);
-                } else if (pixels[i - 1] < pixels[i] && !(pixels[i - 1] == 0x00FF00 || pixels[i - 1] == 0x0000FF)) {
+                } else if (pixels[i - 1] < pixels[i]) {
                     buleData.add(i);
                 }
             }

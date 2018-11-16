@@ -15,6 +15,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.ck.listener.OnOpenCameraListener;
+import com.ck.utils.CarmeraDataDone;
 import com.ck.utils.DecodeUtil;
 import com.ck.utils.FindLieFenUtils;
 import com.ck.utils.PreferenceHelper;
@@ -53,6 +55,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     public Bitmap blackWriteBitmap;
     public boolean isBlackWrite = false;
     public boolean isFindSide = false;
+    public boolean isCanMove = true;
     private boolean isHaveFindside = false;
     public boolean isStart = false; //是否开始检测
     public float width = 0;
@@ -71,7 +74,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
     private float m_fDispDensity;
     private Paint m_PaintDrawLine;
     private CameraTask mCameraTask;
-    private Context mContext;
+    private AppCompatActivity mContext;
     private Thread carmeraThread;
     private Handler checkTaskHandler = new Handler();
     //开启一个线程  用来查询摄像机是否停止了
@@ -121,25 +124,25 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     public CameraView(Context context, int screenWidth, int screenHeight) {
         super(context);
-        init(context);
+        init((AppCompatActivity) context);
     }
 
     public CameraView(Context context) {
         super(context);
-        init(context);
+        init((AppCompatActivity)context);
     }
 
     public CameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init((AppCompatActivity)context);
     }
 
     public CameraView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init((AppCompatActivity)context);
     }
 
-    private void init(Context context) {
+    private void init(AppCompatActivity context) {
         mContext = context;
         m_SurfaceTexture = new SurfaceTexture(MAGIC_TEXTURE_ID);
         DisplayMetrics dm = new DisplayMetrics();
@@ -343,7 +346,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         }
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         RectF rectF = new RectF(0, 0, m_nScreenWidth, m_nScreenHeight); // w和h分别是屏幕的宽和高，也就是你想让图片显示的宽和高
-        if (!isStart) {
+//        if (!isStart) {
             showBitmap = isBlackWrite ? blackWriteBitmap : m_DrawBitmap;
             canvas.drawBitmap(showBitmap, null, rectF, null);
             if (isFindSide) { //描边
@@ -365,7 +368,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     buleY = (float) (((buleY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
                     canvas.drawPoint(buleX, buleY, paint);
                 }
-            }
+//            }
         }
         drawRuleAndFlag(canvas);//画刻度和标志
     }
@@ -557,14 +560,39 @@ public class CameraView extends View implements Camera.PreviewCallback {
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         // TODO Auto-generated method stub
-        mCameraTask = new CameraTask(bytes);
-        mCameraTask.execute((Void) null);
+//        mCameraTask = new CameraTask(bytes);
+//        mCameraTask.execute((Void) null);
         sycTaskNum++;
         camera.addCallbackBuffer(m_Buffer);
+        synchronized (this) {
+            try {
+                if (!isStart) {
+                    return ;
+                }
+                if (m_Camera == null) {
+                    return ;
+                }
+                if (null == m_Camera.getParameters()) {
+                    return ;
+                }
+                m_DraBitMapWith = m_Camera.getParameters().getPreviewSize().width;
+                m_DraBitMapHight = m_Camera.getParameters().getPreviewSize().height;
+//                    int[] rgb = DecodeUtil.decodeYUV420SP(mData, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
+                int[] rgb = CarmeraDataDone.decodeYUV420SPJni(bytes, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
+                m_DrawBitmap = Bitmap.createBitmap(rgb, m_DraBitMapWith, m_DraBitMapHight, Bitmap.Config.RGB_565);
+                FindLieFenUtils.findLieFen(rgb, m_DraBitMapWith, m_DraBitMapHight, m_bCountMode);
+                postInvalidate();//刷新OnDraw，重新绘图
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isCanMove){
+            return super.onTouchEvent(event);
+        }
         if(isFindSide) {
             isHaveFindside = true;
             isFindSide = false;
@@ -670,7 +698,8 @@ public class CameraView extends View implements Camera.PreviewCallback {
                     }
                     m_DraBitMapWith = m_Camera.getParameters().getPreviewSize().width;
                     m_DraBitMapHight = m_Camera.getParameters().getPreviewSize().height;
-                    int[] rgb = DecodeUtil.decodeYUV420SP(mData, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
+//                    int[] rgb = DecodeUtil.decodeYUV420SP(mData, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
+                    int[] rgb = CarmeraDataDone.decodeYUV420SPJni(mData, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
                     m_DrawBitmap = Bitmap.createBitmap(rgb, m_DraBitMapWith, m_DraBitMapHight, Bitmap.Config.RGB_565);
                     FindLieFenUtils.findLieFen(rgb, m_DraBitMapWith, m_DraBitMapHight, m_bCountMode);
                     postInvalidate();//刷新OnDraw，重新绘图

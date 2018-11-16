@@ -1,5 +1,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true" android:drawable="@drawable/switch_on_icon" /> <!-- pressed -->
-    <item android:state_checked="true" android:drawable="@drawable/switch_off_icon" /> <!-- focused -->
-    <item android:drawable="@drawable/switch_off_icon" /> <!-- default -->
+    <item android:state_checked="true" android:drawable="@drawable/checkbox_on" /> <!-- pressed -->
+    <item android:state_checked="true" android:drawable="@drawable/checkbox_off" /> <!-- focused -->
+    <item android:drawable="@drawable/checkbox_off" /> <!-- default -->
 </selector>

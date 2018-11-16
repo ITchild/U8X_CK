@@ -86,6 +86,7 @@ public class OnTimeCollectActivity extends TitleBaseActivity implements View.OnC
         super.initData();
         initWheelView();
         baseTitle_title_tv.setText("定时监测");
+        ontime_cameraView_cv.isCanMove = false;
     }
 
     @Override
