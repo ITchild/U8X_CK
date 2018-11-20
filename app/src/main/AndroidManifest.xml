@@ -32,7 +32,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme_White">
         <activity
-            android:name="com.ck.activity_key.KeyHomeActivity"
+            android:name="com.ck.activity.HomeActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
@@ -45,22 +45,13 @@
         </activity>
 
         <activity
-            android:name="com.ck.activity_key.KeyCollectActivity"
+            android:name="com.ck.activity.CollectActivity"
             android:configChanges="orientation|keyboardHidden"
             android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"></activity>
-
-        <!--<activity-->
-            <!--android:name="com.ck.activity.USBCollectActivity"-->
-            <!--android:configChanges="orientation|keyboardHidden"-->
-            <!--android:hardwareAccelerated="true"-->
-            <!--android:label="@string/app_name"-->
-            <!--android:screenOrientation="landscape"-->
-            <!--android:theme="@android:style/Theme.NoTitleBar.Fullscreen"-->
-            <!--android:windowSoftInputMode="adjustUnspecified|stateHidden"></activity>-->
 
         <activity
             android:name="com.ck.activity.AboutActivity"

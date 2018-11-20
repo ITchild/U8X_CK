@@ -20,4 +20,9 @@ public class CarmeraDataDone {
      */
     public native static int[] decodeYUV420SPJni(byte[] yuv420sp,int width,int hight,int[] buff);
 
+    /**
+     * 将纯RGB数据数组转化成int像素数组
+     * @return
+     */
+    public native static int[] convertByteToColorJni(byte[] data,int size);
 }

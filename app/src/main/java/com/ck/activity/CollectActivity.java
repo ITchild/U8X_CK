@@ -1,6 +1,7 @@
 package com.ck.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
@@ -85,6 +86,9 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             }
         }
     };
+
+
+    private boolean isYuTakePic = false;
 
     @Override
     protected int initLayout() {
@@ -229,8 +233,17 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 FindLieFenUtils.m_nRLineSite = data.get(position).getRightX();
                 FindLieFenUtils.bytGrayAve = data.get(position).getAvage();
                 collect_cameraView.makeInitSetting();
-                collect_cameraView.setBitmap(BitmapFactory.decodeStream(fis));
+                Bitmap bitmap = BitmapFactory.decodeStream(fis);
+                collect_cameraView.setBitmap(bitmap);
+                FindLieFenUtils.setBitmapWidth(bitmap.getWidth());
                 changeCollectView(1);
+                collect_cameraView.setZY(1);
+                collect_autoOrhand_bt.setText("");
+                collect_startStop_bt.setText(getStr(R.string.str_startCollect));
+                collect_Cursor_bt.setText(getStr(R.string.str_leftCursor));
+                collect_left_bt.setText(getStr(R.string.str_toLeft));
+                collect_right_bt.setText(getStr(R.string.str_toRight));
+                isYuTakePic = false;
             }
 
             @Override
@@ -252,6 +265,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 break;
             case R.id.collect_save_bt: // TODO： 预拍以及保存
                 if (collect_save_bt.getText().toString().equals(getStr(R.string.str_takePhoto))) {
+                    isYuTakePic = true;
                     onBeforTakePic();//预拍
                 } else if (collect_save_bt.getText().toString().equals(getStr(R.string.str_save))) {
                     onTakePic();//保存
@@ -443,14 +457,28 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         }
         File isHaveFile = new File(PathUtils.PROJECT_PATH+"/" + proName + "/" + gjName+"/"+fileName+".bmp");
         if(isHaveFile.exists()){
-            showToast("文件名重复");
-            return;
-        }
-        List<MeasureDataBean> isHaveData = DBService.getInstence(this).
-                getMeasureData(proName,gjName,fileName,MeasureDataBean.FILESTATE_USERING);
-        if(null != isHaveData && isHaveData.size()>0){
-            showToast("文件名重复");
-            return;
+            if(isYuTakePic){
+                showToast("文件名重复");
+                return;
+            }
+            List<MeasureDataBean> isHaveData = DBService.getInstence(this).
+                    getMeasureData(proName,gjName,fileName+".bmp",MeasureDataBean.FILESTATE_USERING);
+            if(null != isHaveData && isHaveData.size()>0){
+                //更新数据库内容
+                MeasureDataBean dataBean = new MeasureDataBean();
+                dataBean.setObjName(proName);
+                dataBean.setGjName(gjName);
+                dataBean.setFileName(fileName + ".bmp");
+                dataBean.setWidth(collect_cameraView.width);
+                dataBean.setLeftY(FindLieFenUtils.m_nY);
+                dataBean.setLeftX(FindLieFenUtils.m_nLLineSite);
+                dataBean.setRightY(FindLieFenUtils.m_nY);
+                dataBean.setRightX(FindLieFenUtils.m_nRLineSite);
+                DBService.getInstence(this).upDateMeasureData(dataBean);
+                showToast(getStr(R.string.str_saveSuccess));
+                collect_save_bt.setText("");
+                return;
+            }
         }
         FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
                 "/" + proName + "/" + gjName, fileName, "%s.bmp");
@@ -480,6 +508,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         onCollectStart();//保存成功之后继续进行检测
         collect_cameraView.setBlackWrite(false, false);
         showToast(getStr(R.string.str_saveSuccess));
+        isYuTakePic = false;
     }
 
     /**
@@ -511,17 +540,21 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
                 if (FindLieFenUtils.m_nLLineSite > 0) {
                     FindLieFenUtils.LLineToLOrR(true);
+                    collect_save_bt.setText(getStr(R.string.str_save));
                 }
             } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
                 if (FindLieFenUtils.m_nRLineSite > 0) {
                     FindLieFenUtils.RLineToLOrR(true);
+                    collect_save_bt.setText(getStr(R.string.str_save));
                 }
             }
         } else { //光标右移的处理
             if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
                 FindLieFenUtils.LLineToLOrR(false);
+                collect_save_bt.setText(getStr(R.string.str_save));
             } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
                 FindLieFenUtils.RLineToLOrR(false);
+                collect_save_bt.setText(getStr(R.string.str_save));
             }
         }
         collect_cameraView.onMove();

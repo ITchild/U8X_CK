@@ -8,7 +8,6 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.ck.activity_key.KeyHomeActivity;
 import com.ck.base.TitleBaseActivity;
 import com.ck.utils.PreferenceHelper;
 import com.hc.u8x_ck.R;
@@ -155,7 +154,7 @@ public class SettingActivity extends TitleBaseActivity {
      * 返回Home界面
      */
     private void backToHome(){
-        Intent intent = new Intent(SettingActivity.this,KeyHomeActivity.class);
+        Intent intent = new Intent(SettingActivity.this,HomeActivity.class);
         intent.putExtra("jump","setting");
         startActivity(intent);
     }

@@ -5,7 +5,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 
-import com.ck.activity_key.KeyCollectActivity;
 import com.ck.adapter.HomeDisAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.dlg.SigleBtMsgDialog;
@@ -91,7 +90,7 @@ public class HomeActivity extends TitleBaseActivity {
      * 跳转到裂缝检测界面
      */
     private void jumpToCollect() {
-        startActivity(new Intent(this, KeyCollectActivity.class));
+        startActivity(new Intent(this, CollectActivity.class));
 //        startActivity(new Intent(this, USBCollectActivity.class));
     }
 

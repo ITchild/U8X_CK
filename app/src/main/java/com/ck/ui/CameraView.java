@@ -253,7 +253,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     /**
      * 设置显示描边
-     *
      * @param isFindSide
      * @param isRefresh
      */
@@ -270,7 +269,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     /**
      * 计算模式，true自动计算，false手动计算
-     *
      * @param bCountMode
      */
     public void setCountMode(boolean bCountMode) {
@@ -394,9 +392,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
         }
         m_PaintDrawLine.setColor(Color.RED);
         m_PaintDrawLine.setStrokeWidth(2);
+        canvas.drawLine(nL, nYMid, nR, nYMid, m_PaintDrawLine); //左右两个卡标中间的连线
         if (m_nDrawFlag == 1) {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
+        //左卡标的绘制
         canvas.drawLine(nL, nYMid - m_nScreenHeight / 20, nL, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
         canvas.drawLine(nL - 50, nYMid, nL, nYMid, m_PaintDrawLine);
         canvas.drawLine(nL - 10, nYMid - 10, nL, nYMid, m_PaintDrawLine);
@@ -405,7 +405,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         if (m_nDrawFlag == 2) {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
-        canvas.drawLine(nL, nYMid, nR, nYMid, m_PaintDrawLine);
+        //右卡标的绘制
         canvas.drawLine(nR, nYMid - m_nScreenHeight / 20, nR, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
         canvas.drawLine(nR + 50, nYMid, nR, nYMid, m_PaintDrawLine);
         canvas.drawLine(nR + 10, nYMid - 10, nR, nYMid, m_PaintDrawLine);
@@ -423,7 +423,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
         canvas.drawLine(0, nKDY, m_nScreenWidth, nKDY, m_PaintDrawLine);//打底线
         canvas.drawLine(1, nKDY, 1, nKDY - 60, m_PaintDrawLine); // 0刻度线
         canvas.drawText("0", 1, nKDY + 40, m_PaintDrawLine);
-
+        //底部标度尺的绘制
         float unit = 10;
         for (int i = 1; i <= max_X; i++) {
             if (i % unit == 0) {
@@ -488,7 +488,6 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
     /**
      * 进行标定（2mm）
-     *
      * @param isCalibration
      */
     public void setCalibration(boolean isCalibration) {
@@ -529,9 +528,9 @@ public class CameraView extends View implements Camera.PreviewCallback {
 
                 m_Parameters = m_Camera.getParameters();
                 List<Size> preSize = m_Parameters.getSupportedPreviewSizes();
-                for (Size size : preSize) {
-                    Log.i("fei", size.width + "*" + size.height);
-                }
+//                for (Size size : preSize) {
+//                    Log.i("fei", size.width + "*" + size.height);
+//                }
 //                Camera.Size size = DecodeUtil.pickBestSizeCandidate(m_nScreenWidth, m_nScreenHeight, preSize);
                 Camera.Size size = DecodeUtil.pickBestSizeCandidate(640, 480, preSize);
                 Log.i("fei", "我选择的" + size.width + "*" + size.height + "屏幕自己的" + m_nScreenWidth + "*" + m_nScreenHeight);
@@ -577,7 +576,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
                 }
                 m_DraBitMapWith = m_Camera.getParameters().getPreviewSize().width;
                 m_DraBitMapHight = m_Camera.getParameters().getPreviewSize().height;
-//                    int[] rgb = DecodeUtil.decodeYUV420SP(mData, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
+//                int[] rgb = DecodeUtil.decodeYUV420SP(bytes, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
                 int[] rgb = CarmeraDataDone.decodeYUV420SPJni(bytes, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
                 m_DrawBitmap = Bitmap.createBitmap(rgb, m_DraBitMapWith, m_DraBitMapHight, Bitmap.Config.RGB_565);
                 FindLieFenUtils.findLieFen(rgb, m_DraBitMapWith, m_DraBitMapHight, m_bCountMode);
@@ -677,12 +676,10 @@ public class CameraView extends View implements Camera.PreviewCallback {
     /*自定义的CameraTask类，开启一个线程分析数据*/
     private class CameraTask extends AsyncTask<Void, Void, Void> {
         private byte[] mData;
-
         //构造函数
         CameraTask(byte[] data) {
             this.mData = data;
         }
-
         @Override
         protected Void doInBackground(Void... params) {
             synchronized (this) {

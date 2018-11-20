@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 
-import com.ck.activity_key.KeyCollectActivity;
 import com.ck.base.TitleBaseActivity;
 import com.hc.u8x_ck.R;
 
@@ -39,7 +38,7 @@ public class CalibrationActivity extends TitleBaseActivity {
         text_entryDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(CalibrationActivity.this, KeyCollectActivity.class);
+                Intent intent = new Intent(CalibrationActivity.this, CollectActivity.class);
                 startActivity(intent);
                 finish();
             }

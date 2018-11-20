@@ -25,7 +25,6 @@ public class DecodeUtil {
         int avage = FindLieFenUtils.bytGrayAve;
         greenData.clear();
         buleData.clear();
-//        pixels = medianFiltering(pixels,width,height);
         for (int i = 0; i < pixels.length; i++) {
             int allFlag = (((((pixels[i] >> 16) & 0xFF) * 30) + (((pixels[i] >> 8) & 0xFF) * 59)
                     + ((pixels[i] >> 0) & 0xFF) * 11) / 100);
@@ -188,7 +187,8 @@ public class DecodeUtil {
                 k++;
             }
         }
-        return convertByteToColor(pixels);
+//        return convertByteToColor(pixels);
+        return CarmeraDataDone.convertByteToColorJni(pixels,pixels.length);
     }
 
     // 将纯RGB数据数组转化成int像素数组

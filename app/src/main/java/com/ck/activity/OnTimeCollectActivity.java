@@ -2,6 +2,7 @@ package com.ck.activity;
 
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.ck.base.TitleBaseActivity;
 import com.ck.bean.MeasureDataBean;
 import com.ck.db.DBService;
+import com.ck.dlg.TwoBtMsgDialog;
 import com.ck.listener.OnOpenCameraListener;
 import com.ck.ui.CameraView;
 import com.ck.ui.WheelView;
@@ -119,7 +121,6 @@ public class OnTimeCollectActivity extends TitleBaseActivity implements View.OnC
                 break;
         }
     }
-
 
     /**
      * 开始进行测量
@@ -292,6 +293,44 @@ public class OnTimeCollectActivity extends TitleBaseActivity implements View.OnC
         collect_fileName_tv.setText(fileName);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK :
+                if("检测中".equals(ontime_state_tv.getText().toString())){
+                    showBackDialog();
+                }
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 正在检测时的退出界面的提示框
+      */
+    private void showBackDialog(){
+        final TwoBtMsgDialog msgDialog = new TwoBtMsgDialog(this);
+        msgDialog.show();
+        msgDialog.setMsg("正在检测，退出将会停止\n是否继续退出？");
+        msgDialog.setTitleMsg("重要提示");
+        msgDialog.setBtOkTxt("退出");
+        msgDialog.setBtCancelTxt("继续检测");
+        msgDialog.setOnBtClickListener(new TwoBtMsgDialog.OnBtClickListener() {
+            @Override
+            public void onBtClick(boolean isOk) {
+                if(isOk){
+                    finish();
+                }
+                msgDialog.dismiss();
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopCameraView();
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {

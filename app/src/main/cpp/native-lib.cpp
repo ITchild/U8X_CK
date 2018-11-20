@@ -26,19 +26,24 @@
 //
 //}
 
-int* decodeYUV420SP(int* rgbBuf, char* yuv420sp, int width, int height)
-{
+/**
+ * 摄像机的流转换为RGB的int数组
+ * @param rgbBuf
+ * @param yuv420sp
+ * @param width
+ * @param height
+ * @return
+ */
+int *decodeYUV420SP(int *rgbBuf, char *yuv420sp, int width, int height) {
     int frameSize = width * height;
     int i = 0, y = 0;
     int uvp = 0, u = 0, v = 0;
     int y1192 = 0, r = 0, g = 0, b = 0;
-    for (int j = 0, yp = 0; j < height; j++)
-    {
+    for (int j = 0, yp = 0; j < height; j++) {
         uvp = frameSize + (j >> 1) * width;
         u = 0;
         v = 0;
-        for (i = 0; i < width; i++, yp++)
-        {
+        for (i = 0; i < width; i++, yp++) {
             y = (0xff & ((int) yuv420sp[yp])) - 16;
             if (y < 0) y = 0;
             if ((i & 1) == 0) {
@@ -76,21 +81,91 @@ JNICALL
 Java_com_ck_utils_CarmeraDataDone_decodeYUV420SPJni(JNIEnv *env, jclass type, jbyteArray yuv420sp_,
                                                     jint width, jint hight, jintArray buff_) {
     jint *buff = env->GetIntArrayElements(buff_, NULL);
-    jbyte* array = env->GetByteArrayElements(yuv420sp_,NULL);
+    jbyte *array = env->GetByteArrayElements(yuv420sp_, NULL);
 
-    int arraysize = env ->GetArrayLength(yuv420sp_);
-    char buf[arraysize+1];
+    int arraysize = env->GetArrayLength(yuv420sp_);
+    char buf[arraysize + 1];
     int i = 0;
-    for(i = 0; i < arraysize; i++){
+    for (i = 0; i < arraysize; i++) {
         buf[i] = array[i];
     }
     buf[arraysize] = '\0';
     // TODO
-    int* a = decodeYUV420SP(buff,buf,width,hight);
-    int length = hight*width;
-    jintArray res = env ->NewIntArray(length);
-    env ->SetIntArrayRegion(res,0,length,a);
+    int *a = decodeYUV420SP(buff, buf, width, hight);
+    int length = hight * width;
+    jintArray res = env->NewIntArray(length);
+    env->SetIntArrayRegion(res, 0, length, a);
     env->ReleaseIntArrayElements(buff_, buff, 0);
     env->ReleaseByteArrayElements(yuv420sp_, array, 0);
-    return res ;
+    return res;
+}
+
+
+// 将一个byte数转成int
+// 实现这个函数的目的是为了将byte数当成无符号的变量去转化成int
+ int convertByteToInt(char data) {
+    int heightBit = (int) ((data >> 4) & 0x0F);
+    int lowBit = (int) (0x0F & data);
+    return heightBit *16 + lowBit;
+}
+
+// 将纯RGB数据数组转化成int像素数组
+int *convertByteToColor(char *data, int size) {
+    if (size == 0) {
+        return NULL;
+    }
+    int arg = 0;
+    if (size % 3 != 0) {
+        arg = 1;
+    }
+    // 一般RGB字节数组的长度应该是3的倍数，
+    // 不排除有特殊情况，多余的RGB数据用黑色0XFF000000填充
+    int colorLen = size / 3 + arg;
+    int *color = new int[colorLen];
+    int red, green, blue;
+//    memset(color, 0, sizeof(colorLen));
+    if (arg == 0) {
+        for (int i = 0; i < colorLen; i++) {
+            red = convertByteToInt(data[i * 3]);
+            green = convertByteToInt(data[i * 3 + 1]);
+            blue = convertByteToInt(data[i * 3 + 2]);
+            //获取RGB分量值通过按位或生成int的像素值
+            color[i] = (red << 16) | (green << 8) | blue | 0xFF000000;
+        }
+    } else {
+        for (int i = 0; i < colorLen - 1; ++i) {
+            red = convertByteToInt(data[i * 3]);
+            green = convertByteToInt(data[i * 3 + 1]);
+            blue = convertByteToInt(data[i * 3 + 2]);
+            color[i] = (red << 16) | (green << 8) | blue | 0xFF000000;
+        }
+        color[colorLen - 1] = 0xFF000000;
+    }
+    return color;
+}
+
+extern "C"
+JNIEXPORT jintArray JNICALL
+Java_com_ck_utils_CarmeraDataDone_convertByteToColorJni(JNIEnv *env, jclass type,
+                                                        jbyteArray data_,jint size) {
+    jbyte *data = env->GetByteArrayElements(data_, NULL);
+    char buf[size + 1];
+    int i = 0;
+    for (i = 0; i < size; i++) {
+        buf[i] = data[i];
+    }
+    buf[size] = '\0';
+    // TODO
+    int *a = convertByteToColor(buf, size);
+    int arg = 0;
+    if (size % 3 != 0) {
+        arg = 1;
+    }
+    // 一般RGB字节数组的长度应该是3的倍数，
+    // 不排除有特殊情况，多余的RGB数据用黑色0XFF000000填充
+    int colorLen = size / 3 + arg;
+    jintArray res = env->NewIntArray(colorLen);
+    env->SetIntArrayRegion(res, 0, colorLen, a);
+    env->ReleaseByteArrayElements(data_, data, 0);
+    return res;
 }

@@ -10,7 +10,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import com.ck.activity_key.KeyCollectActivity;
 import com.ck.adapter.FileListGJAdapter;
 import com.ck.adapter.FileListProjectAdapter;
 import com.ck.base.TitleBaseActivity;
@@ -193,7 +192,7 @@ public class FileBowerActivity extends TitleBaseActivity  {
      */
     protected void cilickFileObjList(int position, boolean isShowPic) {
         mGJAdapter.setSelect(position);
-        Intent intent = new Intent(this,KeyCollectActivity.class);
+        Intent intent = new Intent(this,CollectActivity.class);
         intent.putExtra("objName",proData.get(mProjectAdapter.getSelect()).mFileProjectName);
         intent.putExtra("gjName",fileData.mstrArrFileGJ.get(mGJAdapter.getSelect()).mFileGJName);
         startActivity(intent);

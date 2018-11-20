@@ -152,23 +152,17 @@ public class DBService {
     /**
      * 更新检测表的信息
      */
-    public void upDateMeasureData(String flag , MeasureDataBean bean){
-        if(null == flag || null == bean){
+    public void upDateMeasureData( MeasureDataBean bean){
+        if(null == bean){
             return;
         }
         SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
-        if(flag.equals("changeData")){ //更新测量裂缝的数据信息
-            cv.put("width", bean.getWidth());
-            cv.put("leftX", bean.getLeftX());
-            cv.put("leftY", bean.getLeftY());
-            cv.put("rightX", bean.getRightX());
-            cv.put("rightY", bean.getRightY());
-        }else{ //更新文件被删除信息
-            //待定（和新建的文件有冲突）
-            cv.put("fileState", bean.getFileState());
-            cv.put("delDate", bean.getDelDate());
-        }
+        cv.put("width", bean.getWidth());
+        cv.put("leftX", bean.getLeftX());
+        cv.put("leftY", bean.getLeftY());
+        cv.put("rightX", bean.getRightX());
+        cv.put("rightY", bean.getRightY());
         String[] args = {bean.getObjName(),bean.getGjName(),bean.getFileName()};
         String where = "objName=? and gjName=? and fileName=?";
         readableDatabase.update("MeasureData",cv, where,args);
