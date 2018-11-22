@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <string>
+#include <vector>
 
 
 //extern "C" JNIEXPORT jint*
@@ -167,5 +168,77 @@ Java_com_ck_utils_CarmeraDataDone_convertByteToColorJni(JNIEnv *env, jclass type
     jintArray res = env->NewIntArray(colorLen);
     env->SetIntArrayRegion(res, 0, colorLen, a);
     env->ReleaseByteArrayElements(data_, data, 0);
+    return res;
+}
+
+
+/// <summary>
+/// 回溯法标记连通域
+/// </summary>
+/// <param name="x">该点的横坐标</param>
+/// <param name="y">该点的纵坐标</param>
+/// <param name="isMarked">是否已经被标记过，用于记录回溯路线。默认值为false
+/// 如果该点已经被标记过，则应指定该参数为true。</param>
+void connect(int * data,bool * boolFlag,std::vector<int>& flag,int i,int width,int hight,int small){
+    if(boolFlag[i]){
+        return;
+    }
+    if(i>= width* hight){
+        return;
+    }
+    if(data[i] == 0){
+        boolFlag[i] = true;
+        flag[0]++;
+        flag.push_back(i);
+        connect(data,boolFlag,flag,i+1,width,hight,small);
+        connect(data,boolFlag,flag,i+width,width,hight,small);
+    }else{
+        return;
+    }
+}
+/**
+ * 获取图片的小的连通区域，并删除
+ * @param data
+ * @param width
+ * @param hight
+ * @return
+ */
+void delLittleSquare(int * data,int width,int hight, int littleSq){
+    bool * boolFlag = new bool [width*hight]{false};
+    std::vector<int> intFlag;
+    intFlag.push_back(0);
+    int i= 0;
+    for (i = 0; i < width*hight; i++) {
+        connect(data,boolFlag,intFlag,i,width,hight,littleSq);
+        if(intFlag[0]<littleSq){
+            for (int i = 1; i <= intFlag[0] ; ++i) {
+                data[intFlag[i]] = 0xFFFFFF;
+            }
+        }
+        intFlag.clear();
+        intFlag.push_back(0);
+    }
+}
+
+extern "C"
+JNIEXPORT jintArray
+JNICALL
+/**
+ * 去除连通区域小于标准值得区域
+ * @param env
+ * @param type
+ * @param data_
+ * @param width
+ * @param hight
+ * @param littleSq
+ * @return
+ */
+Java_com_ck_utils_CarmeraDataDone_delLittleSquareJni(JNIEnv *env, jclass type, jintArray data_,
+                                                  jint width, jint hight, jint littleSq) {
+    jint *data = env->GetIntArrayElements(data_, NULL);
+    delLittleSquare(data,width,hight,littleSq);
+    int len = width * hight;
+    jintArray res = env->NewIntArray(len);
+    env->SetIntArrayRegion(res, 0, len, data);
     return res;
 }

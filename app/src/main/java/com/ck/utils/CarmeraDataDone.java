@@ -25,4 +25,9 @@ public class CarmeraDataDone {
      * @return
      */
     public native static int[] convertByteToColorJni(byte[] data,int size);
+
+    /**
+     * 将二值图像的联通区域较小的去除掉
+     */
+    public native static int[] delLittleSquareJni(int []data,int width,int hight,int littleSq);
 }

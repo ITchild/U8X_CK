@@ -241,12 +241,14 @@ public class CameraView extends View implements Camera.PreviewCallback {
      * @param isRefresh
      */
     public void setBlackWrite(boolean isBlackWrite, boolean isRefresh) {
+        if (null == blackWriteBitmap || blackWriteBitmap.isRecycled()) {
+            if(isRefresh) {
+                Toast.makeText(mContext, "数据处理中，请稍后再试", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
         this.isBlackWrite = isBlackWrite;
         if (isRefresh) {
-            if (null == blackWriteBitmap || blackWriteBitmap.isRecycled()) {
-                Toast.makeText(mContext, "数据处理中，请稍后再试", Toast.LENGTH_SHORT).show();
-                return;
-            }
             invalidate();
         }
     }
@@ -257,12 +259,14 @@ public class CameraView extends View implements Camera.PreviewCallback {
      * @param isRefresh
      */
     public void setFindSide(boolean isFindSide, boolean isRefresh) {
+        if (null == blackWriteBitmap || blackWriteBitmap.isRecycled()) {
+            if(isRefresh) {
+                Toast.makeText(mContext, "数据处理中，请稍后再试", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
         this.isFindSide = isFindSide;
         if (isRefresh) {
-            if (null == blackWriteBitmap || blackWriteBitmap.isRecycled()) {
-                Toast.makeText(mContext, "数据处理中，请稍后再试", Toast.LENGTH_SHORT).show();
-                return;
-            }
             invalidate();
         }
     }
@@ -345,7 +349,11 @@ public class CameraView extends View implements Camera.PreviewCallback {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         RectF rectF = new RectF(0, 0, m_nScreenWidth, m_nScreenHeight); // w和h分别是屏幕的宽和高，也就是你想让图片显示的宽和高
 //        if (!isStart) {
+        if(! isStart) {
             showBitmap = isBlackWrite ? blackWriteBitmap : m_DrawBitmap;
+        }else{
+            showBitmap = m_DrawBitmap;
+        }
             canvas.drawBitmap(showBitmap, null, rectF, null);
             if (isFindSide) { //描边
                 Paint paint = getPaint(Style.FILL, 3, Color.GREEN, 25);
@@ -465,6 +473,9 @@ public class CameraView extends View implements Camera.PreviewCallback {
      * @param isToLarge
      */
     public void setLargeOrSmall(boolean isToLarge, boolean isRefresh) {
+        if(isStart){
+            return;
+        }
         toLargeSize = isToLarge ? toLargeSize + 0.3f : toLargeSize-0.3f;
         if(toLargeSize > 2.5f){
             toLargeSize = 2.5f;
@@ -586,6 +597,7 @@ public class CameraView extends View implements Camera.PreviewCallback {
             }
         }
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {

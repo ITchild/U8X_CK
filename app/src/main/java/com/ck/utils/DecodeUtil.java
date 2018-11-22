@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.media.ThumbnailUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,15 +20,22 @@ public class DecodeUtil {
     public static List<Integer> buleData = new ArrayList<>();
 
     public static Bitmap convertToBlackWhite(Bitmap bmp) {
+        Log.i("fei","黑白图处理开始：" + System.currentTimeMillis());
         int width = bmp.getWidth(); // 获取位图的宽
         int height = bmp.getHeight(); // 获取位图的高
-        int[] pixels = bitmap2RGB(bmp);
+        int red, green, blue;
+//        int[] pixels = bitmap2RGB(bmp);
+        int [] pixels = new int[width*height];
         int avage = FindLieFenUtils.bytGrayAve;
         greenData.clear();
         buleData.clear();
         for (int i = 0; i < pixels.length; i++) {
-            int allFlag = (((((pixels[i] >> 16) & 0xFF) * 30) + (((pixels[i] >> 8) & 0xFF) * 59)
-                    + ((pixels[i] >> 0) & 0xFF) * 11) / 100);
+            int color = bmp.getPixel(i%width, i/width);
+            red =  Color.red(color);
+            green = Color.green(color);
+            blue = Color.blue(color);
+            //获取RGB分量值通过按位或生成灰阶int的像素值
+            int allFlag = ((((red & 0xFF) * 30) + ((green & 0xFF) * 59) + ((blue & 0xFF) * 11)) / 100);
             pixels[i] = allFlag < avage ? 0x00 : 0xFFFFFF;
             if (i > 0) {
                 if (pixels[i - 1] > pixels[i]) {
@@ -37,11 +45,15 @@ public class DecodeUtil {
                 }
             }
         }
+        Log.i("fei","黑白图开始生成图像：" + System.currentTimeMillis());
+        //计算连通区域，小于阈值的直接改为白色
+        pixels = CarmeraDataDone.delLittleSquareJni(pixels,width,height,20);
         //新建图片
         Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
         //设置图片数据
         newBmp.setPixels(pixels, 0, width, 0, 0, width, height);
         Bitmap resizeBmp = ThumbnailUtils.extractThumbnail(newBmp, width, height);
+        Log.i("fei","黑白图处理结束：" + System.currentTimeMillis());
         return resizeBmp;
     }
 
@@ -167,78 +179,27 @@ public class DecodeUtil {
         return newpix;
     }
 
+
     /**
      * @方法描述 Bitmap转int像素组
      */
     public static int[] bitmap2RGB(Bitmap bmp) {
         int w = bmp.getWidth();
         int h = bmp.getHeight();
-
-        byte[] pixels = new byte[w * h * 3]; // Allocate for RGB
-
+        int red, green, blue;
+        int[] pixels = new int[w * h]; // Allocate for RGB
         int k = 0;
-
         for (int x = 0; x < h; x++) {
             for (int y = 0; y < w; y++) {
                 int color = bmp.getPixel(y, x);
-                pixels[k * 3] = (byte) Color.red(color);
-                pixels[k * 3 + 1] = (byte) Color.green(color);
-                pixels[k * 3 + 2] = (byte) Color.blue(color);
+                red =  Color.red(color);
+                green = Color.green(color);
+                blue = Color.blue(color);
+                //获取RGB分量值通过按位或生成int的像素值
+                pixels[k] = (red << 16) | (green << 8) | blue | 0xFF000000;
                 k++;
             }
         }
-//        return convertByteToColor(pixels);
-        return CarmeraDataDone.convertByteToColorJni(pixels,pixels.length);
+        return pixels;
     }
-
-    // 将纯RGB数据数组转化成int像素数组
-    public static int[] convertByteToColor(byte[] data) {
-        int size = data.length;
-        if (size == 0) {
-            return null;
-        }
-
-        int arg = 0;
-        if (size % 3 != 0) {
-            arg = 1;
-        }
-
-        // 一般RGB字节数组的长度应该是3的倍数，
-        // 不排除有特殊情况，多余的RGB数据用黑色0XFF000000填充
-        int[] color = new int[size / 3 + arg];
-        int red, green, blue;
-        int colorLen = color.length;
-        if (arg == 0) {
-            for (int i = 0; i < colorLen; ++i) {
-                red = convertByteToInt(data[i * 3]);
-                green = convertByteToInt(data[i * 3 + 1]);
-                blue = convertByteToInt(data[i * 3 + 2]);
-
-                // 获取RGB分量值通过按位或生成int的像素值
-                color[i] = (red << 16) | (green << 8) | blue | 0xFF000000;
-            }
-        } else {
-            for (int i = 0; i < colorLen - 1; ++i) {
-                red = convertByteToInt(data[i * 3]);
-                green = convertByteToInt(data[i * 3 + 1]);
-                blue = convertByteToInt(data[i * 3 + 2]);
-                color[i] = (red << 16) | (green << 8) | blue | 0xFF000000;
-            }
-
-            color[colorLen - 1] = 0xFF000000;
-        }
-
-        return color;
-    }
-
-    // 将一个byte数转成int
-    // 实现这个函数的目的是为了将byte数当成无符号的变量去转化成int
-    public static int convertByteToInt(byte data) {
-
-        int heightBit = (int) ((data >> 4) & 0x0F);
-        int lowBit = (int) (0x0F & data);
-        return heightBit * 16 + lowBit;
-    }
-
-
 }
