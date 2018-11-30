@@ -26,6 +26,7 @@ import com.ck.dlg.TwoBtMsgDialog;
 import com.ck.info.ClasFileProjectInfo;
 import com.ck.listener.OnOpenCameraListener;
 import com.ck.ui.CameraView;
+import com.ck.utils.CarmeraDataDone;
 import com.ck.utils.Catition;
 import com.ck.utils.DateUtil;
 import com.ck.utils.FileUtil;
@@ -183,6 +184,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 }
             }
         }).start();
+        CarmeraDataDone.openHardDevJni(1,1,1);
     }
 
     @Override
@@ -356,13 +358,13 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      * 开始进行测量
      */
     private void onCollectStart() {
-        changeCollectView(1);
         collect_cameraView.setStartView();
-        changeStartStopTakeView(Catition.CollectView.START);
         collect_cameraView.onenCamera(new OnOpenCameraListener() {
             @Override
             public void OnOpenCameraResultListener(boolean bResult) {
                 if (bResult) {
+                    changeStartStopTakeView(Catition.CollectView.START);
+                    changeCollectView(1);
                     if (null == mHolder) {
                         mHolder = collect_sfv.getHolder();
                         mHolder.addCallback(CollectActivity.this);
@@ -377,7 +379,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             @Override
             public void onCarameError() {
                 stopCameraView(); // 停止进行检测
-                onCollectStart();
+//                onCollectStart();
             }
         });
     }
@@ -700,6 +702,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        CarmeraDataDone.openHardDevJni(1,1,0);
     }
 
     @Override
@@ -726,11 +729,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         Log.i("fei",""+event.getAction()+ "      " + keyCode);
-//        if(keyCode == KeyEvent.KEYCODE_DPAD_UP){
-//            return true;
-//        }else if(keyCode == KeyEvent.KEYCODE_DPAD_DOWN){
-//            return false;
-//        }
+        if(keyCode == KeyEvent.KEYCODE_F3){
+            onBeforTakePic();//预拍
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
 }

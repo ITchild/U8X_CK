@@ -13,7 +13,7 @@
 
     <string name="str_blackWrite">黑白图</string>
     <string name="str_pic">原  图</string>
-    <string name="str_findBian">描  边</string>
+    <string name="str_findBian">自动判别</string>
     <string name="str_enlarge">放  大</string>
     <string name="str_lessen">缩  小</string>
     <string name="str_morePic">缩略图</string>

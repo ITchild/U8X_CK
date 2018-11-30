@@ -7,7 +7,6 @@ import android.media.ThumbnailUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,7 +19,10 @@ public class DecodeUtil {
     public static List<Integer> buleData = new ArrayList<>();
 
     public static Bitmap convertToBlackWhite(Bitmap bmp) {
-        Log.i("fei","黑白图处理开始：" + System.currentTimeMillis());
+//        Log.i("fei","黑白图处理开始：" + System.currentTimeMillis());
+        if(null == bmp){
+            return bmp;
+        }
         int width = bmp.getWidth(); // 获取位图的宽
         int height = bmp.getHeight(); // 获取位图的高
         int red, green, blue;
@@ -29,6 +31,9 @@ public class DecodeUtil {
         int avage = FindLieFenUtils.bytGrayAve;
         greenData.clear();
         buleData.clear();
+//        Log.i("fei","获取整体的bitmap的int数组START：" + System.currentTimeMillis());
+        bmp.getPixels(pixels,0,width,0,0,width,height);
+//        Log.i("fei","获取整体的bitmap的int数组END：" + System.currentTimeMillis());
         for (int i = 0; i < pixels.length; i++) {
             int color = bmp.getPixel(i%width, i/width);
             red =  Color.red(color);
@@ -37,24 +42,532 @@ public class DecodeUtil {
             //获取RGB分量值通过按位或生成灰阶int的像素值
             int allFlag = ((((red & 0xFF) * 30) + ((green & 0xFF) * 59) + ((blue & 0xFF) * 11)) / 100);
             pixels[i] = allFlag < avage ? 0x00 : 0xFFFFFF;
-            if (i > 0) {
-                if (pixels[i - 1] > pixels[i]) {
-                    greenData.add(i);
-                } else if (pixels[i - 1] < pixels[i]) {
-                    buleData.add(i);
+        }
+//        Log.i("fei","开始使用连通域处理图像：" + System.currentTimeMillis());
+        //计算连通区域，小于阈值的直接改为白色
+        pixels = CarmeraDataDone.delLittleSquareJni(pixels,width,height,30,25);
+//        Log.i("fei","开始边缘检测：" + System.currentTimeMillis());
+        int flagLeng = width * height/2;
+        int nLeft = -1, nRight = -1;
+        int m_nRLineSite = 0,m_nLLineSite = 0;
+        for (int i =flagLeng ; i < flagLeng+width; i++) {
+            if (pixels[i] == 0x00 && nLeft < 0) {
+                nLeft = i;
+            }
+            if (pixels[i] == 0xFFFFFF && nLeft >= 0) {
+                nRight = i==0?0:i-1;
+            }
+            if (nLeft >= 0 && nRight >= 0) {
+                if (nRight - nLeft >= 1 && nRight - nLeft >= m_nRLineSite - m_nLLineSite) {//过滤小范围值得波动
+                    m_nLLineSite = nLeft - flagLeng;
+                    m_nRLineSite = nRight - flagLeng;
                 }
+                nLeft = -1;
+                nRight = -1;
             }
         }
-        Log.i("fei","黑白图开始生成图像：" + System.currentTimeMillis());
-        //计算连通区域，小于阈值的直接改为白色
-        pixels = CarmeraDataDone.delLittleSquareJni(pixels,width,height,20);
+        boolean [] isChecks = new boolean[width*height];
+        for (int i=0;i<isChecks.length;i++){
+            isChecks[i] = false;
+        }
+        //获取左右连续边界   顺序不能乱
+        //获取左侧向上的边
+        getGreenDataUp(pixels,isChecks,width,height,m_nLLineSite,height/2);
+        //获取左侧向下的边
+        getGreenDataDown(pixels,isChecks,width,height,m_nLLineSite,height/2);
+        //获取右侧向上的边
+        getBuleDataUp(pixels,isChecks,width,height,m_nRLineSite,height/2);
+        //获取右侧向下的边
+        getBuleDataDown(pixels,isChecks,width,height,m_nRLineSite,height/2);
+
+
+        float zX = FindLieFenUtils.m_nLLineSite;
+        float zY = height/2;
+        float length = 10000;
+        for(int flag : buleData){
+            float flagX =(float) (flag % width);
+            float flagY =(float) (flag / width);
+            float flagLength = (float) Math.sqrt(Math.abs((flagX - zX)* (flagX - zX)+(flagY - zY)* (flagY - zY)));
+            if(length > flagLength){
+                length = flagLength;
+                FindLieFenUtils.m_nCRXLineSite = flagX;
+                FindLieFenUtils.m_nCRYLineSite = flagY;
+                FindLieFenUtils.m_nCLXLineSite = m_nLLineSite;
+                FindLieFenUtils.m_nCLYLineSite = height/2;
+            }
+        }
+//        Log.i("fei","开始新建bitmap图像：" + System.currentTimeMillis());
         //新建图片
         Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
         //设置图片数据
         newBmp.setPixels(pixels, 0, width, 0, 0, width, height);
         Bitmap resizeBmp = ThumbnailUtils.extractThumbnail(newBmp, width, height);
-        Log.i("fei","黑白图处理结束：" + System.currentTimeMillis());
+//        Log.i("fei","处理结束：" + System.currentTimeMillis());
         return resizeBmp;
+    }
+
+    /**
+     * 获取左侧向上的描边的点
+     * @param pixels
+     * @param x
+     * @param y
+     *  TODO :::: 必须在子线程中
+     */
+    private static void getGreenDataUp(int [] pixels,boolean [] isChecks ,int width,int hight,int x,int y) {
+        greenData.add(y * width + x);
+        boolean stopFlag = true;
+        int flagy  , flagx ;
+        while(stopFlag){
+            if (x <= 1 || y <= 1 || y >= hight-2 || x >= width-1) {
+                break;
+            }
+            //先往上检测
+            flagy = y -1;
+            flagx = x;
+            if( !isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //左上
+            flagy = y-1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //右上
+            flagy = y-1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //右
+            flagy = y;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //右下
+            flagy = y+1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //下
+            flagy = y+1;
+            flagx = x;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //左下
+            flagy = y+1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //左
+            flagy = y;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            stopFlag = false;
+        }
+        Log.i("fei", "getGreenDataUp: 左侧向上运行完");
+    }
+
+
+    /**
+     * 获取左侧向下的描边的点
+     * @param pixels
+     * @param x
+     * @param y
+     *  TODO :::: 必须在子线程中
+     */
+    private static void getGreenDataDown(int [] pixels,boolean [] isChecks,int width,int hight,int x,int y) {
+        greenData.add(y * width + x);
+        boolean stopFlag = true;
+        int flagy  , flagx ;
+        while(stopFlag){
+            if (x <= 1 || y <= 1 || y >= hight-2 || x >= width-1) {
+                break;
+            }
+            //下
+            flagy = y+1;
+            flagx = x;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //左下
+            flagy = y+1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //右下
+            flagy = y+1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //左
+            flagy = y;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //先往上检测
+            flagy = y -1;
+            flagx = x;
+            if( !isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //左上
+            flagy = y-1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //右上
+            flagy = y-1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            //右
+            flagy = y;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx-1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                greenData.add(flagy * width +flagx);
+                continue;
+            }
+            stopFlag = false;
+        }
+        Log.i("fei", "getGreenDataUp: 左侧向下运行完");
+    }
+
+    /**
+     * 获取右侧向上的描边的点
+     * @param pixels
+     * @param x
+     * @param y
+     *  TODO :::: 必须在子线程中
+     */
+    private static void getBuleDataUp(int [] pixels,boolean [] isChecks,int width,int hight,int x,int y) {
+        buleData.add(y * width + x);
+        boolean stopFlag = true;
+        int flagy  , flagx ;
+        while(stopFlag){
+            if (x <= 1 || y <= 1 || y >= hight-2 || x >= width-1) {
+                break;
+            }
+            //先往上检测
+            flagy = y -1;
+            flagx = x;
+            if( !isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //左上
+            flagy = y-1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //右上
+            flagy = y-1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //右
+            flagy = y;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //右下
+            flagy = y+1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //下
+            flagy = y+1;
+            flagx = x;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //左下
+            flagy = y+1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //左
+            flagy = y;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            stopFlag = false;
+        }
+    }
+
+
+    /**
+     * 获取右侧向下的描边的点
+     * @param pixels
+     * @param x
+     * @param y
+     *  TODO :::: 必须在子线程中
+     */
+    private static void getBuleDataDown(int [] pixels,boolean [] isChecks,int width,int hight,int x,int y) {
+        buleData.add(y * width + x);
+        boolean stopFlag = true;
+        int flagy  , flagx ;
+        while(stopFlag){
+            if (x <= 1 || y <= 1 || y >= hight -2 || x >= width) {
+                break;
+            }
+            //下
+            flagy = y+1;
+            flagx = x;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //左下
+            flagy = y+1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //右下
+            flagy = y+1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //左
+            flagy = y;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //先往上检测
+            flagy = y -1;
+            flagx = x;
+            if( !isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //左上
+            flagy = y-1;
+            flagx = x-1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //右上
+            flagy = y-1;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            //右
+            flagy = y;
+            flagx = x+1;
+            if(!isChecks[flagy * width +flagx] && ((pixels[flagy*width+flagx] == 0x00 && pixels[flagy*width+flagx+1] == 0xFFFFFF)
+                    || (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy+1)*width+flagx] == 0xFFFFFF)
+                    ||  (pixels[flagy*width+flagx] == 0x00 && pixels[(flagy-1)*width+flagx] == 0xFFFFFF))){
+                x = flagx;
+                y = flagy;
+                isChecks[flagy * width +flagx] = true;
+                buleData.add(flagy * width +flagx);
+                continue;
+            }
+            stopFlag = false;
+        }
     }
 
     public static int[] decodeYUV420SP(byte[] yuv420sp, int width, int height, int[] m_nTextureBuffer) {
@@ -142,43 +655,6 @@ public class DecodeUtil {
         }
         return candidate;
     }
-
-
-    /**
-     * 中值滤波
-     *
-     * @param pix 像素矩阵数组
-     * @param w   矩阵的宽
-     * @param h   矩阵的高
-     * @return 处理后的数组
-     */
-    public static int[] medianFiltering(int pix[], int w, int h) {
-        int newpix[] = new int[w * h];
-        int[] temp = new int[9];
-        int r = 0;
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                if (x != 0 && x != w - 1 && y != 0 && y != h - 1) {
-                    temp[0] = (pix[x - 1 + (y - 1) * w] >> 16) & 0xFF;
-                    temp[1] = (pix[x + (y - 1) * w]>> 16) & 0xFF;
-                    temp[2] = (pix[x + 1 + (y - 1) * w]>> 16) & 0xFF;
-                    temp[3] = (pix[x - 1 + (y) * w]>> 16) & 0xFF;
-                    temp[4] = (pix[x + (y) * w]>> 16) & 0xFF;
-                    temp[5] = (pix[x + 1 + (y) * w]>> 16) & 0xFF;
-                    temp[6] = (pix[x - 1 + (y + 1) * w]>> 16) & 0xFF;
-                    temp[7] = (pix[x + (y + 1) * w]>> 16) & 0xFF;
-                    temp[8] = (pix[x + 1 + (y + 1) * w]>> 16) & 0xFF;
-                    Arrays.sort(temp);
-                    r = temp[4];
-                    newpix[y * w + x] = 255 << 24 | r << 16 | r << 8 | r;
-                } else {
-                    newpix[y * w + x] = pix[y * w + x];
-                }
-            }
-        }
-        return newpix;
-    }
-
 
     /**
      * @方法描述 Bitmap转int像素组

@@ -1,6 +1,7 @@
 package com.ck.activity;
 
 import android.content.Intent;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -9,6 +10,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ck.base.TitleBaseActivity;
+import com.ck.utils.DisplayUtil;
 import com.ck.utils.PreferenceHelper;
 import com.hc.u8x_ck.R;
 
@@ -85,6 +87,7 @@ public class SettingActivity extends TitleBaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 settingPar_light_tv.setText(i+"");
+                DisplayUtil.setScreenBrightness(i*255/100);
             }
 
             @Override
@@ -99,14 +102,9 @@ public class SettingActivity extends TitleBaseActivity {
         findViewById(R.id.settingtime_date_bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
-//                startActivity(intent);
+                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
+                startActivity(intent);
 //                DateUtil.setDate(2018,10,24);
-
-//                Intent intent = new Intent("android.intent.action.ACTION_REQUEST_SHUTDOWN");
-//                intent.putExtra("android.intent.extra.KEY_CONFIRM", false);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                sendBroadcast(intent);
             }
         });
         settingPar_theme_cb.setOnClickListener(new View.OnClickListener() {

@@ -17,11 +17,13 @@ public abstract class TitleBaseActivity extends U8BaseAc {
     private TextClock baseTitle_clock_tc;
     protected TextView baseTitle_title_tv;
     private ImageView baseTitle_power_iv;
+    private TextView baseTitle_power_tv;
 
     protected void initView(){
         baseTitle_clock_tc = findView(R.id.baseTitle_clock_tc);
         baseTitle_title_tv = findView(R.id.baseTitle_title_tv);
         baseTitle_power_iv = findView(R.id.baseTitle_power_iv);
+        baseTitle_power_tv = findView(R.id.baseTitle_power_tv);
     }
     protected void initListener(){
 
@@ -34,7 +36,7 @@ public abstract class TitleBaseActivity extends U8BaseAc {
         super.onResume();
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);//电量检测
-        filter.addAction(Intent.ACTION_SCREEN_OFF); //息屏检测
+//        filter.addAction(Intent.ACTION_SCREEN_OFF); //息屏检测
         this.registerReceiver(this.mBatteryReceiver,filter);
     }
 
@@ -53,7 +55,8 @@ public abstract class TitleBaseActivity extends U8BaseAc {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
             String action = arg1.getAction();
-            if(Intent.ACTION_POWER_CONNECTED.equals(action)) {
+            Log.i("fei",action);
+            if(Intent.ACTION_BATTERY_CHANGED.equals(action)) {
                 String msg = "";
                 int voltage = arg1.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
                 msg = msg + "电压：" + voltage / 1000 + "." + voltage % 1000 + "V\n";
@@ -86,7 +89,7 @@ public abstract class TitleBaseActivity extends U8BaseAc {
 
                 int health = arg1.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN);
                 String strHealth = "未知 :(";
-                switch (status) {
+                switch (health) {
                     case BatteryManager.BATTERY_HEALTH_GOOD:
                         strHealth = "好 :)";
                         break;
@@ -111,17 +114,19 @@ public abstract class TitleBaseActivity extends U8BaseAc {
                 String technology = arg1.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
                 msg = msg + "电池技术：" + technology;
                 Log.i("fei", msg);
-            } else if (Intent.ACTION_SCREEN_OFF.equals(action)) { // 锁屏
-                screenOff();//调用息屏的方法
+                baseTitle_power_tv.setText(levelPercent+"%");
             }
+//            else if (Intent.ACTION_SCREEN_OFF.equals(action)) { // 锁屏
+//                screenOff();//调用息屏的方法
+//            }
         }
     };
 
-    /**
-     * 息屏的方法
-     */
-    protected void screenOff(){
-
-    }
+//    /**
+//     * 息屏的方法
+//     */
+//    protected void screenOff(){
+//
+//    }
 
 }

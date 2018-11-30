@@ -35,4 +35,15 @@
         android:layout_marginRight="7pt"
         android:src="@drawable/power" />
 
+    <TextView
+        android:id="@+id/baseTitle_power_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/baseTitle_power_iv"
+        android:layout_marginRight="@dimen/x10"
+        android:textColor="?attr/textColor"
+        android:textSize="@dimen/x16"
+        android:text="0%"/>
+
 </RelativeLayout>

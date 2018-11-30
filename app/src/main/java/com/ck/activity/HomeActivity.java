@@ -38,7 +38,6 @@ public class HomeActivity extends TitleBaseActivity {
             Manifest.permission.CAMERA};
     // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
     List<String> mPermissionList = new ArrayList<>();
-
     @Override
     protected int initLayout() {
         return R.layout.ac_home;

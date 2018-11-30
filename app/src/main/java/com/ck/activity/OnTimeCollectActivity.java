@@ -263,6 +263,10 @@ public class OnTimeCollectActivity extends TitleBaseActivity implements View.OnC
             showToast("文件名重复");
             return;
         }
+        if(null == ontime_cameraView_cv.m_DrawBitmap){
+            showToast("获取照相机图像失败");
+            return;
+        }
         FileUtil.saveBmpImageFile(ontime_cameraView_cv.m_DrawBitmap,
                 "/" + proName + "/" + gjName, fileName, "%s.bmp");
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");

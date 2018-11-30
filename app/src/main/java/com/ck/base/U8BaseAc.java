@@ -232,7 +232,7 @@ public abstract class U8BaseAc extends AppCompatActivity {
     protected void unSubscribeRxBus(Context context){
         RxBus.getInstance().unSubscribe(context);
     }
-
+//
 
     @Override
     protected void onDestroy() {

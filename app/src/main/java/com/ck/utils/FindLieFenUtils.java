@@ -20,12 +20,17 @@ import android.util.Log;
 public class FindLieFenUtils {
     public static float m_nLLineSite = 0;
     public static float m_nRLineSite = 0;
+
+    public static float m_nCLXLineSite = 0;
+    public static float m_nCLYLineSite = 0;
+    public static float m_nCRXLineSite = 0;
+    public static float m_nCRYLineSite = 0;
     public static int m_nY = 0;
     public static float unitF;
     public static int bytGrayAve;
     static boolean m_bCursorFlag = true;
     static int GRAY_DIF = 50;
-    static int ERROR_COUNT = 2;
+    public static int ERROR_COUNT = 2;
 
     public static void findLieFen(int[] m_lpBaseBuf, int nWidth, int nHeight, boolean mCountMode) {
         m_bCursorFlag = mCountMode;
@@ -69,7 +74,7 @@ public class FindLieFenUtils {
                 for (int i = 0; i < nWidth; i++) {
                     bytTemp[i] = (bytTemp[i] <= bytGrayAve ? 0 : 0xFF);//转为黑白二值
                     if (bytTemp[i] == 0x00 && nLeft < 0) {
-                        nLeft = i;
+                        nLeft = i==0 ? 0 : i-1;
                         nError = 0;
                     }
                     if (bytTemp[i] == 0xFF && nLeft >= 0) {
@@ -81,7 +86,7 @@ public class FindLieFenUtils {
                     if (nLeft >= 0 && nRight >= 0) {
                         if (nRight - nLeft >= 1 && nRight - nLeft >= m_nRLineSite - m_nLLineSite) {//过滤小范围值得波动
                             m_nLLineSite = nLeft;
-                            m_nRLineSite = nRight - 2;
+                            m_nRLineSite = nRight;
                             Log.i("fei",m_nLLineSite +"      "+m_nRLineSite);
                         }
                         nLeft = -1;

@@ -1,6 +1,10 @@
 #include <jni.h>
 #include <string>
 #include <vector>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 
 //extern "C" JNIEXPORT jint*
@@ -85,10 +89,10 @@ Java_com_ck_utils_CarmeraDataDone_decodeYUV420SPJni(JNIEnv *env, jclass type, jb
     jbyte *array = env->GetByteArrayElements(yuv420sp_, NULL);
 
     int arraysize = env->GetArrayLength(yuv420sp_);
-    char buf[arraysize + 1];
+    char * buf = new char[arraysize];
     int i = 0;
     for (i = 0; i < arraysize; i++) {
-        buf[i] = array[i];
+        buf[i] = (char) array[i];
     }
     buf[arraysize] = '\0';
     // TODO
@@ -124,7 +128,7 @@ int *convertByteToColor(char *data, int size) {
     int colorLen = size / 3 + arg;
     int *color = new int[colorLen];
     int red, green, blue;
-//    memset(color, 0, sizeof(colorLen));
+    memset(color, 0, sizeof(colorLen));
     if (arg == 0) {
         for (int i = 0; i < colorLen; i++) {
             red = convertByteToInt(data[i * 3]);
@@ -179,19 +183,59 @@ Java_com_ck_utils_CarmeraDataDone_convertByteToColorJni(JNIEnv *env, jclass type
 /// <param name="y">该点的纵坐标</param>
 /// <param name="isMarked">是否已经被标记过，用于记录回溯路线。默认值为false
 /// 如果该点已经被标记过，则应指定该参数为true。</param>
-void connect(int * data,bool * boolFlag,std::vector<int>& flag,int i,int width,int hight,int small){
+void connect(int * data,bool * boolFlag,std::vector<int>& flag,int i,int width,int hight){
     if(boolFlag[i]){
         return;
     }
-    if(i>= width* hight){
+    if(i>= width* hight || i < 0){
         return;
     }
     if(data[i] == 0){
         boolFlag[i] = true;
         flag[0]++;
         flag.push_back(i);
-        connect(data,boolFlag,flag,i+1,width,hight,small);
-        connect(data,boolFlag,flag,i+width,width,hight,small);
+        if(flag[0] > 300){
+            return;
+        }
+        connect(data,boolFlag,flag,i-width,width,hight);
+        connect(data,boolFlag,flag,i-1,width,hight);
+        connect(data,boolFlag,flag,i+1,width,hight);
+        connect(data,boolFlag,flag,i+width,width,hight);
+    }else{
+        return;
+    }
+}
+/**
+ * 白色区域的连通域
+ * @param data
+ * @param boolFlag
+ * @param flag
+ * @param i
+ * @param width
+ * @param hight
+ * @param small
+ */
+void connectWhite(int * data,bool * boolWhiteFlag,std::vector<int>& whiteflag,int i,int width,int hight,int whiteLittleSq){
+    if(boolWhiteFlag[i]){
+        return;
+    }
+    if(i >= width* hight){
+        return;
+    }
+    if(data[i] != 0){
+        if(whiteflag[0] > 2*whiteLittleSq){
+            return;
+        }
+        boolWhiteFlag[i] = true;
+        whiteflag[0]++;
+        whiteflag.push_back(i);
+        if(whiteflag[0] > 300){
+            return;
+        }
+        connectWhite(data,boolWhiteFlag,whiteflag,i-width,width,hight,whiteLittleSq);
+        connectWhite(data,boolWhiteFlag,whiteflag,i+1,width,hight,whiteLittleSq);
+        connectWhite(data,boolWhiteFlag,whiteflag,i-1,width,hight,whiteLittleSq);
+        connectWhite(data,boolWhiteFlag,whiteflag,i+width,width,hight,whiteLittleSq);
     }else{
         return;
     }
@@ -203,16 +247,32 @@ void connect(int * data,bool * boolFlag,std::vector<int>& flag,int i,int width,i
  * @param hight
  * @return
  */
-void delLittleSquare(int * data,int width,int hight, int littleSq){
+void delLittleSquare(int * data,int width,int hight, int littleSq,int whiteLittleSq){
     bool * boolFlag = new bool [width*hight]{false};
+    bool * boolWhiteFlag = new bool [width*hight]{false};
     std::vector<int> intFlag;
     intFlag.push_back(0);
+    std::vector<int> intWhiteFlag;
+    intWhiteFlag.push_back(0);
+
+    int j = 0;
+    for(j = 0;j< width*hight ; j++){
+        connectWhite(data,boolWhiteFlag,intWhiteFlag,j,width,hight,whiteLittleSq);
+        if (intWhiteFlag[0] < whiteLittleSq && intWhiteFlag.size() > 1){
+            for (int ij = 1; ij <= intWhiteFlag[0] ; ++ij) {
+                data[intWhiteFlag[ij]] = 0;
+            }
+        }
+        intWhiteFlag.clear();
+        intWhiteFlag.push_back(0);
+    }
+
     int i= 0;
     for (i = 0; i < width*hight; i++) {
-        connect(data,boolFlag,intFlag,i,width,hight,littleSq);
-        if(intFlag[0]<littleSq){
-            for (int i = 1; i <= intFlag[0] ; ++i) {
-                data[intFlag[i]] = 0xFFFFFF;
+        connect(data, boolFlag, intFlag, i, width, hight);
+        if (intFlag[0] < littleSq && intFlag.size() > 1) {
+            for (int ii = 1; ii <= intFlag[0]; ++ii) {
+                data[intFlag[ii]] = 0xFFFFFF;
             }
         }
         intFlag.clear();
@@ -234,11 +294,30 @@ JNICALL
  * @return
  */
 Java_com_ck_utils_CarmeraDataDone_delLittleSquareJni(JNIEnv *env, jclass type, jintArray data_,
-                                                  jint width, jint hight, jint littleSq) {
+                                                  jint width, jint hight, jint littleSq,jint whiteLittleSq) {
     jint *data = env->GetIntArrayElements(data_, NULL);
-    delLittleSquare(data,width,hight,littleSq);
+    delLittleSquare(data,width,hight,littleSq,whiteLittleSq);
     int len = width * hight;
     jintArray res = env->NewIntArray(len);
     env->SetIntArrayRegion(res, 0, len, data);
     return res;
+}
+
+
+extern "C"
+JNIEXPORT jboolean
+JNICALL
+Java_com_ck_utils_CarmeraDataDone_openHardDevJni(JNIEnv *env, jclass type,jint dev,jint model ,jint cmd) {
+    int fd_led = 0;
+    // TODO
+    if (dev == 1) {
+        fd_led = open("/dev/ck102_pwr", O_RDWR);
+    }else if(dev == 2){
+        fd_led = open("/dev/ck102_led", O_RDWR);
+    }
+    if (ioctl(fd_led, cmd, model) < 0) {
+        return false;
+    }
+    close(fd_led);
+    return true;
 }

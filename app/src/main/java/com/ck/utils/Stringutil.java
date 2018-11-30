@@ -1,5 +1,7 @@
 package com.ck.utils;
 
+import com.ck.App_DataPara;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,5 +140,9 @@ public class Stringutil{
             b = true;
         }
         return b;
+    }
+
+    public static float getDimens(int id){
+        return App_DataPara.getApp().getResources().getDimension(id);
     }
 }

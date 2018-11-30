@@ -16,13 +16,15 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.SHUTDOWN"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <uses-feature
         android:name="android.hardware.Camera"
-        android:required="false" />
+        android:required="true" />
     <uses-feature
         android:name="android.hardware.usb.host"
-        android:required="false" />
+        android:required="true" />
 
     <application
         android:name="com.ck.App_DataPara"
@@ -110,6 +112,14 @@
         <!--<service android:name="com.ck.service.SocketService"></service>-->
 
         <service android:name="com.ck.service.SerialService"></service>
+
+
+        <receiver android:name="com.ck.reciver.ShutdownBroadcastReceiver" >
+            <intent-filter >
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
