@@ -286,6 +286,8 @@ public class OpenCvCameraView extends View {
                     greenY = (float) (((greenY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
                     canvas.drawPoint(greenX, greenY, paint);
                 }
+
+
                 paint.setColor(Color.BLUE);
                 for (int i = 0; i < buleNum; i++) {
                     float buleX = DecodeUtil.buleData.get(i) % m_DraBitMapWith + 1;
