@@ -26,6 +26,7 @@ import com.ck.dlg.TwoBtMsgDialog;
 import com.ck.info.ClasFileProjectInfo;
 import com.ck.listener.OnOpenCameraListener;
 import com.ck.ui.CameraView;
+import com.ck.ui.OpenCvCameraView;
 import com.ck.utils.CarmeraDataDone;
 import com.ck.utils.Catition;
 import com.ck.utils.DateUtil;
@@ -34,6 +35,13 @@ import com.ck.utils.FindLieFenUtils;
 import com.ck.utils.PathUtils;
 import com.hc.u8x_ck.R;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.JavaCameraView;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,11 +49,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener, SurfaceHolder.Callback {
+public class CollectActivity extends TitleBaseActivity implements View.OnClickListener, View.OnLongClickListener {
 
-    private SurfaceView collect_sfv;
-    private SurfaceHolder mHolder;
-    private CameraView collect_cameraView;
+    private static String TAG = CollectActivity.class.getSimpleName();
+    private JavaCameraView collect_OpenCvCamera;
+    private OpenCvCameraView collect_cameraView;
     private Button collect_startStop_bt; //开始\停止 按钮
     private Button collect_save_bt; //预拍 \ 存储  按钮
     private Button collect_autoOrhand_bt;//自动计算或手动计算裂缝位置
@@ -88,6 +96,28 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         }
     };
 
+    private LoaderCallbackInterface mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                // OpenCV引擎初始化加载成功
+                case LoaderCallbackInterface.SUCCESS:
+                    Log.i(TAG, "OpenCV loaded successfully.");
+                    // 连接到Camera
+                    collect_OpenCvCamera.enableView();
+
+                    changeStartStopTakeView(Catition.CollectView.START);
+                    changeCollectView(1);
+                    collect_cameraView.setCountMode(true);
+                    collect_cameraView.setZY(0);
+                    break;
+                default:
+                    super.onManagerConnected(status);
+                    break;
+            }
+        }
+    };
+
 
     private boolean isYuTakePic = false;
 
@@ -99,8 +129,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     @Override
     protected void initView() {
         super.initView();
+        collect_OpenCvCamera = findView(R.id.collect_OpenCvCamera);
         collect_view = findView(R.id.collect_view);
-        collect_sfv = findView(R.id.collect_sfv);
         collect_cameraView = findView(R.id.collect_cameraView);
         collect_startStop_bt = findView(R.id.collect_startStop_bt);
         collect_save_bt = findView(R.id.collect_save_bt);
@@ -166,34 +196,43 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 }
             }
         }
+        initCamera();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        new Thread(new Runnable() {
+    private void initCamera(){
+        collect_OpenCvCamera.setMaxFrameSize(1024,768);
+        // 注册Camera连接状态事件监听器
+        collect_OpenCvCamera.setCvCameraViewListener(new CameraBridgeViewBase.CvCameraViewListener2() {
+
+
             @Override
-            public void run() {
-                try {
-                    Thread.sleep(400);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (collect_cameraView.isStart) {
-                    onCollectStart();
-                }
+            public void onCameraViewStarted(int width, int height) {
             }
-        }).start();
-        CarmeraDataDone.openHardDevJni(1,1,1);
+
+            @Override
+            public void onCameraViewStopped() {
+            }
+
+            @Override
+            public Mat onCameraFrame(final CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+//                if (null == drawBitmap) {
+//                    drawBitmap = Bitmap.createBitmap(inputFrame.rgba().cols()
+//                            , inputFrame.rgba().rows(), Bitmap.Config.ARGB_8888);
+//                }
+//                if (null == drawBitmap1) {
+//                    drawBitmap1 = Bitmap.createBitmap(inputFrame.gray().cols()
+//                            , inputFrame.gray().rows(), Bitmap.Config.ARGB_8888);
+//                }
+//                org.opencv.android.Utils.matToBitmap(inputFrame.rgba(), drawBitmap);
+//                org.opencv.android.Utils.matToBitmap(inputFrame.gray(), drawBitmap1);
+//                hell_cV.setData(drawBitmap);
+//                hell_cV1.setData(drawBitmap1);
+                collect_cameraView.setDataMat(inputFrame.rgba(),inputFrame.gray());
+                return inputFrame.rgba();
+            }
+        });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (collect_cameraView.isStart) {
-            collect_cameraView.closeCamera();
-        }
-    }
 
     @Override
     protected void initListener() {
@@ -359,29 +398,14 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onCollectStart() {
         collect_cameraView.setStartView();
-        collect_cameraView.onenCamera(new OnOpenCameraListener() {
-            @Override
-            public void OnOpenCameraResultListener(boolean bResult) {
-                if (bResult) {
-                    changeStartStopTakeView(Catition.CollectView.START);
-                    changeCollectView(1);
-                    if (null == mHolder) {
-                        mHolder = collect_sfv.getHolder();
-                        mHolder.addCallback(CollectActivity.this);
-                    }
-                    collect_cameraView.setHolder(mHolder);
-                    collect_cameraView.setCountMode(true);
-                    collect_cameraView.setZY(0);
-                } else {
-                    Toast.makeText(CollectActivity.this, "请安装指定的摄像头", Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onCarameError() {
-                stopCameraView(); // 停止进行检测
-//                onCollectStart();
-            }
-        });
+        collect_cameraView.onenCamera();
+        if (!OpenCVLoader.initDebug()) {
+            Log.w(TAG, "static loading library fail,Using Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_3_0, this, mLoaderCallback);
+        } else {
+            Log.w(TAG, "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
     }
 
     /**
@@ -597,7 +621,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private void changeStartStopTakeView(int type) {
         switch (type) {
             case Catition.CollectView.START:
-                collect_sfv.setVisibility(View.VISIBLE);
+                collect_OpenCvCamera.setVisibility(View.VISIBLE);
                 collect_startStop_bt.setText(getStr(R.string.str_stopCollect));
                 collect_save_bt.setText(getStr(R.string.str_takePhoto));
                 collect_autoOrhand_bt.setText(getStr(R.string.str_Auto));
@@ -606,7 +630,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 collect_right_bt.setText("");
                 break;
             case Catition.CollectView.STOP:
-                collect_sfv.setVisibility(View.GONE);
+                collect_OpenCvCamera.setVisibility(View.GONE);
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_save_bt.setText("");
                 collect_autoOrhand_bt.setText("");
@@ -615,7 +639,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 collect_right_bt.setText("");
                 break;
             case Catition.CollectView.TAKEPHOTO:
-                collect_sfv.setVisibility(View.GONE);
+                collect_OpenCvCamera.setVisibility(View.GONE);
                 collect_autoOrhand_bt.setText("");
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_save_bt.setText(getStr(R.string.str_save));
@@ -699,31 +723,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         collect_cameraView.closeCamera();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        CarmeraDataDone.openHardDevJni(1,1,0);
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        if (null != collect_cameraView.m_Camera) {
-            collect_cameraView.m_Camera.addCallbackBuffer(collect_cameraView.m_Buffer);
-            collect_cameraView.m_Camera.setPreviewCallbackWithBuffer(collect_cameraView);
-            collect_cameraView.m_Camera.startPreview();
-        }
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
-    }
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -735,4 +734,49 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         }
         return super.onKeyDown(keyCode, event);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        CarmeraDataDone.openHardDevJni(1,1,1);
+        // OpenCVLoader.initDebug()静态加载OpenCV库
+        // OpenCVLoader.initAsync()为动态加载OpenCV库，即需要安装OpenCV Manager
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (collect_cameraView.isStart) {
+                    onCollectStart();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // 断开与Camera的连接
+        if (collect_OpenCvCamera != null) {
+            collect_OpenCvCamera.disableView();
+        }
+
+        if (collect_cameraView.isStart) {
+            collect_cameraView.closeCamera();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 断开与Camera的连接
+        if (collect_OpenCvCamera != null) {
+            collect_OpenCvCamera.disableView();
+        }
+        CarmeraDataDone.openHardDevJni(1,1,0);
+    }
+
 }

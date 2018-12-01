@@ -52,9 +52,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
-
     implementation 'com.github.kongqw:AndroidSerialPort:1.0.1'
-//    implementation project(':feilibs_1_0_0')
+    //    implementation project(':feilibs_1_0_0')
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
+    implementation project(':openCVLibrary341')
 }

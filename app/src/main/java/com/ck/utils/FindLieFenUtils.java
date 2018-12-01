@@ -103,6 +103,79 @@ public class FindLieFenUtils {
         }
     }
 
+
+    public static void findLieFenAtCenter(int[] m_lpBaseBuf, int nWidth, int nHeight, boolean mCountMode) {
+        m_bCursorFlag = mCountMode;
+        unitF = (float) (nWidth * 1.0 / 1000);
+        m_nY = nHeight / 2;
+        int nLeft = -1, nRight = -1, nError = 0;
+        int bytGrayMax = 0, bytGrayMin = 0x7fffffFF;
+        int[] bytTemp  = new int[nWidth];
+        if (m_bCursorFlag) {    // 手动还是自动
+            m_nLLineSite = m_nRLineSite = 0;  ///左右两侧位置的初始化
+            for (int i = 0;i < nWidth; i++) {
+                bytTemp[i] = (((((m_lpBaseBuf[i] >> 16) & 0xFF) * 30) + (((m_lpBaseBuf[i] >> 8) & 0xFF) * 59)
+                        + ((m_lpBaseBuf[i] >> 0) & 0xFF) * 11) / 100); // 颜色灰度化  (R*30 + G*59 +B*11)/100
+                if (bytGrayMax < bytTemp[i]) {
+                    bytGrayMax = bytTemp[i];//灰度最大值
+                }
+                if (bytGrayMin > bytTemp[i]) {
+                    bytGrayMin = bytTemp[i];//灰度最小值
+                }
+            }
+            if (bytGrayMax - bytGrayMin > GRAY_DIF) { //判断灰度最小值和最大值是否符合包含裂缝的标准
+
+                bytGrayAve = (((bytGrayMax) + (bytGrayMin)) >> 1);// -
+                bytGrayAve = bytGrayMin + (bytGrayAve - bytGrayMin) / 3;
+                // GRAY_DIF
+                // 3;
+                //设置阈值
+                int nMinAve = 0, nMaxAve = 0, nMinCnt = 0, nMaxCnt = 0;
+                for (int i = 0; i < nWidth; i++) // 计算最佳阈值
+                {
+                    if (bytTemp[i] < bytGrayAve) {
+                        nMinAve += (bytTemp[i] & 0xFF);
+                        nMinCnt++;
+                    } else {
+                        nMaxAve += (bytTemp[i] & 0xFF);
+                        nMaxCnt++;
+                    }
+                }
+                bytGrayAve = ((nMinAve / nMinCnt + nMaxAve / nMaxCnt) / 2);// /////
+                bytGrayAve = bytGrayAve - (bytGrayAve - bytGrayMin) / 2;
+                for (int i = 0; i < nWidth; i++) {
+                    bytTemp[i] = (bytTemp[i] <= bytGrayAve ? 0 : 0xFF);//转为黑白二值
+                    if (bytTemp[i] == 0x00 && nLeft < 0) {
+                        nLeft = i==0 ? 0 : i-1;
+                        nError = 0;
+                    }
+                    if (bytTemp[i] == 0xFF && nLeft >= 0) {
+                        nError++;
+                        if (nError > ERROR_COUNT) {
+                            nRight = i;
+                        }
+                    }
+                    if (nLeft >= 0 && nRight >= 0) {
+                        if (nRight - nLeft >= 1 && nRight - nLeft >= m_nRLineSite - m_nLLineSite) {//过滤小范围值得波动
+                            m_nLLineSite = nLeft;
+                            m_nRLineSite = nRight;
+                            Log.i("fei",m_nLLineSite +"      "+m_nRLineSite);
+                        }
+                        nLeft = -1;
+                        nRight = -1;
+                    }
+                }
+            }
+        } else {
+            if (m_nLLineSite == 0 && m_nRLineSite == 0) {
+                m_nLLineSite = 180;
+                m_nRLineSite = 220;
+            }
+            return;
+        }
+    }
+
+
     /**
      * 依据设置的图片大小，设置最小的偏移量
      * @param nWidth
