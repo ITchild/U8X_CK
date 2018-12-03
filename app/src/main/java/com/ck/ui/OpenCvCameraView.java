@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ImageFormat;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
@@ -18,8 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.ck.listener.OnOpenCameraListener;
-import com.ck.utils.CarmeraDataDone;
 import com.ck.utils.DecodeUtil;
 import com.ck.utils.FindLieFenUtils;
 import com.ck.utils.PreferenceHelper;
@@ -35,6 +32,7 @@ public class OpenCvCameraView extends View {
     public int m_nTextureBuffer[];
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
+    public Bitmap m_DrawGrayBitmap;
     public Bitmap showBitmap;
     public Bitmap blackWriteBitmap;
     public boolean isBlackWrite = false;
@@ -276,25 +274,37 @@ public class OpenCvCameraView extends View {
 //        }
             canvas.drawBitmap(showBitmap, null, rectF, null);
             if (isFindSide) { //描边
-                Paint paint = getPaint(Paint.Style.FILL, 3, Color.GREEN, 25);
+                Paint paint = getPaint(Paint.Style.FILL, 2, Color.GREEN, 25);
                 int buleNum = DecodeUtil.buleData.size();
                 int greenNum = DecodeUtil.greenData.size();
-                for (int i = 0; i < greenNum; i++) {
-                    float greenX = DecodeUtil.greenData.get(i) % m_DraBitMapWith - 1;
-                    float greenY = DecodeUtil.greenData.get(i) / m_DraBitMapWith + 1;
-                    greenX = (float) (((greenX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-                    greenY = (float) (((greenY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-                    canvas.drawPoint(greenX, greenY, paint);
+                if(null != DecodeUtil.greenData && DecodeUtil.greenData.size() > 1) {
+                    for (int i = 3; i < greenNum; i+=3) {
+                        float greenX = DecodeUtil.greenData.get(i) % m_DraBitMapWith - 1;
+                        float greenY = DecodeUtil.greenData.get(i) / m_DraBitMapWith + 1;
+                        greenX = (float) (((greenX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+                        greenY = (float) (((greenY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+
+                        float greenX_ = DecodeUtil.greenData.get(i - 3) % m_DraBitMapWith - 1;
+                        float greenY_ = DecodeUtil.greenData.get(i - 3) / m_DraBitMapWith + 1;
+                        greenX_ = (float) (((greenX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+                        greenY_ = (float) (((greenY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+
+                        canvas.drawLine(greenX_, greenY_,greenX,greenY, paint);
+                    }
                 }
-
-
                 paint.setColor(Color.BLUE);
-                for (int i = 0; i < buleNum; i++) {
+                for (int i = 3; i < buleNum; i+=3) {
                     float buleX = DecodeUtil.buleData.get(i) % m_DraBitMapWith + 1;
                     float buleY = DecodeUtil.buleData.get(i) / m_DraBitMapWith + 1;
                     buleX = (float) (((buleX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
                     buleY = (float) (((buleY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-                    canvas.drawPoint(buleX, buleY, paint);
+
+                    float buleX_ = DecodeUtil.buleData.get(i-3) % m_DraBitMapWith + 1;
+                    float buleY_ = DecodeUtil.buleData.get(i-3) / m_DraBitMapWith + 1;
+                    buleX_ = (float) (((buleX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+                    buleY_ = (float) (((buleY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+
+                    canvas.drawLine(buleX_,buleY_,buleX, buleY, paint);
                 }
             }
         }
@@ -448,7 +458,11 @@ public class OpenCvCameraView extends View {
         if(null == m_DrawBitmap){
             m_DrawBitmap = Bitmap.createBitmap(RGBData.cols(), RGBData.rows(), Bitmap.Config.ARGB_8888);
         }
+        if(null == m_DrawGrayBitmap){
+            m_DrawGrayBitmap = Bitmap.createBitmap(grayData.cols(), grayData.rows(), Bitmap.Config.ARGB_8888);
+        }
         org.opencv.android.Utils.matToBitmap(RGBData, m_DrawBitmap);
+        org.opencv.android.Utils.matToBitmap(grayData, m_DrawGrayBitmap);
     }
 
     private Handler checkTaskHandler = new Handler();
@@ -466,7 +480,7 @@ public class OpenCvCameraView extends View {
                         m_DraBitMapHight = m_DrawBitmap.getHeight();
 //                        int[] rgb = DecodeUtil.decodeYUV420SP(getBytes, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
 //                        int[] rgb = CarmeraDataDone.decodeYUV420SPJni(getBytes, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
-                        rgb = DecodeUtil.bitmap2RGBAtCenter(m_DrawBitmap);
+                        rgb = DecodeUtil.bitmap2RGBAtCenter(m_DrawGrayBitmap);
                         FindLieFenUtils.findLieFenAtCenter(rgb, m_DraBitMapWith, m_DraBitMapHight, m_bCountMode);
                         postInvalidate();//刷新OnDraw，重新绘图
                         getBytes = null;

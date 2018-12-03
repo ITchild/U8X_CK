@@ -9,13 +9,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ck.adapter.MorePicAdapter;
 import com.ck.base.TitleBaseActivity;
@@ -24,8 +21,6 @@ import com.ck.db.DBService;
 import com.ck.dlg.ShowObjGjFileListDialog;
 import com.ck.dlg.TwoBtMsgDialog;
 import com.ck.info.ClasFileProjectInfo;
-import com.ck.listener.OnOpenCameraListener;
-import com.ck.ui.CameraView;
 import com.ck.ui.OpenCvCameraView;
 import com.ck.utils.CarmeraDataDone;
 import com.ck.utils.Catition;
@@ -232,7 +227,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             }
         });
     }
-
 
     @Override
     protected void initListener() {
