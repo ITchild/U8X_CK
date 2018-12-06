@@ -304,6 +304,24 @@ Java_com_ck_utils_CarmeraDataDone_delLittleSquareJni(JNIEnv *env, jclass type, j
 }
 
 
+//extern "C"
+//JNIEXPORT jboolean
+//JNICALL
+//Java_com_android_internal_policy_impl_PhoneWindowManager_openHardDevJni(JNIEnv *env, jclass type,jint dev,jint model ,jint cmd) {
+//    int fd_led = 0;
+//    // TODO
+//    if (dev == 1) {
+//        fd_led = open("/dev/ck102_pwr", O_RDWR);
+//    }else if(dev == 2){
+//        fd_led = open("/dev/ck102_led", O_RDWR);
+//    }
+//    if (ioctl(fd_led, cmd, model) < 0) {
+//        return false;
+//    }
+//    close(fd_led);
+//    return true;
+//}
+
 extern "C"
 JNIEXPORT jboolean
 JNICALL

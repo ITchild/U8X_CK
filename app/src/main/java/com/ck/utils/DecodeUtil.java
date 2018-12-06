@@ -18,14 +18,16 @@ public class DecodeUtil {
      */
     public static List<Integer> greenData = new ArrayList<>();
     public static List<Integer> buleData = new ArrayList<>();
+    private static int width , height;
+    private static int m_nLLineSite , m_nRLineSite;
 
     public static Bitmap convertToBlackWhite(Bitmap bmp) {
 //        Log.i("fei","黑白图处理开始：" + System.currentTimeMillis());
         if (null == bmp) {
             return bmp;
         }
-        int width = bmp.getWidth(); // 获取位图的宽
-        int height = bmp.getHeight(); // 获取位图的高
+        width = bmp.getWidth(); // 获取位图的宽
+        height = bmp.getHeight(); // 获取位图的高
         int red, green, blue;
 //        int[] pixels = bitmap2RGB(bmp);
         int[] pixels = new int[width * height];
@@ -51,7 +53,6 @@ public class DecodeUtil {
 
         int flagLeng = width * height / 2;
         int nLeft = -1, nRight = -1;
-        int m_nRLineSite = 0, m_nLLineSite = 0;
         for (int i = flagLeng; i < flagLeng + width; i++) {
             if (pixels[i] == 0x00 && nLeft < 0) {
                 nLeft = i;
@@ -140,20 +141,20 @@ public class DecodeUtil {
 //        greenDownData.set(0,height/2*width+m_nLLineSite);
         greenData.addAll(greenDownData);
 
-        float zX = FindLieFenUtils.m_nLLineSite;
-        float zY = height / 2;
-        float length = 10000;
-        for (int flag : buleData) {
-            float flagX = (float) (flag % width);
-            float flagY = (float) (flag / width);
-            float flagLength = (float) Math.sqrt(Math.abs((flagX - zX) * (flagX - zX) + (flagY - zY) * (flagY - zY)));
-            if (length > flagLength) {
-                length = flagLength;
-                FindLieFenUtils.m_nCRXLineSite = flagX;
-                FindLieFenUtils.m_nCRYLineSite = flagY;
-                FindLieFenUtils.m_nCLXLineSite = m_nLLineSite;
-                FindLieFenUtils.m_nCLYLineSite = height / 2;
+        int flagLSite = 0;
+        int lSite = m_nLLineSite+height*width/2;
+        for(int i=0;i<greenData.size();i++){
+            if(greenData.get(i) == lSite){
+                flagLSite = i;
+                Log.i("fei","列表的："+greenData.get(i) + "     左侧的点:"+ flagLSite);
+                break;
             }
+        }
+        //计算左右垂直的坐标点
+        if(flagLSite != 0){
+            getLAndRSite(flagLSite);
+        }else{
+            Log.i("fei","左侧的边缘："+ greenData.size() + "      右侧的边缘：" + buleData.size());
         }
 //        Log.i("fei","开始新建bitmap图像：" + System.currentTimeMillis());
         //新建图片
@@ -164,6 +165,41 @@ public class DecodeUtil {
 //        Log.i("fei","处理结束：" + System.currentTimeMillis());
         return resizeBmp;
     }
+
+    /**
+     * 计算左右垂直的坐标点
+     */
+    public static void getLAndRSite(int flagLSite ){
+        int leftUp = greenData.get(flagLSite-2);
+        int leftDown = greenData.get(flagLSite+2);
+        int leftUpX = leftUp % width;
+        int leftUpY = leftUp / width;
+        int leftDownX = leftDown % width;
+        int leftDownY = leftDown / width;
+        //垂直线的斜率K    TODO：正斜率和负斜率相差90°
+        float K = (float) -((leftDownX-leftUpX)*1.0/(leftDownY-leftUpY));
+        float b = height/2-K*m_nLLineSite;
+
+        for (int flag : buleData) {
+            float flagX = (float) (flag % width);
+            float flagY = (float) (flag / width);
+            float flagSY = flagX*K + b;
+            Log.i("fei","列表的："+flagY + "     计算的点:"+ flagSY);
+            if(flagSY <= flagY+0.5 && flagSY >= flagY-0.5 ) {
+                Log.i("fei","进入     列表的："+flagY + "     计算的点:"+ flagSY);
+                FindLieFenUtils.m_nCRXLineSite = flagX;
+                FindLieFenUtils.m_nCRYLineSite = flagY;
+                FindLieFenUtils.m_nCLXLineSite = m_nLLineSite;
+                FindLieFenUtils.m_nCLYLineSite = height / 2;
+                float tanFlag =  (flagY-height / 2) / (flagX - m_nLLineSite);
+                float dreege = (float) (Math.atan(tanFlag)/Math.PI*180);
+                Log.i("fei","*****************************"+dreege);
+
+                break;
+            }
+        }
+    }
+
 
     private static void delSiglePoint(int[] pixels, int width) {
         for (int i = width + 1; i < pixels.length - width - 1; i++) {
@@ -178,19 +214,18 @@ public class DecodeUtil {
                 flag = pixels[i + width - 1] == 0 ? flag + 1 : flag;
                 flag = pixels[i + width + 1] == 0 ? flag + 1 : flag;
                 pixels[i] = flag <= 3 ? 0xFFFFFF : 0;
+            }else if(pixels[i] == 0xFFFFFF){
+                flag = 0;
+                flag = pixels[i-1] == 0xFFFFFF ? flag+1 : flag;
+                flag = pixels[i+1] == 0xFFFFFF ? flag+1 : flag;
+                flag = pixels[i-width] == 0xFFFFFF ? flag+1 : flag;
+                flag = pixels[i+width] == 0xFFFFFF ? flag+1 : flag;
+                flag = pixels[i-width-1] == 0xFFFFFF ? flag+1 : flag;
+                flag = pixels[i-width+1] == 0xFFFFFF ? flag+1 : flag;
+                flag = pixels[i+width-1] == 0xFFFFFF ? flag+1 : flag;
+                flag = pixels[i+width+1] == 0xFFFFFF ? flag+1 : flag;
+                pixels[i] = flag<=3 ? 0 : 0xFFFFFF;
             }
-//            flag = 0;
-//            if(pixels[i] == 0xFFFFFF){
-//                flag = pixels[i-1] == 0xFFFFFF ? flag+1 : flag;
-//                flag = pixels[i+1] == 0xFFFFFF ? flag+1 : flag;
-//                flag = pixels[i-width] == 0xFFFFFF ? flag+1 : flag;
-//                flag = pixels[i+width] == 0xFFFFFF ? flag+1 : flag;
-//                flag = pixels[i-width-1] == 0xFFFFFF ? flag+1 : flag;
-//                flag = pixels[i-width+1] == 0xFFFFFF ? flag+1 : flag;
-//                flag = pixels[i+width-1] == 0xFFFFFF ? flag+1 : flag;
-//                flag = pixels[i+width+1] == 0xFFFFFF ? flag+1 : flag;
-//                pixels[i] = flag<=4 ? 0 : 0xFFFFFF;
-//            }
         }
     }
 
@@ -202,19 +237,13 @@ public class DecodeUtil {
      */
     private static List<Integer> getGreenDataUp(int[] pixels, boolean[] isChecks, int width, int hight, int x, int y) {
         List<Integer> greenUpData = new ArrayList<>();
-        greenUpData.add(y * width + x);
+        if(!isChecks[y * width + x]) {
+            greenUpData.add(y * width + x);
+            isChecks[y * width + x] = true;
+        }
         boolean stopFlag = true;
         int flagy, flagx;
         while (stopFlag) {
-//            if(y == 1){
-//                if(pixels[width+x] == 0x00 && pixels[width+x+1] == 0x00){
-//                    x++;
-//                    continue;
-//                }else if(pixels[y*width+x] == 0x00 && pixels[y*width+x+1] == 0xFFFFFF){
-//                    y++;
-//                    continue;
-//                }
-//            }
             if (x <= 1 || y <= 1 || y >= hight - 2 || x >= width - 1) {
                 break;
             }
@@ -463,7 +492,10 @@ public class DecodeUtil {
      */
     private static List<Integer> getBuleDataUp(int [] pixels,boolean [] isChecks,int width,int hight,int x,int y) {
         List<Integer> buleUpData = new ArrayList<>();
-        buleUpData.add(y * width + x);
+        if(!isChecks[y * width + x]) {
+            buleUpData.add(y * width + x);
+            isChecks[y * width + x] = true;
+        }
         boolean stopFlag = true;
         int flagy  , flagx ;
         while(stopFlag){

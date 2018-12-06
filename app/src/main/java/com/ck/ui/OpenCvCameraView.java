@@ -17,13 +17,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.ck.bean.PointBean;
 import com.ck.utils.DecodeUtil;
 import com.ck.utils.FindLieFenUtils;
+import com.ck.utils.OpenCvLieFUtil;
 import com.ck.utils.PreferenceHelper;
 import com.ck.utils.Stringutil;
 import com.hc.u8x_ck.R;
 
 import org.opencv.core.Mat;
+
+import java.util.List;
 
 
 public class OpenCvCameraView extends View {
@@ -65,6 +69,9 @@ public class OpenCvCameraView extends View {
     private float doubleFristLength = 0;//双点触控第一次的长度
     private float doubleSecondLength = 0;//双点触控第二次的长度
 
+    //左右检测光标的xy坐标
+    private float nLX = 0,nLY = 0,nRX = 0,nRY = 0;
+    private float length = 0;
 
     public OpenCvCameraView(Context context) {
         super(context);
@@ -146,7 +153,8 @@ public class OpenCvCameraView extends View {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                blackWriteBitmap = DecodeUtil.convertToBlackWhite(m_DrawBitmap);
+//                blackWriteBitmap = DecodeUtil.convertToBlackWhite(m_DrawBitmap);
+                blackWriteBitmap = OpenCvLieFUtil.getDonePic(m_DrawBitmap);
             }
         }).start();
     }
@@ -158,6 +166,9 @@ public class OpenCvCameraView extends View {
      * @param isRefresh
      */
     public void setBlackWrite(boolean isBlackWrite, boolean isRefresh) {
+        if(isStart){
+            return;
+        }
         if (null == blackWriteBitmap || blackWriteBitmap.isRecycled()) {
             if(isRefresh) {
                 Toast.makeText(mContext, "数据处理中，请稍后再试", Toast.LENGTH_SHORT).show();
@@ -176,6 +187,9 @@ public class OpenCvCameraView extends View {
      * @param isRefresh
      */
     public void setFindSide(boolean isFindSide, boolean isRefresh) {
+        if(isStart){
+            return;
+        }
         if (null == blackWriteBitmap || blackWriteBitmap.isRecycled()) {
             if(isRefresh) {
                 Toast.makeText(mContext, "数据处理中，请稍后再试", Toast.LENGTH_SHORT).show();
@@ -216,7 +230,8 @@ public class OpenCvCameraView extends View {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                blackWriteBitmap = DecodeUtil.convertToBlackWhite(m_DrawBitmap);
+//                blackWriteBitmap = DecodeUtil.convertToBlackWhite(m_DrawBitmap);
+                blackWriteBitmap = OpenCvLieFUtil.getDonePic(m_DrawBitmap);
             }
         }).start();
         invalidate();
@@ -275,37 +290,58 @@ public class OpenCvCameraView extends View {
             canvas.drawBitmap(showBitmap, null, rectF, null);
             if (isFindSide) { //描边
                 Paint paint = getPaint(Paint.Style.FILL, 2, Color.GREEN, 25);
-                int buleNum = DecodeUtil.buleData.size();
-                int greenNum = DecodeUtil.greenData.size();
-                if(null != DecodeUtil.greenData && DecodeUtil.greenData.size() > 1) {
-                    for (int i = 3; i < greenNum; i+=3) {
-                        float greenX = DecodeUtil.greenData.get(i) % m_DraBitMapWith - 1;
-                        float greenY = DecodeUtil.greenData.get(i) / m_DraBitMapWith + 1;
+                List<PointBean> data = OpenCvLieFUtil.allData;
+                if(null !=  data &&  data.size() > 1) {
+                    for (int i = 1; i < data.size(); i++) {
+                        if(i == 10){
+                            paint.setColor(Color.RED);
+                        }
+                        if(i ==  100){
+                            paint.setColor(Color.BLUE);
+                        }
+                        float greenX = data.get(i).getX();
+                        float greenY = data.get(i).getY();
                         greenX = (float) (((greenX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
                         greenY = (float) (((greenY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-
-                        float greenX_ = DecodeUtil.greenData.get(i - 3) % m_DraBitMapWith - 1;
-                        float greenY_ = DecodeUtil.greenData.get(i - 3) / m_DraBitMapWith + 1;
-                        greenX_ = (float) (((greenX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-                        greenY_ = (float) (((greenY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-
-                        canvas.drawLine(greenX_, greenY_,greenX,greenY, paint);
+//                        float greenX_ = data.get(i-1).getX();
+//                        float greenY_ = data.get(i-1).getY();
+//                        greenX_ = (float) (((greenX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+//                        greenY_ = (float) (((greenY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+//                        canvas.drawLine(greenX_,greenY_,greenX,greenY, paint);
+                        canvas.drawPoint(greenX,greenY,paint);
                     }
                 }
-                paint.setColor(Color.BLUE);
-                for (int i = 3; i < buleNum; i+=3) {
-                    float buleX = DecodeUtil.buleData.get(i) % m_DraBitMapWith + 1;
-                    float buleY = DecodeUtil.buleData.get(i) / m_DraBitMapWith + 1;
-                    buleX = (float) (((buleX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-                    buleY = (float) (((buleY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-
-                    float buleX_ = DecodeUtil.buleData.get(i-3) % m_DraBitMapWith + 1;
-                    float buleY_ = DecodeUtil.buleData.get(i-3) / m_DraBitMapWith + 1;
-                    buleX_ = (float) (((buleX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-                    buleY_ = (float) (((buleY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-
-                    canvas.drawLine(buleX_,buleY_,buleX, buleY, paint);
-                }
+//                int buleNum = DecodeUtil.buleData.size();
+//                int greenNum = DecodeUtil.greenData.size();
+//                if(null != DecodeUtil.greenData && DecodeUtil.greenData.size() > 1) {
+//                    for (int i = 3; i < greenNum; i+=3) {
+//                        float greenX = DecodeUtil.greenData.get(i) % m_DraBitMapWith - 1;
+//                        float greenY = DecodeUtil.greenData.get(i) / m_DraBitMapWith + 1;
+//                        greenX = (float) (((greenX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+//                        greenY = (float) (((greenY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+//
+//                        float greenX_ = DecodeUtil.greenData.get(i - 3) % m_DraBitMapWith - 1;
+//                        float greenY_ = DecodeUtil.greenData.get(i - 3) / m_DraBitMapWith + 1;
+//                        greenX_ = (float) (((greenX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+//                        greenY_ = (float) (((greenY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+//
+//                        canvas.drawLine(greenX_, greenY_,greenX,greenY, paint);
+//                    }
+//                }
+//                paint.setColor(Color.BLUE);
+//                for (int i = 3; i < buleNum; i+=3) {
+//                    float buleX = DecodeUtil.buleData.get(i) % m_DraBitMapWith + 1;
+//                    float buleY = DecodeUtil.buleData.get(i) / m_DraBitMapWith + 1;
+//                    buleX = (float) (((buleX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+//                    buleY = (float) (((buleY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+//
+//                    float buleX_ = DecodeUtil.buleData.get(i-3) % m_DraBitMapWith + 1;
+//                    float buleY_ = DecodeUtil.buleData.get(i-3) / m_DraBitMapWith + 1;
+//                    buleX_ = (float) (((buleX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
+//                    buleY_ = (float) (((buleY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
+//
+//                    canvas.drawLine(buleX_,buleY_,buleX, buleY, paint);
+//                }
             }
         }
 
@@ -318,55 +354,64 @@ public class OpenCvCameraView extends View {
      * @param canvas
      */
     private void drawRuleAndFlag(Canvas canvas) {
-        float nL = (FindLieFenUtils.m_nLLineSite / m_DraBitMapWith) * m_nScreenWidth;
-        float nR = (FindLieFenUtils.m_nRLineSite / m_DraBitMapWith) * m_nScreenWidth;
-        float nRX = (FindLieFenUtils.m_nCRXLineSite /m_DraBitMapWith)  * m_nScreenWidth;
-        float nRY= (FindLieFenUtils.m_nCRYLineSite  / m_DraBitMapHight) * m_nScreenHeight;
+        nLX = (FindLieFenUtils.m_nLLineSite / m_DraBitMapWith) * m_nScreenWidth;
+        nLY = m_nScreenHeight / 2;
+        nRX = (FindLieFenUtils.m_nRLineSite / m_DraBitMapWith) * m_nScreenWidth;
+        nRY = m_nScreenHeight / 2;
         float mf_fXDensity = m_fXDensity;
-        if (isCalibration) {//标定
-            isCalibration = false;
-            mf_fXDensity = m_fXDensity = (float) (Math.abs(nR - nL) / 20.0);
-            PreferenceHelper.setFXDensity(m_fXDensity);
-            max_X = (int) (m_nScreenWidth / m_fXDensity);
+        length = Math.abs(nRX-nLX);
+        if(!isStart){
+            if(isFindSide){//描边  自动判别时的倾斜连线
+                nLX = (FindLieFenUtils.m_nCLXLineSite / m_DraBitMapWith) * m_nScreenWidth;
+                nLY = (FindLieFenUtils.m_nCLYLineSite / m_DraBitMapHight) * m_nScreenHeight;
+                nRX = (FindLieFenUtils.m_nCRXLineSite /m_DraBitMapWith)  * m_nScreenWidth;
+                nRY= (FindLieFenUtils.m_nCRYLineSite  / m_DraBitMapHight) * m_nScreenHeight;
+                length = (float) Math.sqrt((nRY-nLY) * (nRY-nLY) + (nRX - nLX) * (nRX - nLX));
+            }
+            if (isCalibration) {//标定
+                isCalibration = false;
+                if(nLY == nRY) { //水平线上的标定
+                    mf_fXDensity = m_fXDensity = (float) (Math.abs(nRX - nLX) / 20.0);
+                }else{//非水平线上的标定
+                    mf_fXDensity = m_fXDensity = (float) (length / 20.0);
+                }
+                PreferenceHelper.setFXDensity(m_fXDensity);
+                max_X = (int) (m_nScreenWidth / m_fXDensity);
+            }
         }
-        int nYMid = m_nScreenHeight / 2;
         if (m_PaintDrawLine == null) {
             m_PaintDrawLine = getPaint(Paint.Style.FILL, 3, Color.RED, 25);
         }
         m_PaintDrawLine.setColor(Color.RED);
         m_PaintDrawLine.setStrokeWidth(2);
-        if (isFindSide) { //描边
-            //自动判别时的倾斜连线
-            canvas.drawLine(nL, nYMid, nRX, nRY, m_PaintDrawLine);
-        }else {
-            canvas.drawLine(nL, nYMid, nR, nYMid, m_PaintDrawLine); //左右两个卡标中间的连线
-        }
+        canvas.drawLine(nLX, nLY, nRX, nRY, m_PaintDrawLine);
         if (m_nDrawFlag == 1) {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
         //左卡标的绘制
-        canvas.drawLine(nL, nYMid - m_nScreenHeight / 20, nL, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
-        canvas.drawLine(nL - 50, nYMid, nL, nYMid, m_PaintDrawLine);
-        canvas.drawLine(nL - 10, nYMid - 10, nL, nYMid, m_PaintDrawLine);
-        canvas.drawLine(nL - 10, nYMid + 10, nL, nYMid, m_PaintDrawLine);
+        canvas.drawLine(nLX, nLY - 30, nLX, nLY +30, m_PaintDrawLine);
+        canvas.drawLine(nLX - 50, nLY, nLX, nLY, m_PaintDrawLine);
+        canvas.drawLine(nLX - 10, nLY - 10, nLX, nLY, m_PaintDrawLine);
+        canvas.drawLine(nLX - 10, nLY + 10, nLX, nLY, m_PaintDrawLine);
         m_PaintDrawLine.setColor(Color.RED);
         if (m_nDrawFlag == 2) {
             m_PaintDrawLine.setColor(Color.BLUE);
         }
         //右卡标的绘制
-        canvas.drawLine(nR, nYMid - m_nScreenHeight / 20, nR, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
-        canvas.drawLine(nR + 50, nYMid, nR, nYMid, m_PaintDrawLine);
-        canvas.drawLine(nR + 10, nYMid - 10, nR, nYMid, m_PaintDrawLine);
-        canvas.drawLine(nR + 10, nYMid + 10, nR, nYMid, m_PaintDrawLine);
+        canvas.drawLine(nRX, nRY - 30, nRX, nRY + 30, m_PaintDrawLine);
+        canvas.drawLine(nRX + 50, nRY, nRX, nRY, m_PaintDrawLine);
+        canvas.drawLine(nRX + 10, nRY - 10, nRX, nRY, m_PaintDrawLine);
+        canvas.drawLine(nRX + 10, nRY + 10, nRX, nRY, m_PaintDrawLine);
 
         m_PaintDrawLine.setColor(Color.RED);
         m_PaintDrawLine.setTextSize(Stringutil.getDimens(R.dimen.x20));
-        String str = String.format("%.02f", (float) (Math.abs((nR - nL) / mf_fXDensity) / 10.00000000)) + "mm";
+        String str = String.format("%.02f", length / mf_fXDensity / 10.00000000) + "mm";
         str = str.equals("NaNmm") ? "0.00mm" : str; //有时format的返回值为NaN
         canvas.drawText(str, m_nScreenWidth - 40 - m_PaintDrawLine.measureText(str), 50, m_PaintDrawLine);
         width = Float.valueOf(str.replace("mm", ""));
         m_PaintDrawLine.setTextSize(20);
         m_PaintDrawLine.setStrokeWidth(2);
+        int nYMid = m_nScreenHeight / 2;
         int nKDY = nYMid + nYMid * 3 / 4;
         canvas.drawLine(0, nKDY, m_nScreenWidth, nKDY, m_PaintDrawLine);//打底线
         canvas.drawLine(1, nKDY, 1, nKDY - 30, m_PaintDrawLine); // 0刻度线
@@ -442,6 +487,9 @@ public class OpenCvCameraView extends View {
      * @param isCalibration
      */
     public void setCalibration(boolean isCalibration) {
+        if(isStart){
+            return;
+        }
         this.isCalibration = isCalibration;
         invalidate();
     }
@@ -476,8 +524,8 @@ public class OpenCvCameraView extends View {
                         if (!isStart) {
                             return;
                         }
-                        m_DraBitMapWith = m_DrawBitmap.getWidth();
-                        m_DraBitMapHight = m_DrawBitmap.getHeight();
+                        m_DraBitMapWith = m_DrawGrayBitmap.getWidth();
+                        m_DraBitMapHight = m_DrawGrayBitmap.getHeight();
 //                        int[] rgb = DecodeUtil.decodeYUV420SP(getBytes, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
 //                        int[] rgb = CarmeraDataDone.decodeYUV420SPJni(getBytes, m_DraBitMapWith, m_DraBitMapHight, m_nTextureBuffer);
                         rgb = DecodeUtil.bitmap2RGBAtCenter(m_DrawGrayBitmap);
@@ -492,7 +540,6 @@ public class OpenCvCameraView extends View {
             checkTaskHandler.post(checkTaskRunnable);
         }
     };
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
