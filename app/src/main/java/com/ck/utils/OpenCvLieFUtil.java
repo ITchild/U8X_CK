@@ -39,20 +39,19 @@ public class OpenCvLieFUtil {
         mat = removeNoiseGaussianBlur(mat); //高斯滤波
         mat = removeBlur(mat); //模糊，去除毛刺
         mat = grayImage(mat);
-//        mat = equalizeHist(mat);
-//        mat.channels();
-//        byte[] matPoint = new byte[mat.channels()];
-//        for (int i = 0; i < mat.channels(); i ++) {
-//            matPoint[i] = 127;
-//        }
-//        for(int i=0 ;i<mat.cols() ;i++){
-//            mat.put(0, i , matPoint);
-//            mat.put(mat.rows()-1, i , matPoint);
-//        }
-//        for(int i=0 ;i<mat.rows() ;i++){
-//            mat.put(i, 0 , matPoint);
-//            mat.put(, mat.cols()-1 , matPoint);
-//        }
+        mat = equalizeHist(mat);
+        double[] matPoint = new double[mat.channels()];
+        for (int i = 0; i < mat.channels(); i ++) {
+            matPoint[i] = 255;
+        }
+        for(int i=0 ;i<mat.cols() ;i++){
+            mat.put(0, i , matPoint);
+            mat.put(mat.rows()-1, i , matPoint);
+        }
+        for(int i=0 ;i<mat.rows() ;i++){
+            mat.put(i, 0 , matPoint);
+            mat.put(i, mat.cols()-1 , matPoint);
+        }
         Mat cannyMat = cannyEdge(mat);
         List<MatOfPoint> sideList = new ArrayList<>();
         Mat hierarchy = new Mat();
@@ -63,7 +62,7 @@ public class OpenCvLieFUtil {
             MatOfPoint matOfPoint = sideList.get(i);
             double area = Imgproc.contourArea(matOfPoint);
             Log.i("fei","第"+i+"个Mat的面积"+ area);
-            if(area < 15){
+            if(area < 50){
                 continue;
             }
             for (int j=0;j<matOfPoint.toList().size();j++) {
@@ -82,6 +81,7 @@ public class OpenCvLieFUtil {
             bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
         }
         org.opencv.android.Utils.matToBitmap(mat,bitmap);
+        getLRSidePoint();
         return bitmap;
     }
 
@@ -93,13 +93,18 @@ public class OpenCvLieFUtil {
             PointBean pointBean = OpenCvLieFUtil.allData.get(i);
             int x =(int) pointBean.getX();
             int y =(int) pointBean.getY();
-            if(pointBean.getY() == heght/2){
-                if(bitmap.getPixel(x+1,y) == 0 && bitmap.getPixel(x-2,y)== 0xFF){
+            if(y == heght/2){
+//                if(isPiex(x+1,y,0) && isPiex(x-2,y,255)){
+//                    lSidePoints.add(new PointBean(x,y,i));
+//                }else if (isPiex(x-2,y,0) && isPiex(x+1,y,255)){
+//                    if(lSidePoints.size() != 0){//如果左侧还没有点，则右侧进行采集
+//                        rSidePoints.add(new PointBean(x,y,i));
+//                    }
+//                }
+                if(lSidePoints.size() == rSidePoints.size()){
                     lSidePoints.add(new PointBean(x,y,i));
-                }else if (bitmap.getPixel(x-2,y) == 0 && bitmap.getPixel(x+1,y)== 0xFF){
-                    if(lSidePoints.size() != 0){//如果左侧还没有点，则右侧进行采集
-                        rSidePoints.add(new PointBean(x,y,i));
-                    }
+                }else{
+                    rSidePoints.add(new PointBean(x,y,i));
                 }
             }
         }
@@ -139,8 +144,8 @@ public class OpenCvLieFUtil {
         }
         for(int i= lpointSite-1;i>0;i--){
             if(!checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())]
-                    &&(Math.abs(allData.get(i).getX()-allData.get(i-2).getX()) <=2
-                    ||Math.abs(allData.get(i).getY()-allData.get(i-2).getY()) <=2)){
+                    &&(Math.abs(allData.get(i).getX()-allData.get(i-1).getX()) <=2
+                    ||Math.abs(allData.get(i).getY()-allData.get(i-1).getY()) <=2)){
                 flagAllData.add(allData.get(i));
                 checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())] = true;
             }else{
@@ -174,6 +179,17 @@ public class OpenCvLieFUtil {
 
     }
 
+    private static boolean isPiex(int x,int y,int value){
+        double [] flagPiex = mat.get(x,y);
+        boolean res = true;
+        for(int i=0;i<mat.channels();i++){
+            if(flagPiex [i] != value){
+                res = false;
+            }
+        }
+        return res;
+    }
+
 
 
     //直方图均衡化
@@ -205,7 +221,7 @@ public class OpenCvLieFUtil {
         Imgproc.cvtColor(srcMat, grayImg, Imgproc.COLOR_RGB2GRAY);
         Mat bWImg = new Mat();
         Imgproc.threshold(grayImg,bWImg,70, 255.0, Imgproc.THRESH_BINARY );
-        return grayImg;
+        return bWImg;
     }
 
     //canny边缘检测
