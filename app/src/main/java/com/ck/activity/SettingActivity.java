@@ -1,7 +1,6 @@
 package com.ck.activity;
 
 import android.content.Intent;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -15,6 +14,10 @@ import com.ck.utils.PreferenceHelper;
 import com.hc.u8x_ck.R;
 
 public class SettingActivity extends TitleBaseActivity {
+
+    public static final String ACTION_REQUEST_SHUTDOWN="android.intent.action.ACTION_REQUEST_SHUTDOWN";
+    public static final String EXTRA_KEY_CONFIRM="android.intent.extra.KEY_CONFIRM";
+
     private RadioGroup setting_tab_rg;
     private LinearLayout setting_parm_ll;
     private LinearLayout setting_time_ll;
@@ -23,8 +26,6 @@ public class SettingActivity extends TitleBaseActivity {
     private SeekBar settingPar_light_sb;//背光亮度
     private TextView settingPar_light_tv;//背光亮度数值显示
     private CheckBox settingPar_theme_cb;//主题的选项
-
-    public static final String ACTION_REQUEST_SHUTDOWN = "android.intent.action.ACTION_REQUEST_SHUTDOWN";
 
     @Override
     protected int initLayout() {
@@ -102,9 +103,10 @@ public class SettingActivity extends TitleBaseActivity {
         findViewById(R.id.settingtime_date_bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
-                startActivity(intent);
+//                Intent intent =  new Intent(Settings.ACTION_DATE_SETTINGS);
+//                startActivity(intent);
 //                DateUtil.setDate(2018,10,24);
+                shutdown();
             }
         });
         settingPar_theme_cb.setOnClickListener(new View.OnClickListener() {
@@ -168,6 +170,13 @@ public class SettingActivity extends TitleBaseActivity {
     public void onBackPressed() {
         backToHome();
         super.onBackPressed();
+    }
+
+    public void shutdown() {
+        Intent intent = new Intent(ACTION_REQUEST_SHUTDOWN);
+        intent.putExtra(EXTRA_KEY_CONFIRM, false);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
 }

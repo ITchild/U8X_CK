@@ -14,7 +14,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 
 import com.ck.App_DataPara;
-import com.hc.u8x_ck.R;
 
 /**
  * TODO<请描述这个类是干什么的>
@@ -40,11 +39,11 @@ public class PlayMusic {
 			// 将音乐音量调到最大
 			int max1 = m_AudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 			m_AudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, max1, 0);
-			mPlay = MediaPlayer.create(context, R.raw.tick_sound);
+//			mPlay = MediaPlayer.create(context, R.raw.tick_sound);
 		}
 
 		if (bCreat)
-			mPlay = MediaPlayer.create(context, R.raw.tick_sound);
+//			mPlay = MediaPlayer.create(context, R.raw.tick_sound);
 		mPlay.setLooping(false);
 		mPlay.start();
 

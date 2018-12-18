@@ -91,7 +91,9 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
         }
         holder.m_TVProject.setText(mProjects.get(position).mFileProjectName);
         holder.m_TVGJNum.setText(mProjects.get(position).mstrArrFileGJ.size() + "");
+        holder.m_TVGJNum.setVisibility(View.GONE);
         holder.m_TVTime.setText(mProjects.get(position).mLastModifiedDate);
+        holder.m_TVTime.setVisibility(View.GONE);
     }
 
     @Override

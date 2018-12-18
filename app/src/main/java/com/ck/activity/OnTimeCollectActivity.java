@@ -258,7 +258,7 @@ public class OnTimeCollectActivity extends TitleBaseActivity implements View.OnC
             return;
         }
         List<MeasureDataBean> isHaveData = DBService.getInstence(this).
-                getMeasureData(proName,gjName,fileName,MeasureDataBean.FILESTATE_USERING);
+                getMeasureData(proName,fileName,MeasureDataBean.FILESTATE_USERING);
         if(null != isHaveData && isHaveData.size()>0){
             showToast("文件名重复");
             return;
@@ -272,10 +272,8 @@ public class OnTimeCollectActivity extends TitleBaseActivity implements View.OnC
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         MeasureDataBean dataBean = new MeasureDataBean();
         dataBean.setObjName(proName);
-        dataBean.setGjName(gjName);
         dataBean.setFileName(fileName + ".bmp");
         dataBean.setObjCreateDate(format.format(new File(PathUtils.PROJECT_PATH + "/" + proName).lastModified()));
-        dataBean.setGjCreateDate(format.format(new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + gjName).lastModified()));
         File file = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + gjName + "/" + fileName + ".bmp");
         dataBean.setFileCreateDate(format.format(file.lastModified()));
         dataBean.setJudgeStyle(MeasureDataBean.JUDGESTYLE_HORIZ);

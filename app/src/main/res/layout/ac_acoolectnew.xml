@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/collect_boot_ll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        layout="@layout/ac_basetitle"
+        android:visibility="gone"></include>
+    <!--android:layout_marginRight="243.75pt"-->
+
+    <RelativeLayout xmlns:opencv="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <org.opencv.android.JavaCameraView
+            android:id="@+id/collect_OpenCvCamera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            opencv:camera_id="back" />
+
+        <com.ck.ui.OpenCvCameraView
+            android:id="@+id/collect_cameraView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/background"
+            android:clickable="true" />
+
+
+        <LinearLayout
+            android:id="@+id/collect_key_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="@dimen/x20"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/collect_blackWrite_bt"
+                android:layout_width="@dimen/x80"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_btn"
+                android:focusable="false"
+                android:text="@string/str_blackWrite"
+                android:textColor="@color/black"
+                android:textSize="@dimen/x14" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/colleact_drag_ll"
+            android:layout_width="@dimen/x50"
+            android:layout_height="@dimen/x50"
+            android:background="@color/black"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>

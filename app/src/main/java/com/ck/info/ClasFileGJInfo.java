@@ -34,7 +34,6 @@ public class ClasFileGJInfo implements Comparable<ClasFileGJInfo> {
      */
     public boolean bIsSelect = false;
 
-
     public String getFileGJName() {
         //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
         return mFileGJName == null ? "" : mFileGJName;

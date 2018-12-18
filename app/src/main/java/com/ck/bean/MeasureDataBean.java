@@ -19,10 +19,10 @@ public class MeasureDataBean {
 
     private int id;    //主键ID
     private String objName;  //工程名称
-    private String gjName;  //构件名称
+//    private String gjName;  //构件名称
     private String fileName;   // 文件名称
     private String objCreateDate;  //工程创建时间
-    private String gjCreateDate;  // 构件创建时间
+//    private String gjCreateDate;  // 构件创建时间
     private String fileCreateDate;   //文件创建时间
     private String judgeStyle;   //判别方式 (中间水平上判别   全自动判别)
     private String measureDate;   //测量时间
@@ -56,14 +56,14 @@ public class MeasureDataBean {
         this.objName = objName;
     }
 
-    public String getGjName() {
-        //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
-        return gjName == null ? "" : gjName;
-    }
-
-    public void setGjName(String gjName) {
-        this.gjName = gjName;
-    }
+//    public String getGjName() {
+//        //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
+//        return gjName == null ? "" : gjName;
+//    }
+//
+//    public void setGjName(String gjName) {
+//        this.gjName = gjName;
+//    }
 
     public String getFileName() {
         //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
@@ -92,14 +92,14 @@ public class MeasureDataBean {
         this.objCreateDate = objCreateDate;
     }
 
-    public String getGjCreateDate() {
-        //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
-        return gjCreateDate == null ? "" : gjCreateDate;
-    }
-
-    public void setGjCreateDate(String gjCreateDate) {
-        this.gjCreateDate = gjCreateDate;
-    }
+//    public String getGjCreateDate() {
+//        //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
+//        return gjCreateDate == null ? "" : gjCreateDate;
+//    }
+//
+//    public void setGjCreateDate(String gjCreateDate) {
+//        this.gjCreateDate = gjCreateDate;
+//    }
 
     public String getFileCreateDate() {
         //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身

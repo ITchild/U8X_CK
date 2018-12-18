@@ -825,23 +825,17 @@ public class DecodeUtil {
     }
 
     /**
-     * @方法描述 Bitmap转int像素组
+     * Bitmap转int像素组
+     * @param bmp
+     * @param w
+     * @param h
+     * @param flagB 取像素的点的间隔1：为累加 2：隔一个取一个
+     * @return
      */
-    public static int[] bitmap2RGBAtCenter(Bitmap bmp) {
-        int w = bmp.getWidth();
-        int h = bmp.getHeight();
-        int red, green, blue;
+    public static int[] bitmap2RGBAtCenter(Bitmap bmp,int w,int h,int flagB) {
         int[] pixels = new int[w]; // Allocate for RGB
-        int k = 0;
         int y = h/2;
-        for (int x = 0; x < w; x++) {
-//            int color = bmp.getPixel(x,y);
-//            red =  Color.red(color);
-//            green = Color.green(color);
-//            blue = Color.blue(color);
-//            //获取RGB分量值通过按位或生成int的像素值
-//            pixels[k] = (red << 16) | (green << 8) | blue | 0xFF000000;
-//            k++;
+        for (int x = 0; x < w; x+=flagB) {
             pixels[x] = bmp.getPixel(x,y);
         }
         return pixels;

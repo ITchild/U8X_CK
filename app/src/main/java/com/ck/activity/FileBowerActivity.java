@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -34,17 +35,18 @@ import java.util.List;
  * 为文件管理的Activity
  */
 
-public class FileBowerActivity extends TitleBaseActivity  {
+public class FileBowerActivity extends TitleBaseActivity implements View.OnClickListener{
 
     protected List<ClasFileProjectInfo> proData;
-    private TextView fileBower_objName_tv;
-    private TextView fileBower_gjName_tv;
     protected ClasFileProjectInfo fileData;
     private RecyclerView fileBower_proList_rv;
     private FileListProjectAdapter mProjectAdapter;
     private RecyclerView fileBower_fileList_rv;
     private FileListGJAdapter mGJAdapter;
     private DLG_FileProgress m_ProgressDialog;
+
+    private TextView fileBower_del_tv;
+    private TextView fileBower_toUPan_tv;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -80,10 +82,10 @@ public class FileBowerActivity extends TitleBaseActivity  {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.UpdataProgress);
         registerReceiver(mReceiver, filter);
-        fileBower_objName_tv = findView(R.id.fileBower_objName_tv);
-        fileBower_gjName_tv = findView(R.id.fileBower_gjName_tv);
         fileBower_proList_rv = findView(R.id.fileBower_proList_rv);
         fileBower_fileList_rv = findView(R.id.fileBower_fileList_rv);
+        fileBower_del_tv = findView(R.id.fileBower_del_tv);
+        fileBower_toUPan_tv = findView(R.id.fileBower_toUPan_tv);
         if (null == proData) {
             proData = new ArrayList<>();
         }
@@ -94,7 +96,7 @@ public class FileBowerActivity extends TitleBaseActivity  {
             fileData = new ClasFileProjectInfo();
         }
         mGJAdapter = new FileListGJAdapter(this, fileData);
-        fileBower_fileList_rv.setLayoutManager(new LinearLayoutManager(this));
+        fileBower_fileList_rv.setLayoutManager(new GridLayoutManager(this,3));
         fileBower_fileList_rv.setAdapter(mGJAdapter);
     }
 
@@ -110,7 +112,6 @@ public class FileBowerActivity extends TitleBaseActivity  {
      */
     private void refreshProListData(int position) {
         proData = PathUtils.getProFileList();
-        fileBower_objName_tv.setText("工程名称("+proData.size()+")");
         mProjectAdapter.setData(proData, position);
     }
 
@@ -123,13 +124,14 @@ public class FileBowerActivity extends TitleBaseActivity  {
         }else {
             fileData = new ClasFileProjectInfo();
         }
-        fileBower_gjName_tv.setText("构件名称("+fileData.mstrArrFileGJ.size()+")");
         mGJAdapter.setData(fileData, backgroundPosition);
     }
 
     @Override
     protected void initListener() {
         super.initListener();
+        fileBower_del_tv.setOnClickListener(this);
+        fileBower_toUPan_tv.setOnClickListener(this);
         //TODO : 工程列表的监听
         mProjectAdapter.setOnFileProItemClick(new FileListProjectAdapter.OnFileProItemClick() {
             @Override
@@ -225,23 +227,23 @@ public class FileBowerActivity extends TitleBaseActivity  {
         isSelectAllObj();//改变全选按钮的提示
     }
 
-//    @Override
-//    public void onClick(View view) {
-//        switch (view.getId()) {
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
 //            case R.id.fileBower_select_bt: // TODO : 全选 / 取消全选
 //                selectAllOrCancel();
 //                break;
-//            case R.id.fileBower_toUsb_bt: //TODO : 转到U盘中
-//                onSaveSDcard();
-//                break;
-//            case R.id.fileBower_del_bt://TODO : 删除选中项
-//                onDelete();
-//                break;
+            case R.id.fileBower_toUPan_tv: //TODO : 转到U盘中
+                onSaveSDcard();
+                break;
+            case R.id.fileBower_del_tv://TODO : 删除选中项
+                onDelete();
+                break;
 //            case R.id.fileBower_back_bt: //TODO ： 返回
 //                finish();
 //                break;
-//        }
-//    }
+        }
+    }
 
     /**
      * 按键的监听
@@ -259,7 +261,6 @@ public class FileBowerActivity extends TitleBaseActivity  {
                 onSaveSDcard();
                 return true;
         }
-
         return super.onKeyDown(keyCode, event);
     }
 
@@ -332,12 +333,11 @@ public class FileBowerActivity extends TitleBaseActivity  {
      * 删除选中文件的具体方法
      */
     private void delSelectFile() {
-        FileUtil.delSeleceFile(proData);
-        delDbMeasure();
-        refreshProListData(0);
-        refreshFileListData(0, -1);
+        FileUtil.delSeleceFile(proData);//删除本地文件
+        delDbMeasure();//删除数据库中的文件
+        refreshProListData(0);//刷新工程列表
+        refreshFileListData(0, -1);//刷新文件列表
     }
-
 
     /**
      * 删除数据中的文件
@@ -346,14 +346,14 @@ public class FileBowerActivity extends TitleBaseActivity  {
         for(ClasFileProjectInfo info : proData){
             if(info.nIsSelect == 2){
                 DBService.getInstence(this).delMeasureData(
-                        info.mFileProjectName,null,null);
+                        info.mFileProjectName,null);
             }else if(info.nIsSelect == 1){
                 List<ClasFileGJInfo> ArrFileGJ = info.mstrArrFileGJ;
                 for (int j = 0; j < ArrFileGJ.size(); j++) {
                     ClasFileGJInfo clasFileGJInfo = ArrFileGJ.get(j);
                     if (clasFileGJInfo.bIsSelect) {
                         DBService.getInstence(this).delMeasureData(
-                                info.mFileProjectName,clasFileGJInfo.mFileGJName,null);
+                                info.mFileProjectName,clasFileGJInfo.mFileGJName);
                     }
                 }
             }
@@ -416,10 +416,16 @@ public class FileBowerActivity extends TitleBaseActivity  {
         new Thread() {
             public void run() {
                 File sourceF = null;
+                File drawSourceF = null;
                 File targetPathF = null;
+                File drawTargetPathF = null;
                 File targetF = null;
+                File drawTargetF = null;
+
                 String soDir = null;
+                String drawSoDir = null;
                 String tarDir = null;
+                String drawTarDir = null;
                 for (int i = 0; i < proData.size(); i++) {
                     try {
                         Thread.sleep(500);
@@ -429,11 +435,17 @@ public class FileBowerActivity extends TitleBaseActivity  {
                     }
                     if (proData.get(i).nIsSelect == 2) {
                         soDir = PathUtils.PROJECT_PATH + "/" + proData.get(i).mFileProjectName;
-                        tarDir = targetDir + File.separator + proData.get(i).mFileProjectName;
+                        drawSoDir = PathUtils.DRAWPROJECT_PATH+"/"+proData.get(i).mFileProjectName;
+                        tarDir = targetDir + File.separator +"工程"+File.separator + proData.get(i).mFileProjectName;
+                        drawTarDir = targetDir + File.separator +"Draw工程"+ File.separator+ proData.get(i).mFileProjectName;
                         try {
                             if (null != soDir && soDir.length() != 0 && null != tarDir && tarDir.length() != 0) {
-                                // 拷贝文件
+                                // 拷贝原图文件
                                 FileUtil.getInstance().copyDirectiory(soDir, tarDir, AppDatPara);
+                            }
+                            if (null != drawSoDir && drawSoDir.length() != 0 && null != drawSoDir && drawSoDir.length() != 0) {
+                                // 拷贝含有标志的文件
+                                FileUtil.getInstance().copyDirectiory(drawSoDir, drawTarDir, AppDatPara);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -441,13 +453,21 @@ public class FileBowerActivity extends TitleBaseActivity  {
                     } else if (proData.get(i).nIsSelect == 1) {
                         for (int j = 0; j < proData.get(i).mstrArrFileGJ.size(); j++) {
                             if (proData.get(i).mstrArrFileGJ.get(j).bIsSelect == true) {
-                                targetPathF = new File(targetDir
-                                        + File.separator + File.separator + proData.get(i).mFileProjectName);
+                                targetPathF = new File(targetDir + File.separator +
+                                        "工程"+proData.get(i).mFileProjectName);
+                                drawTargetPathF = new File(targetDir + File.separator +
+                                        "Draw工程"+proData.get(i).mFileProjectName);
                                 sourceF = new File(PathUtils.PROJECT_PATH
+                                        + "/" + proData.get(i).mFileProjectName
+                                        + "/" + proData.get(i).mstrArrFileGJ.get(j).mFileGJName);
+                                drawSourceF = new File(PathUtils.DRAWPROJECT_PATH
                                         + "/" + proData.get(i).mFileProjectName
                                         + "/" + proData.get(i).mstrArrFileGJ.get(j).mFileGJName);
                                 targetF = new File(targetPathF.toString()
                                         + File.separator + proData.get(i).mstrArrFileGJ.get(j).mFileGJName);
+                                drawTargetF = new File(drawTargetPathF.toString()
+                                        + File.separator + proData.get(i).mstrArrFileGJ.get(j).mFileGJName);
+                                // 拷贝原图文件
                                 if (null != sourceF && null != targetF) {
                                     if (targetPathF.exists()) {
                                         // 拷贝文件
@@ -457,6 +477,18 @@ public class FileBowerActivity extends TitleBaseActivity  {
                                         (targetPathF).mkdirs();
                                         // 拷贝文件
                                         FileUtil.getInstance().copyFile(sourceF, targetF, AppDatPara);
+                                    }
+                                }
+                                // 拷贝含有标志的文件
+                                if (null != drawSourceF && null != drawTargetF) {
+                                    if (drawTargetPathF.exists()) {
+                                        // 拷贝文件
+                                        FileUtil.getInstance().copyFile(drawSourceF, drawTargetF, AppDatPara);
+                                    } else {
+                                        // 新建目标目录
+                                        (drawTargetPathF).mkdirs();
+                                        // 拷贝文件
+                                        FileUtil.getInstance().copyFile(drawSourceF, drawTargetF, AppDatPara);
                                     }
                                 }
                             }
@@ -507,4 +539,5 @@ public class FileBowerActivity extends TitleBaseActivity  {
         super.onDestroy();
         unregisterReceiver(mReceiver);
     }
+
 }

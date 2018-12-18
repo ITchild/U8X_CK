@@ -41,10 +41,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		db.execSQL("CREATE TABLE IF NOT EXISTS MeasureData(" +
 				"id integer PRIMARY KEY AUTOINCREMENT," +
 				"objName nvarchar," +   //工程名称
-				"gjName nvarchar," +    //构件名称
 				"fileName nvarchar," +   // 文件名称
 				"objCreateDate nvarchar," +  //工程创建时间
-				"gjCreateDate nvarchar," +   // 构件创建时间
 				"fileCreateDate nvarchar," +  //文件创建时间
 				"judgeStyle nvarchar," + //判别方式 (中间水平上判别   全自动判别)
 				"measureDate nvarchar," +  //测量时间

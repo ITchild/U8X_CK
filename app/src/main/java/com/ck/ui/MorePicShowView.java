@@ -3,7 +3,6 @@ package com.ck.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
@@ -59,25 +58,25 @@ public class MorePicShowView extends View {
             RectF rectF = new RectF(0, 0, m_nScreenWidth, m_nScreenHeight);
             canvas.drawBitmap(m_DrawBitmap, null, rectF, null);
 
-            float nL = (m_nLeftX/ m_DrawBitmap.getWidth()) * m_nScreenWidth;
-            float nR = (m_nRightX / m_DrawBitmap.getWidth()) * m_nScreenWidth;
-            int nYMid = m_nScreenHeight / 2;
-            if (m_PaintDrawLine == null) {
-                m_PaintDrawLine = getPaint(Style.FILL, 2, Color.RED);
-            }
-            canvas.drawLine(nL, nYMid - m_nScreenHeight / 20, nL, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
-            canvas.drawLine(nL - 50, nYMid, nL, nYMid, m_PaintDrawLine);
-            canvas.drawLine(nL - 10, nYMid - 10, nL, nYMid, m_PaintDrawLine);
-            canvas.drawLine(nL - 10, nYMid + 10, nL, nYMid, m_PaintDrawLine);
-
-
-            canvas.drawLine(nL, nYMid, nR, nYMid, m_PaintDrawLine);
-            canvas.drawLine(nR, nYMid - m_nScreenHeight / 20, nR, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
-            canvas.drawLine(nR + 50, nYMid, nR, nYMid, m_PaintDrawLine);
-            canvas.drawLine(nR + 10, nYMid - 10, nR, nYMid, m_PaintDrawLine);
-            canvas.drawLine(nR + 10, nYMid + 10, nR, nYMid, m_PaintDrawLine);
-            m_PaintDrawLine.setTextSize(25);
-            canvas.drawText(name,m_nScreenWidth/2,50,m_PaintDrawLine);
+//            float nL = (m_nLeftX/ m_DrawBitmap.getWidth()) * m_nScreenWidth;
+//            float nR = (m_nRightX / m_DrawBitmap.getWidth()) * m_nScreenWidth;
+//            int nYMid = m_nScreenHeight / 2;
+//            if (m_PaintDrawLine == null) {
+//                m_PaintDrawLine = getPaint(Style.FILL, 2, Color.RED);
+//            }
+//            canvas.drawLine(nL, nYMid - m_nScreenHeight / 20, nL, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
+//            canvas.drawLine(nL - 50, nYMid, nL, nYMid, m_PaintDrawLine);
+//            canvas.drawLine(nL - 10, nYMid - 10, nL, nYMid, m_PaintDrawLine);
+//            canvas.drawLine(nL - 10, nYMid + 10, nL, nYMid, m_PaintDrawLine);
+//
+//
+//            canvas.drawLine(nL, nYMid, nR, nYMid, m_PaintDrawLine);
+//            canvas.drawLine(nR, nYMid - m_nScreenHeight / 20, nR, nYMid + m_nScreenHeight / 20, m_PaintDrawLine);
+//            canvas.drawLine(nR + 50, nYMid, nR, nYMid, m_PaintDrawLine);
+//            canvas.drawLine(nR + 10, nYMid - 10, nR, nYMid, m_PaintDrawLine);
+//            canvas.drawLine(nR + 10, nYMid + 10, nR, nYMid, m_PaintDrawLine);
+//            m_PaintDrawLine.setTextSize(25);
+//            canvas.drawText(name,m_nScreenWidth/2,50,m_PaintDrawLine);
         }
     }
     /**

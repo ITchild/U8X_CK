@@ -12,6 +12,8 @@
 
 
     <string name="str_blackWrite">黑白图</string>
+    <string name="str_handModle">手动</string>
+    <string name="str_autoModle">自动</string>
     <string name="str_pic">原  图</string>
     <string name="str_findBian">自动判别</string>
     <string name="str_enlarge">放  大</string>
@@ -91,6 +93,10 @@
 
     <string name="str_ontimeCollect_start">开始监测</string>
     <string name="str_ontimeCpllect_stop">停止监测</string>
+
+    <string name="str_del">删除</string>
+    <string name="str_ToUPan">转U盘</string>
+
 
 
     <string-array name="adjueSytle">

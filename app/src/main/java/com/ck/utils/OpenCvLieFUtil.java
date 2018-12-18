@@ -6,7 +6,6 @@ import android.util.Log;
 import com.ck.bean.PointBean;
 
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -35,161 +34,139 @@ public class OpenCvLieFUtil {
         if(null == mat) {
             mat = new Mat();
         }
+        Log.i("fei","开始转为pic"+System.currentTimeMillis());
         org.opencv.android.Utils.bitmapToMat(pic,mat);
+        Log.i("fei","开始高斯处理"+System.currentTimeMillis());
         mat = removeNoiseGaussianBlur(mat); //高斯滤波
-        mat = removeBlur(mat); //模糊，去除毛刺
+//        mat = removeBlur(mat); //模糊，去除毛刺
+        Log.i("fei","开始黑白处理"+System.currentTimeMillis());
         mat = grayImage(mat);
-        mat = equalizeHist(mat);
-        double[] matPoint = new double[mat.channels()];
-        for (int i = 0; i < mat.channels(); i ++) {
-            matPoint[i] = 255;
-        }
-        for(int i=0 ;i<mat.cols() ;i++){
-            mat.put(0, i , matPoint);
-            mat.put(mat.rows()-1, i , matPoint);
-        }
-        for(int i=0 ;i<mat.rows() ;i++){
-            mat.put(i, 0 , matPoint);
-            mat.put(i, mat.cols()-1 , matPoint);
-        }
-        Mat cannyMat = cannyEdge(mat);
-        List<MatOfPoint> sideList = new ArrayList<>();
-        Mat hierarchy = new Mat();
-        Imgproc.findContours(cannyMat,sideList,hierarchy,Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-        allData.clear();
-        boolean [] checked = new boolean[width * heght];
-        for (int i=0;i<sideList.size();i++){
-            MatOfPoint matOfPoint = sideList.get(i);
-            double area = Imgproc.contourArea(matOfPoint);
-            Log.i("fei","第"+i+"个Mat的面积"+ area);
-            if(area < 50){
-                continue;
-            }
-            for (int j=0;j<matOfPoint.toList().size();j++) {
-                PointBean point = new PointBean();
-                point.setX((float) matOfPoint.toList().get(j).x);
-                point.setY((float) matOfPoint.toList().get(j).y);
-                if(!checked[(int) (point.getX()*point.getY())]) {
-                    allData.add(point);
-                    checked[(int) (point.getX()*point.getY())] = true;
-                }
-
-            }
-        }
-        Log.i("fei","所有边缘设置的个数"+allData.size());
+//        mat = equalizeHist(mat);
+//        Log.i("fei","开始增加边界"+System.currentTimeMillis());
+//        double[] matPoint = new double[mat.channels()];
+//        for (int i = 0; i < mat.channels(); i ++) {
+//            matPoint[i] = 255;
+//        }
+//        for(int i=0 ;i<mat.cols() ;i++){
+//            mat.put(0, i , matPoint);
+//            mat.put(mat.rows()-1, i , matPoint);
+//        }
+//        for(int i=0 ;i<mat.rows() ;i++){
+//            mat.put(i, 0 , matPoint);
+//            mat.put(i, mat.cols()-1 , matPoint);
+//        }
+//        Log.i("fei","开始寻找边界"+System.currentTimeMillis());
+//        Mat cannyMat = cannyEdge(mat);
+//        List<MatOfPoint> sideList = new ArrayList<>();
+//        Mat hierarchy = new Mat();
+//        Log.i("fei","开始获取边界数据"+System.currentTimeMillis());
+//        Imgproc.findContours(cannyMat,sideList,hierarchy,Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+//        allData.clear();
+//        buleData.clear();
+//        greenData.clear();
+//        FindLieFenUtils.m_nCRXLineSite = 0;
+//        FindLieFenUtils.m_nCRYLineSite = 0;
+//        FindLieFenUtils.m_nCLXLineSite = 0;
+//        FindLieFenUtils.m_nCLYLineSite = 0;
+//        double maxArea = 0;
+//        int maxPisition = 0;
+//        Log.i("fei","开始获取最大面积"+System.currentTimeMillis());
+//        for (int i=0;i<sideList.size();i++){
+//            MatOfPoint matOfPoint = sideList.get(i);
+//            double area = Imgproc.contourArea(matOfPoint);
+//            if(maxArea < area){
+//                maxArea = area;
+//                maxPisition = i;
+//            }
+//        }
+//        Log.i("fei","开始获取最优边界"+System.currentTimeMillis());
+//        boolean[] checkFlag = new boolean[width*heght];
+//        MatOfPoint matOfPoint = sideList.get(maxPisition);
+//        for (int j=0;j<matOfPoint.toList().size();j++) {
+//            float x = (float) matOfPoint.toList().get(j).x;
+//            float y = (float) matOfPoint.toList().get(j).y;
+//            if(!checkFlag[(int)(x*y)] && y > 1 && y < heght - 2 ) {
+//                PointBean point = new PointBean();
+//                point.setX(x);
+//                point.setY(y);
+//                allData.add(point);
+//                checkFlag[(int)(x*y)] = true;
+//            }
+//        }
+//        Log.i("fei","所有边缘设置的个数"+allData.size());
         if(null == bitmap) {
             bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
         }
         org.opencv.android.Utils.matToBitmap(mat,bitmap);
-        getLRSidePoint();
+//        getLRSidePoint();
         return bitmap;
     }
 
 
     public static void getLRSidePoint(){
-        List<PointBean> lSidePoints = new ArrayList<>();
-        List<PointBean> rSidePoints = new ArrayList<>();
-        for (int i=0 ;i< OpenCvLieFUtil.allData.size() ; i++){
-            PointBean pointBean = OpenCvLieFUtil.allData.get(i);
-            int x =(int) pointBean.getX();
-            int y =(int) pointBean.getY();
-            if(y == heght/2){
-//                if(isPiex(x+1,y,0) && isPiex(x-2,y,255)){
-//                    lSidePoints.add(new PointBean(x,y,i));
-//                }else if (isPiex(x-2,y,0) && isPiex(x+1,y,255)){
-//                    if(lSidePoints.size() != 0){//如果左侧还没有点，则右侧进行采集
-//                        rSidePoints.add(new PointBean(x,y,i));
-//                    }
-//                }
-                if(lSidePoints.size() == rSidePoints.size()){
-                    lSidePoints.add(new PointBean(x,y,i));
+        int minPoint = 0 ;
+        int minPosition = 0;
+        for(int i=0;i<allData.size();i++){
+            float flagY = allData.get(i).getY();
+            if(minPoint < flagY){
+                minPoint = (int) flagY;
+                minPosition = i;
+            }
+        }
+        for (int i=0;i<allData.size();i++){
+            if(i<=minPosition) {
+                greenData.add(allData.get(i));
+            }else{
+                PointBean endBean = allData.get(i);
+                if(Math.abs(endBean.getX()-greenData.get(0).getX())<4
+                        && Math.abs(endBean.getY() - greenData.get(0).getY())<4) {
+                    break;
                 }else{
-                    rSidePoints.add(new PointBean(x,y,i));
+                    buleData.add(endBean);
                 }
             }
         }
-        if(lSidePoints.size() > rSidePoints.size()){ //如果左侧多于右侧，去掉最后的一个点
-            lSidePoints.remove(lSidePoints.size()-1);
-        }
-        Log.i("fei","左侧个数：" +lSidePoints.size()+"   右侧个数：" +rSidePoints.size());
-        float length = 0;
-        PointBean lPoint = new PointBean(0,heght/2,0);
-        PointBean rPoint = new PointBean(0,heght/2,0);
-        for(int i=0;i<lSidePoints.size();i++){
-            float flagLength = rSidePoints.get(i).getX() -lSidePoints.get(i).getX();
-            if(length < flagLength){
-                length = flagLength;
-                lPoint.setX(lSidePoints.get(i).getX());   //找到左右边界最大的两个点
-                lPoint.setSite(lSidePoints.get(i).getSite());
-                rPoint.setX(rSidePoints.get(i).getX());
-                rPoint.setSite(rSidePoints.get(i).getSite());
+        int flagLSite = 0;
+        for (int i=0;i<greenData.size();i++){
+            PointBean bean = greenData.get(i);
+            if(bean.getY() == heght/2){
+                flagLSite = i;
             }
         }
-        Log.i("fei","左侧的点：" +lPoint.getX()+"*"+lPoint.getY() +"   右侧的点：" + rPoint.getX()+"*" + rPoint.getY());
-        //根据左右边界最大的点，找边界
-        boolean [] checkFlag = new boolean[width*heght];
-        greenData.clear();
-        buleData.clear();
-        List<PointBean> flagAllData = new ArrayList<>();
-        int lpointSite = lPoint.getSite();
-        for(int i= lpointSite;i<allData.size()-1;i++){
-            if(!checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())]
-                    &&(Math.abs(allData.get(i).getX()-allData.get(i+1).getX()) <=2
-                    ||Math.abs(allData.get(i).getY()-allData.get(i+1).getY()) <=2)){
-                flagAllData.add(allData.get(i));
-                checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())] = true;
-            }else{
-                break;
-            }
-        }
-        for(int i= lpointSite-1;i>0;i--){
-            if(!checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())]
-                    &&(Math.abs(allData.get(i).getX()-allData.get(i-1).getX()) <=2
-                    ||Math.abs(allData.get(i).getY()-allData.get(i-1).getY()) <=2)){
-                flagAllData.add(allData.get(i));
-                checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())] = true;
-            }else{
-                break;
-            }
-        }
-        int rpointSite = rPoint.getSite();
-        for(int i= rpointSite;i<allData.size()-1;i++){
-            if(!checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())]
-                    &&(Math.abs(allData.get(i).getX()-allData.get(i+1).getX()) <=2
-                    ||Math.abs(allData.get(i).getY()-allData.get(i+1).getY()) <=2)){
-                flagAllData.add(allData.get(i));
-                checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())] = true;
-            }else{
-                break;
-            }
-        }
-        for(int i= rpointSite-1;i>0;i--){
-            if(!checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())]
-                    &&(Math.abs(allData.get(i).getX()-allData.get(i-1).getX()) <=2
-                    ||Math.abs(allData.get(i).getY()-allData.get(i-1).getY()) <=2)){
-                flagAllData.add(allData.get(i));
-                checkFlag[(int) (allData.get(i).getX() * allData.get(i).getY())] = true;
-            }else{
-                break;
-            }
-        }
-        allData .clear();
-        allData.addAll(flagAllData);
-
-
+        getLAndRSite(flagLSite);
     }
 
-    private static boolean isPiex(int x,int y,int value){
-        double [] flagPiex = mat.get(x,y);
-        boolean res = true;
-        for(int i=0;i<mat.channels();i++){
-            if(flagPiex [i] != value){
-                res = false;
+
+    /**
+     * 计算左右垂直的坐标点
+     */
+    public static void getLAndRSite(int flagLSite ){
+        float leftUpX = greenData.get(flagLSite-2).getX();
+        float leftUpY = greenData.get(flagLSite-2).getY();
+        float leftDownX =greenData.get(flagLSite+2).getX();
+        float leftDownY = greenData.get(flagLSite+2).getY();
+        float leftX = greenData.get(flagLSite).getX();
+        float leftY = greenData.get(flagLSite).getY();
+        //垂直线的斜率K    TODO：正斜率和负斜率相差90°
+        float K = (float) -((leftDownX-leftUpX)*1.0/(leftDownY-leftUpY));
+        float b = leftY-K*leftX;
+
+        for (PointBean flag : buleData) {
+            float flagX = flag.getX();
+            float flagY = flag.getY();
+            float flagSY = flagX*K + b;
+            if(flagSY <= flagY+0.5 && flagSY >= flagY-0.5 ) {
+                FindLieFenUtils.m_nCRXLineSite = flagX;
+                FindLieFenUtils.m_nCRYLineSite = flagY;
+                FindLieFenUtils.m_nCLXLineSite = leftX;
+                FindLieFenUtils.m_nCLYLineSite = leftY;
+                float tanFlag =  (flagY-leftY) / (flagX - leftX);
+                float dreege = (float) (Math.atan(tanFlag)/Math.PI*180);
+                Log.i("fei","*****************************"+dreege);
+                break;
             }
         }
-        return res;
     }
-
 
 
     //直方图均衡化

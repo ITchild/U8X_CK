@@ -31,6 +31,10 @@ public class PathUtils {
      */
     public static final String PROJECT_PATH = SYS_PATH + "/测宽/工程";
     /**
+     * Draw合成工程目录
+     */
+    public static final String DRAWPROJECT_PATH = SYS_PATH + "/测宽/Draw工程";
+    /**
      * 数据库目录
      */
     public static final String DB_PATH = SYS_PATH + "/DB";
@@ -63,6 +67,10 @@ public class PathUtils {
         File proFolder = new File(PROJECT_PATH);
         if (!proFolder.exists()) {
             proFolder.mkdirs();
+        }
+        File drawProFolder = new File(DRAWPROJECT_PATH);
+        if (!drawProFolder.exists()) {
+            drawProFolder.mkdirs();
         }
         File filFolder = new File(FILE_PATH);
         if (!filFolder.exists()) {

@@ -8,8 +8,6 @@
  */
 package com.ck.utils;
 
-import android.util.Log;
-
 /**
  * TODO 获取裂缝所在的位置
  *
@@ -31,6 +29,8 @@ public class FindLieFenUtils {
     static boolean m_bCursorFlag = true;
     static int GRAY_DIF = 50;
     public static int ERROR_COUNT = 2;
+    private static int width , hight;
+
 
     public static void findLieFen(int[] m_lpBaseBuf, int nWidth, int nHeight, boolean mCountMode) {
         m_bCursorFlag = mCountMode;
@@ -87,7 +87,6 @@ public class FindLieFenUtils {
                         if (nRight - nLeft >= 1 && nRight - nLeft >= m_nRLineSite - m_nLLineSite) {//过滤小范围值得波动
                             m_nLLineSite = nLeft;
                             m_nRLineSite = nRight;
-                            Log.i("fei",m_nLLineSite +"      "+m_nRLineSite);
                         }
                         nLeft = -1;
                         nRight = -1;
@@ -103,17 +102,19 @@ public class FindLieFenUtils {
         }
     }
 
-
-    public static void findLieFenAtCenter(int[] m_lpBaseBuf, int nWidth, int nHeight, boolean mCountMode) {
+    public static void findLieFenAtCenter(int[] m_lpBaseBuf, int nWidth, int nHeight, boolean mCountMode,int flagB) {
         m_bCursorFlag = mCountMode;
         unitF = (float) (nWidth * 1.0 / 1000);
+        width = nWidth;
+        hight = nHeight;
         m_nY = nHeight / 2;
         int nLeft = -1, nRight = -1, nError = 0;
         int bytGrayMax = 0, bytGrayMin = 0x7fffffFF;
         int[] bytTemp  = new int[nWidth];
         if (m_bCursorFlag) {    // 手动还是自动
-            m_nLLineSite = m_nRLineSite = 0;  ///左右两侧位置的初始化
-            for (int i = 0;i < nWidth; i++) {
+            m_nCLXLineSite = m_nCRXLineSite = 0;  ///左右两侧位置的初始化
+            m_nCLYLineSite = m_nCRYLineSite = nHeight/2;
+            for (int i = 0;i < nWidth; i+=flagB) {
                 bytTemp[i] = (((((m_lpBaseBuf[i] >> 16) & 0xFF) * 30) + (((m_lpBaseBuf[i] >> 8) & 0xFF) * 59)
                         + ((m_lpBaseBuf[i] >> 0) & 0xFF) * 11) / 100); // 颜色灰度化  (R*30 + G*59 +B*11)/100
                 if (bytGrayMax < bytTemp[i]) {
@@ -131,7 +132,7 @@ public class FindLieFenUtils {
                 // 3;
                 //设置阈值
                 int nMinAve = 0, nMaxAve = 0, nMinCnt = 0, nMaxCnt = 0;
-                for (int i = 0; i < nWidth; i++) // 计算最佳阈值
+                for (int i = 0; i < nWidth; i+=flagB) // 计算最佳阈值
                 {
                     if (bytTemp[i] < bytGrayAve) {
                         nMinAve += (bytTemp[i] & 0xFF);
@@ -156,10 +157,9 @@ public class FindLieFenUtils {
                         }
                     }
                     if (nLeft >= 0 && nRight >= 0) {
-                        if (nRight - nLeft >= 1 && nRight - nLeft >= m_nRLineSite - m_nLLineSite) {//过滤小范围值得波动
-                            m_nLLineSite = nLeft;
-                            m_nRLineSite = nRight;
-                            Log.i("fei",m_nLLineSite +"      "+m_nRLineSite);
+                        if (nRight - nLeft >= 1 && nRight - nLeft >= m_nCRXLineSite - m_nCLXLineSite) {//过滤小范围值得波动
+                            m_nCLXLineSite = nLeft;
+                            m_nCRXLineSite = nRight;
                         }
                         nLeft = -1;
                         nRight = -1;
@@ -167,9 +167,9 @@ public class FindLieFenUtils {
                 }
             }
         } else {
-            if (m_nLLineSite == 0 && m_nRLineSite == 0) {
-                m_nLLineSite = 180;
-                m_nRLineSite = 220;
+            if (m_nCLXLineSite == 0 && m_nCRXLineSite == 0) {
+                m_nCLXLineSite = 180;
+                m_nCRXLineSite = 220;
             }
             return;
         }
@@ -201,4 +201,64 @@ public class FindLieFenUtils {
     public static void RLineToLOrR(boolean isLeft) {
         m_nRLineSite = isLeft ? m_nRLineSite - unitF : m_nRLineSite + unitF;
     }
+
+
+    /**
+     * 左侧线向左向右移动
+     *
+     * @param ori 1 ：向上  2: 向下  3：向左  4：向右
+     */
+    public static void LLineToLRUpOrD(int ori) {
+        if(ori == 1){
+            m_nCLYLineSite = m_nCLYLineSite - unitF;
+            if(m_nCLYLineSite <= 0){
+                m_nCLYLineSite = 0;
+            }
+        }else if(ori == 2){
+            m_nCLYLineSite = m_nCLYLineSite + unitF;
+            if(m_nCLYLineSite >= hight){
+                m_nCLYLineSite = hight;
+            }
+        }else if(ori == 3){
+            m_nCLXLineSite = m_nCLXLineSite - unitF;
+            if(m_nCLXLineSite <= 0){
+                m_nCLXLineSite = 0;
+            }
+        }else if(ori == 4){
+            m_nCLXLineSite = m_nCLXLineSite + unitF;
+            if(m_nCLXLineSite >= width){
+                m_nCLXLineSite = width;
+            }
+        }
+    }
+
+    /**
+     * 右侧线向左向右移动
+     *
+     * @param ori 1 ：向上  2: 向下  3：向左  4：向右
+     */
+    public static void RLineToLOrRUpOrD(int ori) {
+        if(ori == 1){
+            m_nCRYLineSite = m_nCRYLineSite - unitF;
+            if(m_nCRYLineSite <= 0){
+                m_nCRYLineSite = 0;
+            }
+        }else if(ori == 2){
+            m_nCRYLineSite = m_nCRYLineSite + unitF;
+            if(m_nCRYLineSite >= hight){
+                m_nCRYLineSite = hight;
+            }
+        }else if(ori == 3){
+            m_nCRXLineSite = m_nCRXLineSite - unitF;
+            if(m_nCRXLineSite <= 0){
+                m_nCRXLineSite = 0;
+            }
+        }else if(ori == 4){
+            m_nCRXLineSite = m_nCRXLineSite + unitF;
+            if(m_nCRXLineSite >= width){
+                m_nCRXLineSite = width;
+            }
+        }
+    }
+
 }

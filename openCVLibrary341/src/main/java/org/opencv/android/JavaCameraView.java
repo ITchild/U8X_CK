@@ -32,6 +32,7 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
     private static final int MAGIC_TEXTURE_ID = 10;
     private static final String TAG = "JavaCameraView";
 
+    private Context mContext;
     private byte mBuffer[];
     private Mat[] mFrameChain;
     private int mChainIdx = 0;
@@ -60,10 +61,12 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
 
     public JavaCameraView(Context context, int cameraId) {
         super(context, cameraId);
+        mContext = context;
     }
 
     public JavaCameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
     }
 
     protected boolean initializeCamera(int width, int height) {
@@ -90,6 +93,7 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                             connected = true;
                         } catch (RuntimeException e) {
                             Log.e(TAG, "Camera #" + camIdx + "failed to open: " + e.getLocalizedMessage());
+//                            mOnCarmeraError.onError();
                         }
                         if (connected) break;
                     }
@@ -128,6 +132,7 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                             mCamera = Camera.open(localCameraIndex);
                         } catch (RuntimeException e) {
                             Log.e(TAG, "Camera #" + localCameraIndex + "failed to open: " + e.getLocalizedMessage());
+//                            mOnCarmeraError.onError();
                         }
                     }
                 }
@@ -149,7 +154,9 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                      * fei      2018年11月30
                      */
                     frameSize.height = 480;
-                    frameSize.width = 640;
+                    frameSize.width = 800;
+//                    frameSize.height = 480;
+//                    frameSize.width = 640;
 
                     /* Image format NV21 causes issues in the Android emulators */
                     if (Build.FINGERPRINT.startsWith("generic")
@@ -381,4 +388,15 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
             Log.d(TAG, "Finish processing thread");
         }
     }
+
+//    public interface OnCarmeraError{
+//        void onError();
+//    }
+//
+//    private OnCarmeraError mOnCarmeraError;
+//
+//    public void setOnCarmeraError(OnCarmeraError onCarmeraError){
+//        mOnCarmeraError = onCarmeraError;
+//    }
+
 }

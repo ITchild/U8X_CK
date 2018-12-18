@@ -47,8 +47,7 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull MyViewHodler holder, final int position) {
         MeasureDataBean bean = data.get(position);
-        Bitmap bitmap = BitmapFactory.decodeFile(PathUtils.PROJECT_PATH+"/"+bean.getObjName()+
-        "/"+bean.getGjName()+"/"+bean.getFileName());
+        Bitmap bitmap = BitmapFactory.decodeFile(PathUtils.PROJECT_PATH+"/"+bean.getObjName()+"/"+bean.getFileName());
         holder.morePic_show_mpsv.setBitmap(bitmap,bean.getLeftX(),bean.getRightX(),bean.getFileName());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -69,34 +69,31 @@ public class DBService {
      * 根据工程名，构件名，文件名 查找所存储的检测文件
      *
      * @param objName
-     * @param gjName
      * @param fileName 可以为空
      * @return
      */
-    public List<MeasureDataBean> getMeasureData(String objName, String gjName, String fileName,String fileState) {
-        if(null == objName || null == gjName){
+    public List<MeasureDataBean> getMeasureData(String objName, String fileName,String fileState) {
+        if(null == objName ){
             return new ArrayList<>();
         }
         List<MeasureDataBean> mList = new ArrayList<>();
         SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
         Cursor rawQuery;
-        if (null == fileName || fileName.equals("")) {
+        if (Stringutil.isEmpty(fileName)) {
             rawQuery = readableDatabase.rawQuery(
-                    "Select * from MeasureData where objName=? and gjName=? and fileState=?",
-                    new String[]{objName, gjName,fileState});
+                    "Select * from MeasureData where objName=?and fileState=?",
+                    new String[]{objName,fileState});
         } else {
             rawQuery = readableDatabase.rawQuery(
-                    "Select * from MeasureData where objName=? and gjName=? and fileName=? and fileState=?",
-                    new String[]{objName, gjName, fileName, fileState});
+                    "Select * from MeasureData where objName=? and fileName=? and fileState=?",
+                    new String[]{objName, fileName, fileState});
         }
         while (rawQuery.moveToNext()) {
             MeasureDataBean bean = new MeasureDataBean();
             bean.setId(rawQuery.getInt(rawQuery.getColumnIndex("id")));
             bean.setObjName(rawQuery.getString(rawQuery.getColumnIndex("objName")));
-            bean.setGjName(rawQuery.getString(rawQuery.getColumnIndex("gjName")));
             bean.setFileName(rawQuery.getString(rawQuery.getColumnIndex("fileName")));
             bean.setObjCreateDate(rawQuery.getString(rawQuery.getColumnIndex("objCreateDate")));
-            bean.setGjCreateDate(rawQuery.getString(rawQuery.getColumnIndex("gjCreateDate")));
             bean.setFileCreateDate(rawQuery.getString(rawQuery.getColumnIndex("fileCreateDate")));
             bean.setJudgeStyle(rawQuery.getString(rawQuery.getColumnIndex("judgeStyle")));
             bean.setMeasureDate(rawQuery.getString(rawQuery.getColumnIndex("measureDate")));
@@ -127,10 +124,8 @@ public class DBService {
         }
         ContentValues values = new ContentValues();
         values.put("objName", bean.getObjName());
-        values.put("gjName", bean.getGjName());
         values.put("fileName", bean.getFileName());
         values.put("objCreateDate",bean.getObjCreateDate());
-        values.put("gjCreateDate",bean.getGjCreateDate());
         values.put("fileCreateDate",bean.getFileCreateDate());
         values.put("judgeStyle",bean.getJudgeStyle());
         values.put("measureDate",bean.getMeasureDate());
@@ -163,8 +158,8 @@ public class DBService {
         cv.put("leftY", bean.getLeftY());
         cv.put("rightX", bean.getRightX());
         cv.put("rightY", bean.getRightY());
-        String[] args = {bean.getObjName(),bean.getGjName(),bean.getFileName()};
-        String where = "objName=? and gjName=? and fileName=?";
+        String[] args = {bean.getObjName(),bean.getFileName()};
+        String where = "objName=? and fileName=?";
         readableDatabase.update("MeasureData",cv, where,args);
         readableDatabase.close();
     }
@@ -172,26 +167,21 @@ public class DBService {
     /**
      * 删除测量的数据
      * @param proName  不可为空
-     * @param gjName   可为空
      * @param fileName   可为空
      */
-    public void delMeasureData(String proName,String gjName,String fileName){
+    public void delMeasureData(String proName,String fileName){
         if(Stringutil.isEmpty(proName)){
             return;
         }
         SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
-        if(!Stringutil.isEmpty(proName) && Stringutil.isEmpty(gjName) && Stringutil.isEmpty(fileName)){
+        if(!Stringutil.isEmpty(proName) && Stringutil.isEmpty(fileName)){
             //删除工程
             readableDatabase.delete("MeasureData",
                     "objName=?", new String[]{proName});
-        }else if (!Stringutil.isEmpty(proName) && !Stringutil.isEmpty(gjName) && Stringutil.isEmpty(fileName)){
-            //删除构件
-            readableDatabase.delete("MeasureData",
-                    "objName=? and gjName=?", new String[]{proName,gjName});
-        }else if (!Stringutil.isEmpty(proName) && !Stringutil.isEmpty(gjName) && !Stringutil.isEmpty(fileName)){
+        }else if (!Stringutil.isEmpty(proName) && !Stringutil.isEmpty(fileName)){
             //删除文件
             readableDatabase.delete("MeasureData",
-                    "objName=? and gjName=? and fileName=?", new String[]{proName,gjName,fileName});
+                    "objName=? and fileName=?", new String[]{proName,fileName});
         }
         readableDatabase.close();
     }

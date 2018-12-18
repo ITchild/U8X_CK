@@ -16,6 +16,7 @@ import com.ck.adapter.HomeDisAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.dlg.SigleBtMsgDialog;
 import com.ck.dlg.TwoBtMsgDialog;
+import com.ck.utils.CarmeraDataDone;
 import com.hc.u8x_ck.R;
 
 import java.util.ArrayList;
@@ -115,8 +116,19 @@ public class HomeActivity extends TitleBaseActivity {
      * 跳转到裂缝检测界面
      */
     private void jumpToCollect() {
-        startActivity(new Intent(this, CollectActivity.class));
-//        startActivity(new Intent(this, USBCollectActivity.class));
+        openUsbPower();//打开USB摄像头电源
+        startActivity(new Intent(this, CollectNewActivity.class));
+//        startActivity(new Intent(this, CollectActivity.class));
+    }
+
+    /**
+     * 打开USB摄像头的电源
+     */
+    private void openUsbPower() {
+        boolean isOn = false;
+        while (!isOn) {
+            isOn = CarmeraDataDone.openHardDevJni(1, 1, 1);
+        }
     }
 
     /**

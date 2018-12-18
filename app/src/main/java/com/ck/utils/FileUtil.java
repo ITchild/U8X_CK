@@ -192,6 +192,42 @@ public class FileUtil {
     }
 
     /**
+     * 保存bitmap图片为bmp格式
+     * 路径自己设置
+     * @param bmp
+     */
+    public static void saveDrawBmpFile(Bitmap bmp, String m_strSaveProName, String m_strSaveGJName, String style) {
+        String mediaState = Environment.getExternalStorageState();
+        if ((!mediaState.equals(Environment.MEDIA_MOUNTED)) || (mediaState.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
+            Log.d("fei", "Media storage not ready:" + mediaState);
+            return;
+        }
+        File path = null;
+        File imageFile = null;
+        path = new File(PathUtils.DRAWPROJECT_PATH + m_strSaveProName);
+        if(!path.exists()) {
+            path.mkdirs();
+        }
+
+        String fileName = String.format(style, m_strSaveGJName);
+
+        imageFile = new File(path, fileName);
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(imageFile);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 获取现有的文件文件名称，并在存储时进行加1
      *
      * @param strData
@@ -229,16 +265,21 @@ public class FileUtil {
                 for (int j = 0; j < ArrFileGJ.size(); j++) {
                     ClasFileGJInfo clasFileGJInfo = ArrFileGJ.get(j);
                     if (clasFileGJInfo.bIsSelect) {
-                        String path = PathUtils.PROJECT_PATH
+                        //删除原图的单张图片
+                        deleteFile(PathUtils.PROJECT_PATH
                                 + "/" + proData.get(i).mFileProjectName
-                                + "/" + clasFileGJInfo.mFileGJName;
-                        deleteDirectory(path);
+                                + "/" + clasFileGJInfo.mFileGJName);
+                        //删除含有光标的图片的单张图片
+                        deleteFile(PathUtils.DRAWPROJECT_PATH
+                                + "/" + proData.get(i).mFileProjectName
+                                + "/" + clasFileGJInfo.mFileGJName);
                     }
                 }
                 if (proSelect == 2) { //全部选中的时候删除文件夹
-                    String path2 = PathUtils.PROJECT_PATH
-                            + "/" + proData.get(i).mFileProjectName;
-                    deleteDirectory(path2);
+                    //删除原图的工程
+                    deleteDirectory(PathUtils.PROJECT_PATH + "/" + proData.get(i).mFileProjectName);
+                    //删除含有光标的图片的工程
+                    deleteDirectory(PathUtils.DRAWPROJECT_PATH + "/"+ proData.get(i).mFileProjectName);
                 }
             }
         }

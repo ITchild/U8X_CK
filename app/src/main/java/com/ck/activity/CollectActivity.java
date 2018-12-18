@@ -21,6 +21,7 @@ import com.ck.db.DBService;
 import com.ck.dlg.ShowObjGjFileListDialog;
 import com.ck.dlg.TwoBtMsgDialog;
 import com.ck.info.ClasFileProjectInfo;
+import com.ck.listener.OnOpenCameraListener;
 import com.ck.ui.OpenCvCameraView;
 import com.ck.utils.CarmeraDataDone;
 import com.ck.utils.Catition;
@@ -163,7 +164,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         String objName = intent.getStringExtra("objName");
         String gjName = intent.getStringExtra("gjName");
         if (!isStrEmpty(objName) && !isStrEmpty(gjName)) {//从文件管理界面跳转过来
-            List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName, gjName,
+            List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName,
                     null, MeasureDataBean.FILESTATE_USERING);
             if (null != beans && beans.size() > 0) {
                 data.clear();
@@ -179,7 +180,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                     && fileData.get(0).mstrArrFileGJ.size()>0) {
                 objName = fileData.get(0).mFileProjectName;
                 gjName = fileData.get(0).mstrArrFileGJ.get(0).mFileGJName;
-                List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName, gjName,
+                List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName,
                         null, MeasureDataBean.FILESTATE_USERING);
                 if (null != beans && beans.size() > 0) {
                     data.clear();
@@ -210,18 +211,6 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
 
             @Override
             public Mat onCameraFrame(final CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-//                if (null == drawBitmap) {
-//                    drawBitmap = Bitmap.createBitmap(inputFrame.rgba().cols()
-//                            , inputFrame.rgba().rows(), Bitmap.Config.ARGB_8888);
-//                }
-//                if (null == drawBitmap1) {
-//                    drawBitmap1 = Bitmap.createBitmap(inputFrame.gray().cols()
-//                            , inputFrame.gray().rows(), Bitmap.Config.ARGB_8888);
-//                }
-//                org.opencv.android.Utils.matToBitmap(inputFrame.rgba(), drawBitmap);
-//                org.opencv.android.Utils.matToBitmap(inputFrame.gray(), drawBitmap1);
-//                hell_cV.setData(drawBitmap);
-//                hell_cV1.setData(drawBitmap1);
                 collect_cameraView.setDataMat(inputFrame.rgba(),inputFrame.gray());
                 return inputFrame.rgba();
             }
@@ -254,9 +243,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
             @Override
             public void onPicClick(int position) {
                 String objName = data.get(position).getObjName();
-                String gjName = data.get(position).getGjName();
                 String fileName = data.get(position).getFileName();
-                String path = PathUtils.PROJECT_PATH + "/" + objName + "/" + gjName + "/" + fileName;
+                String path = PathUtils.PROJECT_PATH + "/" + objName  + "/" + fileName;
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(path);
@@ -392,10 +380,20 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onCollectStart() {
         collect_cameraView.setStartView();
-        collect_cameraView.onenCamera();
+        collect_cameraView.onenCamera(new OnOpenCameraListener() {
+            @Override
+            public void OnOpenCameraResultListener(boolean bResult) {
+
+            }
+
+            @Override
+            public void onCarameError() {
+                Log.i("fei","摄像机已停止，正在重启");
+            }
+        });
         if (!OpenCVLoader.initDebug()) {
             Log.w(TAG, "static loading library fail,Using Manager for initialization");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_3_0, this, mLoaderCallback);
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallback);
         } else {
             Log.w(TAG, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
@@ -442,16 +440,15 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
 
     private void delFile(int position){
         String proName = data.get(position).getObjName();
-        String gjName = data.get(position).getGjName();
         String fileName = data.get(position).getFileName();
         File file = new File(PathUtils.PROJECT_PATH+
-                "/"+ proName + "/"+gjName+"/"+fileName);
+                "/"+ proName +"/"+fileName);
         boolean isdel = false;
         if(file.exists()){
             isdel = file.delete();
         }
         if(isdel){
-            DBService.getInstence(this).delMeasureData(proName,gjName,fileName);
+            DBService.getInstence(this).delMeasureData(proName,fileName);
         }
         data.remove(position);
         showToast("删除成功");
@@ -482,12 +479,11 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 return;
             }
             List<MeasureDataBean> isHaveData = DBService.getInstence(this).
-                    getMeasureData(proName,gjName,fileName+".bmp",MeasureDataBean.FILESTATE_USERING);
+                    getMeasureData(proName,fileName+".bmp",MeasureDataBean.FILESTATE_USERING);
             if(null != isHaveData && isHaveData.size()>0){
                 //更新数据库内容
                 MeasureDataBean dataBean = new MeasureDataBean();
                 dataBean.setObjName(proName);
-                dataBean.setGjName(gjName);
                 dataBean.setFileName(fileName + ".bmp");
                 dataBean.setWidth(collect_cameraView.width);
                 dataBean.setLeftY(FindLieFenUtils.m_nY);
@@ -505,10 +501,8 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         MeasureDataBean dataBean = new MeasureDataBean();
         dataBean.setObjName(proName);
-        dataBean.setGjName(gjName);
         dataBean.setFileName(fileName + ".bmp");
         dataBean.setObjCreateDate(format.format(new File(PathUtils.PROJECT_PATH + "/" + proName).lastModified()));
-        dataBean.setGjCreateDate(format.format(new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + gjName).lastModified()));
         File file = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + gjName + "/" + fileName + ".bmp");
         dataBean.setFileCreateDate(format.format(file.lastModified()));
         dataBean.setJudgeStyle(MeasureDataBean.JUDGESTYLE_HORIZ);
@@ -700,8 +694,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
         String objName = collect_proName_tv.getText().toString();
         String gjName = collect_gjName_tv.getText().toString();
         if (!isStrEmpty(objName) && !isStrEmpty(gjName)) {//从文件管理界面跳转过来
-            List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName, gjName,
-                    null, MeasureDataBean.FILESTATE_USERING);
+            List<MeasureDataBean> beans = DBService.getInstence(this).getMeasureData(objName, gjName, MeasureDataBean.FILESTATE_USERING);
             if (null != beans && beans.size() > 0) {
                 data.addAll(beans);
             }
