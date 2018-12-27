@@ -9,6 +9,7 @@
  */ 
 package com.ck.info;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * @data:  2016-3-18 下午3:19:54 
  * @version:  V1.0 
  */
-public class ClasFileProjectInfo {
+public class ClasFileProjectInfo implements Serializable{
 	/**
 	 * 工程文件名
 	 */
@@ -38,4 +39,8 @@ public class ClasFileProjectInfo {
 	 * 工程种文件信息
 	 */
 	public List<ClasFileGJInfo> mstrArrFileGJ = new ArrayList<ClasFileGJInfo>();
+
+
+
+
 }

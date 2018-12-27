@@ -8,6 +8,13 @@
  */
 package com.ck.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 /**
  * TODO<请描述这个类是干什么的>
  * 
@@ -111,4 +118,62 @@ public class BMPUtils {
 		}
 		return buffer;
 	}
+
+	/*
+	 * bitmap转base64   将图片转为String类型进行存储
+	 * */
+	public static String bitmapToBase64(Bitmap bitmap) {
+		String result = null;
+		byte[] bitmapBytes = bitmapToByteArr(bitmap);
+		if(null != bitmapBytes) {
+			result = Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+		}
+		return result;
+	}
+
+	/**
+	 * bitmap转为二进制数组
+	 * @param bitmap
+	 * @return
+	 */
+	public static byte[] bitmapToByteArr(Bitmap bitmap){
+		ByteArrayOutputStream baos = null;
+		byte[] bitmapBytes = null;
+		try {
+			if (bitmap != null) {
+				baos = new ByteArrayOutputStream();
+				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+				baos.flush();
+				baos.close();
+				bitmapBytes = baos.toByteArray();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (baos != null) {
+					baos.flush();
+					baos.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return bitmapBytes;
+	}
+
+	/**
+	 * base64转为bitmap
+	 * @param base64Data
+	 * @return
+	 */
+	public static Bitmap base64ToBitmap(String base64Data,BitmapFactory.Options options) {
+		byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
+		return bytesToBitmap(bytes,options);
+	}
+
+	public static Bitmap bytesToBitmap(byte[] bytes ,BitmapFactory.Options options){
+		return BitmapFactory.decodeByteArray(bytes, 0, bytes.length,options);
+	}
+
 }

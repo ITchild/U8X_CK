@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.ck.bean.MeasureDataBean;
+import com.ck.bean.MeasureObjBean;
 import com.ck.info.UserInfo;
 import com.ck.utils.Stringutil;
 
@@ -81,11 +82,11 @@ public class DBService {
         Cursor rawQuery;
         if (Stringutil.isEmpty(fileName)) {
             rawQuery = readableDatabase.rawQuery(
-                    "Select * from MeasureData where objName=?and fileState=?",
+                    "Select * from MeasureGJData where objName=?and fileState=?",
                     new String[]{objName,fileState});
         } else {
             rawQuery = readableDatabase.rawQuery(
-                    "Select * from MeasureData where objName=? and fileName=? and fileState=?",
+                    "Select * from MeasureGJData where objName=? and fileName=? and fileState=?",
                     new String[]{objName, fileName, fileState});
         }
         while (rawQuery.moveToNext()) {
@@ -93,7 +94,6 @@ public class DBService {
             bean.setId(rawQuery.getInt(rawQuery.getColumnIndex("id")));
             bean.setObjName(rawQuery.getString(rawQuery.getColumnIndex("objName")));
             bean.setFileName(rawQuery.getString(rawQuery.getColumnIndex("fileName")));
-            bean.setObjCreateDate(rawQuery.getString(rawQuery.getColumnIndex("objCreateDate")));
             bean.setFileCreateDate(rawQuery.getString(rawQuery.getColumnIndex("fileCreateDate")));
             bean.setJudgeStyle(rawQuery.getString(rawQuery.getColumnIndex("judgeStyle")));
             bean.setMeasureDate(rawQuery.getString(rawQuery.getColumnIndex("measureDate")));
@@ -107,6 +107,7 @@ public class DBService {
             bean.setFileState(rawQuery.getString(rawQuery.getColumnIndex("fileState")));
             bean.setFileSize(rawQuery.getFloat(rawQuery.getColumnIndex("fileSize")));
             bean.setDelDate(rawQuery.getString(rawQuery.getColumnIndex("delDate")));
+//            bean.setImage(rawQuery.getBlob(rawQuery.getColumnIndex("image")));
             mList.add(bean);
         }
         rawQuery.close();
@@ -125,7 +126,6 @@ public class DBService {
         ContentValues values = new ContentValues();
         values.put("objName", bean.getObjName());
         values.put("fileName", bean.getFileName());
-        values.put("objCreateDate",bean.getObjCreateDate());
         values.put("fileCreateDate",bean.getFileCreateDate());
         values.put("judgeStyle",bean.getJudgeStyle());
         values.put("measureDate",bean.getMeasureDate());
@@ -139,8 +139,9 @@ public class DBService {
         values.put("fileState",bean.getFileState());
         values.put("fileSize",bean.getFileSize());
         values.put("delDate",bean.getDelDate());
+        values.put("image",bean.getImage());
         SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
-        readableDatabase.insert("MeasureData", null, values);
+        readableDatabase.insert("MeasureGJData", null, values);
         readableDatabase.close();
     }
 
@@ -160,7 +161,7 @@ public class DBService {
         cv.put("rightY", bean.getRightY());
         String[] args = {bean.getObjName(),bean.getFileName()};
         String where = "objName=? and fileName=?";
-        readableDatabase.update("MeasureData",cv, where,args);
+        readableDatabase.update("MeasureGJData",cv, where,args);
         readableDatabase.close();
     }
 
@@ -176,15 +177,78 @@ public class DBService {
         SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
         if(!Stringutil.isEmpty(proName) && Stringutil.isEmpty(fileName)){
             //删除工程
-            readableDatabase.delete("MeasureData",
+            readableDatabase.delete("MeasureGJData",
                     "objName=?", new String[]{proName});
         }else if (!Stringutil.isEmpty(proName) && !Stringutil.isEmpty(fileName)){
             //删除文件
-            readableDatabase.delete("MeasureData",
+            readableDatabase.delete("MeasureGJData",
                     "objName=? and fileName=?", new String[]{proName,fileName});
         }
         readableDatabase.close();
     }
+
+    /**
+     * 根据工程名查找所存储的检测工程文件
+     * @param objName  可以为空
+     * @return
+     */
+    public List<MeasureObjBean> getMeasureObjData(String objName) {
+        if(null == objName ){
+            return new ArrayList<>();
+        }
+        List<MeasureObjBean> mList = new ArrayList<>();
+        SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
+        Cursor rawQuery;
+        if (Stringutil.isEmpty(objName)) {
+            rawQuery = readableDatabase.rawQuery(
+                    "Select * from MeasureOBJData", new String[]{});
+        } else {
+            rawQuery = readableDatabase.rawQuery(
+                    "Select * from MeasureOBJData where objName=?",new String[]{objName});
+        }
+        while (rawQuery.moveToNext()) {
+            MeasureObjBean bean = new MeasureObjBean();
+            bean.setId(rawQuery.getInt(rawQuery.getColumnIndex("id")));
+            bean.setObjName(rawQuery.getString(rawQuery.getColumnIndex("objName")));
+            bean.setObjCreateDate(rawQuery.getString(rawQuery.getColumnIndex("objCreateDate")));
+            mList.add(bean);
+        }
+        rawQuery.close();
+        readableDatabase.close();
+        return mList;
+    }
+
+    /**
+     * 存储检测工程的数据
+     * @param bean
+     */
+    public void SetMeasureObjData(MeasureObjBean bean) {
+        if(null == bean){
+            return;
+        }
+        ContentValues values = new ContentValues();
+        values.put("objName", bean.getObjName());
+        values.put("objCreateDate", bean.getObjCreateDate());
+        SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
+        readableDatabase.insert("MeasureOBJData", null, values);
+        readableDatabase.close();
+    }
+
+    /**
+     * 删除测量的数据
+     * @param proName  不可为空
+     */
+    public void delMeasureObjData(String proName){
+        if(Stringutil.isEmpty(proName)){
+            return;
+        }
+        SQLiteDatabase readableDatabase = dbOpenHelper.getReadableDatabase();
+            //删除工程
+        readableDatabase.delete("MeasureOBJData",
+                    "objName=?", new String[]{proName});
+        readableDatabase.close();
+    }
+
 
 
 

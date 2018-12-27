@@ -12,6 +12,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 
+import com.ck.App_DataPara;
 import com.ck.adapter.HomeDisAdapter;
 import com.ck.base.TitleBaseActivity;
 import com.ck.dlg.SigleBtMsgDialog;
@@ -26,12 +27,7 @@ public class HomeActivity extends TitleBaseActivity {
 
     protected HomeDisAdapter mHomeDisAdapter;
     protected List<String> homeDisData;
-    protected int num = 3; //RecycleView的gridLayout布局中的列数
-    private RecyclerView home_display;
-
-    //申请权限的dialog
-    private TwoBtMsgDialog permissionDialog;
-    private boolean isNotShowAgin = false; //用户是否选择了不在询问
+    protected int num = 2; //RecycleView的gridLayout布局中的列数
     // 声明一个数组，用来存储所有需要动态申请的权限
     String[] permissions = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -39,6 +35,11 @@ public class HomeActivity extends TitleBaseActivity {
             Manifest.permission.CAMERA};
     // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
     List<String> mPermissionList = new ArrayList<>();
+    private RecyclerView home_display;
+    //申请权限的dialog
+    private TwoBtMsgDialog permissionDialog;
+    private boolean isNotShowAgin = false; //用户是否选择了不在询问
+
     @Override
     protected int initLayout() {
         return R.layout.ac_home;
@@ -57,10 +58,10 @@ public class HomeActivity extends TitleBaseActivity {
             homeDisData = new ArrayList<>();
             homeDisData.add(getStr(R.string.str_measureWide));
             homeDisData.add(getStr(R.string.str_flieManger));
-            homeDisData.add(getStr(R.string.str_onTimeMeasure));
+//            homeDisData.add(getStr(R.string.str_onTimeMeasure));
             homeDisData.add(getStr(R.string.str_instrument));
             homeDisData.add(getStr(R.string.str_setting));
-            homeDisData.add(getStr(R.string.str_about));
+//            homeDisData.add(getStr(R.string.str_about));
         }
         home_display.setLayoutManager(new GridLayoutManager(this, num));
         mHomeDisAdapter = new HomeDisAdapter(this, homeDisData);
@@ -71,6 +72,23 @@ public class HomeActivity extends TitleBaseActivity {
     protected void onResume() {
         super.onResume();
         checkPermission();
+        //开启子线程，去除activity列表中的多余列表
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        App_DataPara.getApp().finishOtherAll(HomeActivity.this);
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override
@@ -86,6 +104,7 @@ public class HomeActivity extends TitleBaseActivity {
 
     /**
      * 点击后跳转界面的所有方法的入口
+     *
      * @param position
      */
     protected void jumpOnAll(int position) {
@@ -97,16 +116,10 @@ public class HomeActivity extends TitleBaseActivity {
                 jumpToFileManger();
                 break;
             case 2:
-                jumpToOnTime();
-                break;
-            case 3:
                 jumpToCalibration();
                 break;
-            case 4:
+            case 3:
                 jumpToSetting();
-                break;
-            case 5:
-                jumpToAbout();
                 break;
         }
         mHomeDisAdapter.setFocusPosition(position);
@@ -137,6 +150,7 @@ public class HomeActivity extends TitleBaseActivity {
     private void jumpToFileManger() {
         startActivity(new Intent(this, FileBowerActivity.class));
     }
+
     /**
      * 跳转到定时监测界面
      */
@@ -153,7 +167,6 @@ public class HomeActivity extends TitleBaseActivity {
 
     private void jumpToSetting() {
         startActivity(new Intent(this, SettingActivity.class));
-        finish();
     }
 
     private void jumpToAbout() {
@@ -194,14 +207,14 @@ public class HomeActivity extends TitleBaseActivity {
                 permissionDialog.setOnBtClickListener(new TwoBtMsgDialog.OnBtClickListener() {
                     @Override
                     public void onBtClick(boolean isOk) {
-                        if(isOk){
+                        if (isOk) {
                             permissionDialog.dismiss();
                             if (isNotShowAgin || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                                 getAppDetailSettingIntent();
                             } else {
                                 getPermission();
                             }
-                        }else{
+                        } else {
                             permissionDialog.dismiss();
                             finish();
                         }
@@ -218,6 +231,7 @@ public class HomeActivity extends TitleBaseActivity {
 
         }
     }
+
     /**
      * 适配6.0以上，获取动态权限
      */
@@ -270,9 +284,9 @@ public class HomeActivity extends TitleBaseActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-
-
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true; //屏蔽返回键
+        }
         return super.onKeyDown(keyCode, event);
     }
 
@@ -280,7 +294,6 @@ public class HomeActivity extends TitleBaseActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
-
 
 
 }

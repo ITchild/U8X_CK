@@ -37,6 +37,27 @@ public class MeasureDataBean {
     private float fileSize;   //  文件大小
     private String delDate;   // 删除时间
 
+    private String image; //图片文件
+
+    private byte[] imageBytes ;//图片文件的byte[]数组
+
+    public byte[] getImageBytes() {
+        //其它类型返回字段值本身
+        return imageBytes;
+    }
+
+    public void setImageBytes(byte[] imageBytes) {
+        this.imageBytes = imageBytes;
+    }
+
+    public String getImage() {
+        //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
+        return image == null ? "" : image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public int getId() {
         //其它类型返回字段值本身

@@ -1,9 +1,6 @@
 package org.opencv.android;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -134,6 +131,8 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
          * TODO: pass the parameters specifying the format of the frame (BPP, YUV or RGB and etc)
          */
         public Mat onCameraFrame(CvCameraViewFrame inputFrame);
+
+        public void onCameraError();
     };
 
     protected class CvCameraViewListenerAdapter implements CvCameraViewListener2  {
@@ -163,6 +162,11 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
             };
 
             return result;
+        }
+
+        @Override
+        public void onCameraError() {
+
         }
 
         public void setFrameFormat(int format) {
@@ -358,17 +362,19 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
         Log.d(TAG, "call onEnterStartedState");
         /* Connect camera */
         if (!connectCamera(getWidth(), getHeight())) {
-            AlertDialog ad = new AlertDialog.Builder(getContext()).create();
-            ad.setCancelable(false); // This blocks the 'BACK' button
-            ad.setMessage("It seems that you device does not support camera (or it is locked). Application will be closed.");
-            ad.setButton(DialogInterface.BUTTON_NEUTRAL,  "OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    ((Activity) getContext()).finish();
-                }
-            });
-            ad.show();
-
+//            AlertDialog ad = new AlertDialog.Builder(getContext()).create();
+//            ad.setCancelable(false); // This blocks the 'BACK' button
+//            ad.setMessage("It seems that you device does not support camera (or it is locked). Application will be closed.");
+//            ad.setButton(DialogInterface.BUTTON_NEUTRAL,  "OK", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.dismiss();
+//                    ((Activity) getContext()).finish();
+//                }
+//            });
+//            ad.show();
+            if(null != mListener){
+                mListener.onCameraError();
+            }
         }
     }
 

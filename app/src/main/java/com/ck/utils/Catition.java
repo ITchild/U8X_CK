@@ -8,6 +8,9 @@ public class Catition {
         public static final int TAKEPHOTO = 3; // 进行照片预拍的布局标志
     }
 
+
+
+
     public class Key{
         public static final int KEY = 100000;
 
@@ -16,9 +19,11 @@ public class Catition {
         public static final int TO_LEFT = 100003;
         public static final int TO_RIGHT = 100004;
         public static final int OK = 100005;
-
         public static final int CHANGE = 100006;
 
     }
+
+    public static final int EDITBACKTOFILE = 1007;
+    public static final int FLIETURNTOEDIT = 1008;
 
 }

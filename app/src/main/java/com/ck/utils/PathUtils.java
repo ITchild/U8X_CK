@@ -29,11 +29,11 @@ public class PathUtils {
     /**
      * 工程目录
      */
-    public static final String PROJECT_PATH = SYS_PATH + "/测宽/工程";
+    public static final String PROJECT_PATH = SYS_PATH + "/工程";
     /**
      * Draw合成工程目录
      */
-    public static final String DRAWPROJECT_PATH = SYS_PATH + "/测宽/Draw工程";
+    public static final String DRAWPROJECT_PATH = SYS_PATH + "/Draw工程";
     /**
      * 数据库目录
      */
@@ -41,7 +41,7 @@ public class PathUtils {
 
     public static final String DB_PATH_NAME = DB_PATH + "/user.db";
 
-    public static final String FILE_PATH = SYS_PATH + "/测宽/FILE";
+    public static final String FILE_PATH = SYS_PATH + "/FILE";
 
     public static final String NET_SOFT_UPDATE_PATH = "UpdateFile\\PhoneUpdate\\HCDT5X\\";
 
@@ -89,10 +89,18 @@ public class PathUtils {
             File[] gjList = OrderByDate(PathUtils.PROJECT_PATH + File.separator + project.mFileProjectName);
             for (int j = 0; j < gjList.length; j++) {
                 ClasFileGJInfo gj = new ClasFileGJInfo();
-                gj.mFileGJName = gjList[j].getName();
-                File file = new File(PathUtils.PROJECT_PATH + File.separator + project.mFileProjectName, gjList[j].getName());
-                gj.mLastModifiedDate = format.format(file.lastModified());
-                project.mstrArrFileGJ.add(gj);
+                String name = gjList[j].getName();
+                if(name.endsWith("bmp")) {
+                    String[] names = name.split("\\.");
+                    if (null != names && names.length > 1) {
+                        gj.mFileGJName = names[0];
+                    } else {
+                        gj.mFileGJName = name;
+                    }
+//                File file = new File(PathUtils.PROJECT_PATH + File.separator + project.mFileProjectName, gjList[j].getName());
+//                gj.mLastModifiedDate = format.format(file.lastModified());
+                    project.mstrArrFileGJ.add(gj);
+                }
             }
 //            Collections.sort(project.mstrArrFileGJ);
             m_ListProject.add(project);

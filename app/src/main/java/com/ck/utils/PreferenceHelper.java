@@ -69,4 +69,31 @@ public class PreferenceHelper {
 		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences("theme", Context.MODE_PRIVATE);
 		return mdPreferences.getFloat("Density", 0);
 	}
+
+	/**
+	 * 获取存储的String的值
+	 * @param name
+	 * @param key
+	 * @return
+	 */
+	public static String getString(String name,String key){
+		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences(name, Context.MODE_PRIVATE);
+		return mdPreferences.getString(key,"");
+	}
+
+
+	/**
+	 * 设置String的值
+	 * @param name
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public static void setString(String name,String key,String value){
+		SharedPreferences mdPreferences = App_DataPara.getApp().getSharedPreferences(name, Context.MODE_PRIVATE);
+		Editor editor = mdPreferences.edit();
+		editor.putString(key,value);
+		editor.commit();
+	}
+
 }

@@ -38,11 +38,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				+ "strusername nvarchar," 
 				+ "strpassword nvarchar)");
 
-		db.execSQL("CREATE TABLE IF NOT EXISTS MeasureData(" +
+		db.execSQL("CREATE TABLE IF NOT EXISTS MeasureGJData(" +
 				"id integer PRIMARY KEY AUTOINCREMENT," +
 				"objName nvarchar," +   //工程名称
 				"fileName nvarchar," +   // 文件名称
-				"objCreateDate nvarchar," +  //工程创建时间
 				"fileCreateDate nvarchar," +  //文件创建时间
 				"judgeStyle nvarchar," + //判别方式 (中间水平上判别   全自动判别)
 				"measureDate nvarchar," +  //测量时间
@@ -55,8 +54,16 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				"checkStyle nvarvhar," +  // 检测类型 (宽度检测   实时检测)
 				"fileState nvarvhar," +  //  文件状态
 				"fileSize float," +  //  文件大小
-				"delDate nvarchar)");  // 删除时间
+				"delDate nvarchar," + // 删除时间
+				"image BLOB)");  //图片的二进制
+
+		db.execSQL("CREATE TABLE IF NOT EXISTS MeasureOBJData(" +
+				"id integer PRIMARY KEY AUTOINCREMENT," +
+				"objName nvarchar," +   //工程名称
+				"objCreateDate nvarchar)");   //工程创建时间
 	}
+
+
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

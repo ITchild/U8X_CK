@@ -1,6 +1,5 @@
 package com.ck.activity;
 
-import android.view.View;
 import android.widget.TextView;
 
 import com.ck.base.TitleBaseActivity;
@@ -41,11 +40,11 @@ public class AboutActivity extends TitleBaseActivity {
     @Override
     protected void initListener() {
         super.initListener();
-        findViewById(R.id.about_back_bt).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+//        findViewById(R.id.about_back_bt).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                finish();
+//            }
+//        });
     }
 }

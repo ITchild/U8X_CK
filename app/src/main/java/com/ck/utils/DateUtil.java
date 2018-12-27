@@ -23,7 +23,7 @@ public class DateUtil {
     public static void setDate(int year, int month, int day) {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.YEAR, year);
-        c.set(Calendar.MONTH, month);
+        c.set(Calendar.MONTH, month-1);
         c.set(Calendar.DAY_OF_MONTH, day);
         long when = c.getTimeInMillis();
 

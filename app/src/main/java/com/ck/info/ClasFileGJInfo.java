@@ -9,9 +9,9 @@
  */
 package com.ck.info;
 
-import android.support.annotation.NonNull;
+import android.graphics.Bitmap;
 
-import com.ck.utils.Stringutil;
+import java.io.Serializable;
 
 /**
  * TODO<请描述这个类是干什么的>
@@ -20,7 +20,7 @@ import com.ck.utils.Stringutil;
  * @data: 2016-3-18 下午3:57:30
  * @version: V1.0
  */
-public class ClasFileGJInfo implements Comparable<ClasFileGJInfo> {
+public class ClasFileGJInfo implements Serializable {
     /**
      * 文件名
      */
@@ -33,6 +33,26 @@ public class ClasFileGJInfo implements Comparable<ClasFileGJInfo> {
      * 是否选中
      */
     public boolean bIsSelect = false;
+    public Bitmap src;
+    private String width;
+
+    public String getWidth() {
+        //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
+        return width == null ? "" : width;
+    }
+
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
+    public Bitmap getSrc() {
+        //其它类型返回字段值本身
+        return src;
+    }
+
+    public void setSrc(Bitmap src) {
+        this.src = src;
+    }
 
     public String getFileGJName() {
         //如果是String类型，那么判断是否为空，为空返回"",否则返回字段值本身
@@ -59,11 +79,6 @@ public class ClasFileGJInfo implements Comparable<ClasFileGJInfo> {
 
     public void setbIsSelect(boolean bIsSelect) {
         this.bIsSelect = bIsSelect;
-    }
-
-    @Override
-    public int compareTo(@NonNull ClasFileGJInfo clasFileGJInfo) {
-        return Stringutil.compareTo(this.getFileGJName(),clasFileGJInfo.getFileGJName());
     }
 
 

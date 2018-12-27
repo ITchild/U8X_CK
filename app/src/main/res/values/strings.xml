@@ -27,7 +27,7 @@
     <string name="str_flieManger">文件管理</string>
     <string name="str_onTimeMeasure">定时监测</string>
     <string name="str_instrument">仪器标定</string>
-    <string name="str_setting">设置</string>
+    <string name="str_setting">系统设置</string>
     <string name="str_about">关于仪器</string>
     
     <string name="str_makeSure">确定</string>

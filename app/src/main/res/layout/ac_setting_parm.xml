@@ -43,7 +43,6 @@
         android:layout_height="@dimen/xhdpi_90dp"
         android:background="?attr/button"
         android:gravity="center_vertical"
-        android:visibility="gone"
         android:orientation="horizontal">
 
         <TextView
@@ -123,6 +122,7 @@
         android:layout_height="@dimen/xhdpi_90dp"
         android:background="?attr/button"
         android:gravity="center_vertical"
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <TextView
@@ -206,15 +206,22 @@
             android:text="操作密码"
             android:textColor="?attr/textColor"
             android:textSize="@dimen/xhdpi_25sp" />
-
-        <TextView
-            android:id="@+id/settingPar_pwd_tv"
+        <View
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"></View>
+        <EditText
+            android:id="@+id/settingPar_pwd_et"
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_weight="2"
             android:gravity="center"
             android:text="00000"
             android:textColor="?attr/textColor" />
+        <View
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"></View>
     </LinearLayout>
 
 

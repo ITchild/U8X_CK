@@ -13,6 +13,7 @@ import com.ck.base.TitleBaseActivity;
 import com.ck.bean.MeasureDataBean;
 import com.ck.db.DBService;
 import com.ck.dlg.CreateObjFileDialog;
+import com.ck.dlg.LoadingDialog;
 import com.ck.dlg.SigleBtMsgDialog;
 import com.ck.listener.OnOpenCameraListener;
 import com.ck.ui.OpenCvCameraView;
@@ -21,7 +22,9 @@ import com.ck.utils.DateUtil;
 import com.ck.utils.FileUtil;
 import com.ck.utils.FindLieFenUtils;
 import com.ck.utils.PathUtils;
+import com.ck.utils.PreferenceHelper;
 import com.ck.utils.Stringutil;
+import com.google.gson.Gson;
 import com.hc.u8x_ck.R;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -40,17 +43,19 @@ import java.util.List;
  * @date on 2018/12/7 0007
  * @describe TODO :
  **/
-public class CollectNewActivity extends TitleBaseActivity implements View.OnClickListener {
+public class CollectNewActivity extends TitleBaseActivity implements View.OnClickListener,View.OnLongClickListener{
 
     private String TAG = CollectNewActivity.class.getSimpleName();
     private JavaCameraView collect_OpenCvCamera;
     private OpenCvCameraView collect_cameraView;
 
-    private LinearLayout collect_key_ll;
+//    private LinearLayout collect_key_ll;
     private Button collect_blackWrite_bt;
     private boolean isLoading = false;
     private LinearLayout colleact_drag_ll;
     private LinearLayout collect_boot_ll;
+    private LoadingDialog mLoadingDialog;
+    private SigleBtMsgDialog cameraErrorDialog;
 
     private String proName = "工程1", fileName = "构件1";
 
@@ -65,7 +70,7 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
                     Log.i(TAG, "OpenCV loaded successfully.");
                     // 连接到Camera
                     collect_OpenCvCamera.enableView();
-                    collect_key_ll.setVisibility(View.GONE);
+                    colleact_drag_ll.setVisibility(View.GONE);
                     break;
                 default:
                     super.onManagerConnected(status);
@@ -84,10 +89,11 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         super.initView();
         collect_OpenCvCamera = findView(R.id.collect_OpenCvCamera);
         collect_cameraView = findView(R.id.collect_cameraView);
-        collect_key_ll = findView(R.id.collect_key_ll);
+//        collect_key_ll = findView(R.id.collect_key_ll);
         collect_blackWrite_bt = findView(R.id.collect_blackWrite_bt);
         colleact_drag_ll = findView(R.id.colleact_drag_ll);
         collect_boot_ll = findView(R.id.collect_boot_ll);
+        mLoadingDialog = new LoadingDialog(this);
         initCamera();
     }
 
@@ -95,6 +101,14 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     @Override
     protected void initData() {
         super.initData();
+        proName = PreferenceHelper.getString("obj", "proname");
+        if (Stringutil.isEmpty(proName)) {
+            proName = "工程1";
+        }
+        fileName = PreferenceHelper.getString("obj", "gjname");
+        if (Stringutil.isEmpty(fileName)) {
+            fileName = "构件1";
+        }
     }
 
 
@@ -102,23 +116,12 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     protected void initListener() {
         super.initListener();
         collect_blackWrite_bt.setOnClickListener(this);
-        colleact_drag_ll.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                ClipData.Item item = new ClipData.Item("11");
-                ClipData dragData = new ClipData("11", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
-                // Instantiates the drag shadow builder.
-                View.DragShadowBuilder myShadow = new View.DragShadowBuilder(colleact_drag_ll);
-                colleact_drag_ll.startDrag(dragData, myShadow, null, 0);
-                colleact_drag_ll.setVisibility(View.GONE);
-                return false;
-            }
-        });
+        collect_blackWrite_bt.setOnLongClickListener(this);
+        colleact_drag_ll.setOnLongClickListener(this);
         collect_boot_ll.setOnDragListener(new myDragEventListener());
     }
 
     private void initCamera() {
-//        collect_OpenCvCamera.setMaxFrameSize(800,480);
         // 注册Camera连接状态事件监听器
         collect_OpenCvCamera.setCvCameraViewListener(new CameraBridgeViewBase.CvCameraViewListener2() {
 
@@ -134,12 +137,26 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
             public Mat onCameraFrame(final CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
                 if (isLoading) {
                     isLoading = false;
-                    Log.i("fei", "loading关闭");
+                    stopLoading();
+                }
+                if(null != cameraErrorDialog && cameraErrorDialog.isShowing()) {
+                    cameraErrorDialog.dismiss();
                 }
                 if (collectState == 0) {
-                    collect_cameraView.setDataMat(inputFrame.rgba(), inputFrame.gray());
+                     collect_cameraView.setDataMat(inputFrame.rgba(), inputFrame.gray());
                 }
                 return inputFrame.rgba();
+            }
+
+            @Override
+            public void onCameraError() {
+                Log.i("fei","");
+                CollectNewActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showCameraErrorDia();
+                    }
+                });
             }
         });
     }
@@ -147,13 +164,13 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("fei", "loading打开");
+        showLoading();
         isLoading = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -175,6 +192,21 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         }
     }
 
+    @Override
+        public boolean onLongClick(View view) {
+        switch (view.getId()){
+            case R.id.collect_blackWrite_bt :
+            case R.id.colleact_drag_ll:
+                ClipData.Item item = new ClipData.Item("11");
+                ClipData dragData = new ClipData("11", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+                // Instantiates the drag shadow builder.
+                View.DragShadowBuilder myShadow = new View.DragShadowBuilder(colleact_drag_ll);
+                colleact_drag_ll.startDrag(dragData, myShadow, null, 0);
+                colleact_drag_ll.setVisibility(View.GONE);
+                break;
+        }
+        return false;
+    }
     /**
      * 开始进行测量
      */
@@ -185,7 +217,6 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
             public void OnOpenCameraResultListener(boolean bResult) {
 
             }
-
             @Override
             public void onCarameError() {
                 Log.i("fei", "摄像机已停止，正在重启");
@@ -210,12 +241,13 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
      */
     private void onBeforTakePic() {
         stopCameraView();
+//        collect_cameraView.changeEx();//处理畸变
         collect_cameraView.setZY(1);
         collect_cameraView.onBeforTakePic();//预拍之后的预处理
         collect_OpenCvCamera.disableView();
         collect_OpenCvCamera.setVisibility(View.GONE);
         collect_cameraView.setVisibility(View.VISIBLE);
-        collect_key_ll.setVisibility(View.VISIBLE);
+        colleact_drag_ll.setVisibility(View.VISIBLE);
         collectState = 1;//更新状态标志
     }
 
@@ -236,7 +268,7 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
      * 保存照片数据
      */
     private void onSave() {
-        File isHaveFile = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + fileName + ".bmp");
+        File isHaveFile = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + fileName + ".CK3");
         if (isHaveFile.exists()) {
             showToast("文件名重复");
             return;
@@ -266,18 +298,23 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         dataBean.setFileState(MeasureDataBean.FILESTATE_USERING);
         dataBean.setFileSize(file.length());
         dataBean.setDelDate("0000/00/00");
-        DBService.getInstence(this).SetMeasureData(dataBean);
+//        dataBean.setImageBytes(BMPUtils.bitmapToByteArr(collect_cameraView.m_DrawBitmap));
+        Gson gson = new Gson();
+        FileUtil.saveBmpFile(gson.toJson(dataBean), "/" + proName, fileName, "%s.CK");
+//        DBService.getInstence(this).SetMeasureData(dataBean);
 
         //刷新列表
         collect_cameraView.setZY(0); //恢复光标的颜色
         collect_cameraView.setBlackWrite(false, false);
         fileName = FileUtil.GetDigitalPile(fileName);//文件名称默认增加1
+        PreferenceHelper.setString("obj","gjname",fileName);
+        PreferenceHelper.setString("obj","proname",proName);
         showToast(getStr(R.string.str_saveSuccess));
         collect_cameraView.setStartView();
         collect_OpenCvCamera.enableView();
         collect_OpenCvCamera.setVisibility(View.VISIBLE);
         collect_cameraView.setVisibility(View.VISIBLE);
-        collect_key_ll.setVisibility(View.GONE);
+        colleact_drag_ll.setVisibility(View.GONE);
         collectState = 0;//更新状态标志
     }
 
@@ -341,38 +378,19 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         collect_cameraView.closeCamera();
     }
 
-    private void showSigleMsg(String msg) {
-        final SigleBtMsgDialog dialog = new SigleBtMsgDialog(CollectNewActivity.this);
-        dialog.show();
-        dialog.setTitleMsg(getStr(R.string.str_prompt));
-        dialog.setMsg(msg);
-        dialog.setBtTxt(getStr(R.string.str_ok));
-        dialog.setOnBtClickListener(new SigleBtMsgDialog.OnBtClickListener() {
-            @Override
-            public void onBtClick() {
-                dialog.dismiss();
-            }
-        });
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_F3) { //摄像头上的按键
-            if (collectState == 0) {
+            if (collectState == 0) { //0:正在采集
                 onBeforTakePic();//预拍
-            } else if (collectState == 1) {
+            } else if (collectState == 1) { //1：处于预拍的照片状态
                 onSaveFile();//进行存储
             }
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_BACK) { //返回按键
             // 断开与Camera的连接
-            if (collect_OpenCvCamera != null) {
-                collect_OpenCvCamera.disableView();
-            }
-            collect_cameraView.setStopView();
-            collect_cameraView.closeCamera();
-            CarmeraDataDone.openHardDevJni(1,1,0);
-            finish();
+            finishActivity();
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
             if (!collect_cameraView.isStart) {
@@ -396,14 +414,37 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
             }
         } else if (keyCode == KeyEvent.KEYCODE_F1) {
             //存储
+            if(collectState == 1){
+                onSaveFile();//进行存储
+            }
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_F2) {
             //切换
+            if(collectState == 1) {
+                if (collect_cameraView.m_nDrawFlag == 2 || collect_cameraView.m_nDrawFlag == 0) {
+                    collect_cameraView.setZY(1);
+                } else {
+                    collect_cameraView.setZY(2);
+                }
+            }
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
 
+
+    /**
+     * 退出检测界面
+     */
+    private void finishActivity(){
+        if (collect_OpenCvCamera != null) {
+            collect_OpenCvCamera.disableView();
+        }
+        collect_cameraView.setStopView();
+        collect_cameraView.closeCamera();
+        CarmeraDataDone.openHardDevJni(1,1,0);
+        finish();
+    }
 
     /**
      * 光标的左右移动
@@ -428,8 +469,8 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     protected class myDragEventListener implements View.OnDragListener {
         public boolean onDrag(View v, DragEvent event) {
             if (0 != event.getX() && 0 != event.getY()) {
-                colleact_drag_ll.setX(event.getX());
-                colleact_drag_ll.setY(event.getY());
+                colleact_drag_ll.setX(event.getX()-40);
+                colleact_drag_ll.setY(event.getY()-20);
             } else {
                 colleact_drag_ll.setVisibility(View.VISIBLE);
             }
@@ -460,4 +501,61 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         }
     }
 
+    private void showLoading(){
+        if(null != mLoadingDialog && !mLoadingDialog.isShowing()) {
+            mLoadingDialog.show();
+        }
+    }
+
+    private void stopLoading(){
+        if(null != mLoadingDialog && mLoadingDialog.isShowing()) {
+            mLoadingDialog.dismiss();
+        }
+    }
+
+    /**
+     * 摄像头失去连接的时候进行弹窗
+     */
+    private void showCameraErrorDia(){
+        if(null == cameraErrorDialog) {
+            cameraErrorDialog = new SigleBtMsgDialog(this);
+        }
+        if(!cameraErrorDialog.isShowing()) {
+            cameraErrorDialog.show();
+            cameraErrorDialog.setTitleMsg("错误");
+            cameraErrorDialog.setCancelable(false);
+            cameraErrorDialog.setMsg("摄像机连接异常\n请确认摄像机是否连接");
+            cameraErrorDialog.setBtTxt("退出");
+            cameraErrorDialog.setOnBtClickListener(new SigleBtMsgDialog.OnBtClickListener() {
+                @Override
+                public void onBtClick() {
+                    finishActivity();
+                }
+            });
+        }
+    }
+
+    /**
+     * 单按钮信息提示的弹框
+     * @param msg
+     */
+    private void showSigleMsg(String msg) {
+        final SigleBtMsgDialog dialog = new SigleBtMsgDialog(CollectNewActivity.this);
+        dialog.show();
+        dialog.setTitleMsg(getStr(R.string.str_prompt));
+        dialog.setMsg(msg);
+        dialog.setBtTxt(getStr(R.string.str_ok));
+        dialog.setOnBtClickListener(new SigleBtMsgDialog.OnBtClickListener() {
+            @Override
+            public void onBtClick() {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        stopLoading();
+        super.onStop();
+    }
 }

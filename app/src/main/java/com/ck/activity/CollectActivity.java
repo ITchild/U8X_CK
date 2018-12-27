@@ -214,6 +214,11 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 collect_cameraView.setDataMat(inputFrame.rgba(),inputFrame.gray());
                 return inputFrame.rgba();
             }
+
+            @Override
+            public void onCameraError() {
+
+            }
         });
     }
 

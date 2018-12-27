@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
 
+import com.ck.App_DataPara;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
 
@@ -20,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +93,7 @@ public class FileUtil {
             return false;
         } finally {
             try {
-                if(null != fw) {
+                if (null != fw) {
                     fw.close();
                 }
             } catch (IOException e) {
@@ -157,7 +159,6 @@ public class FileUtil {
 
     /**
      * 保存bitmap图片为bmp格式
-     *
      * @param bmp
      */
     public static void saveBmpImageFile(Bitmap bmp, String m_strSaveProName, String m_strSaveGJName, String style) {
@@ -169,8 +170,81 @@ public class FileUtil {
         File path = null;
         File imageFile = null;
         path = new File(PathUtils.PROJECT_PATH + m_strSaveProName);
-        if(!path.exists()) {
+        if (!path.exists()) {
             path.mkdirs();
+        }
+        String fileName = String.format(style, m_strSaveGJName);
+        imageFile = new File(path, fileName);
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(imageFile);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 保存bitmap图片自定义格式
+     * @param json
+     */
+    public static void saveBmpFile(String json, String m_strSaveProName, String m_strSaveGJName, String style) {
+        String mediaState = Environment.getExternalStorageState();
+        if ((!mediaState.equals(Environment.MEDIA_MOUNTED)) || (mediaState.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
+            Log.d("fei", "Media storage not ready:" + mediaState);
+            return;
+        }
+        File path = null;
+        File imageFile = null;
+        path = new File(PathUtils.PROJECT_PATH + m_strSaveProName);
+        if (!path.exists()) {
+            path.mkdirs();
+        }
+        String fileName = String.format(style, m_strSaveGJName);
+        try {
+            imageFile = new File(path, fileName);
+            if (!imageFile.exists()) {
+                imageFile.getParentFile().mkdirs();
+                imageFile.createNewFile();
+            }else{
+                imageFile.delete();
+                imageFile.createNewFile();
+            }
+            RandomAccessFile raf = new RandomAccessFile(imageFile, "rwd");
+            raf.seek(imageFile.length());
+            raf.write(json.getBytes());
+            raf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 保存包含标志的bitmap图片为bmp格式
+     * 路径自己设置
+     *
+     * @param bmp
+     */
+    public static void saveDrawBmpFile(Bitmap bmp, String m_strSaveProName, String m_strSaveGJName, String style) {
+        String mediaState = Environment.getExternalStorageState();
+        if ((!mediaState.equals(Environment.MEDIA_MOUNTED)) || (mediaState.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
+            Log.d("fei", "Media storage not ready:" + mediaState);
+            return;
+        }
+        File path = null;
+        File imageFile = null;
+        path = new File(PathUtils.DRAWPROJECT_PATH + m_strSaveProName);
+        if (!path.exists() ) {
+            path.mkdirs();
+        }
+        if( !path.canWrite()){
+            return;
         }
 
         String fileName = String.format(style, m_strSaveGJName);
@@ -192,39 +266,29 @@ public class FileUtil {
     }
 
     /**
-     * 保存bitmap图片为bmp格式
-     * 路径自己设置
-     * @param bmp
+     * 读取文件为字符串
+     * @param filePath
+     * @return
      */
-    public static void saveDrawBmpFile(Bitmap bmp, String m_strSaveProName, String m_strSaveGJName, String style) {
-        String mediaState = Environment.getExternalStorageState();
-        if ((!mediaState.equals(Environment.MEDIA_MOUNTED)) || (mediaState.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
-            Log.d("fei", "Media storage not ready:" + mediaState);
-            return;
+    public static String readData(String filePath){
+        if(Stringutil.isEmpty(filePath)){
+            return null;
         }
-        File path = null;
-        File imageFile = null;
-        path = new File(PathUtils.DRAWPROJECT_PATH + m_strSaveProName);
-        if(!path.exists()) {
-            path.mkdirs();
-        }
+        String str = "";
+        File file = new File(filePath);
+        if(file.exists()) {
+            try {
+                FileInputStream fin = new FileInputStream(file);
+                int length = fin.available();
+                byte[] buffer = new byte[length];
+                fin.read(buffer);
+                str = new String(buffer);
+                fin.close();
+            } catch (Exception e) {
 
-        String fileName = String.format(style, m_strSaveGJName);
-
-        imageFile = new File(path, fileName);
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(imageFile);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            }
         }
-        try {
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return str;
     }
 
     /**
@@ -257,7 +321,7 @@ public class FileUtil {
      *
      * @param proData
      */
-    public static void delSeleceFile(List<ClasFileProjectInfo> proData) {
+    public static List<ClasFileProjectInfo> delSeleceFile(List<ClasFileProjectInfo> proData) {
         for (int i = 0; i < proData.size(); i++) {
             int proSelect = proData.get(i).nIsSelect;
             if (proSelect == 1 || proSelect == 2) {
@@ -268,28 +332,33 @@ public class FileUtil {
                         //删除原图的单张图片
                         deleteFile(PathUtils.PROJECT_PATH
                                 + "/" + proData.get(i).mFileProjectName
-                                + "/" + clasFileGJInfo.mFileGJName);
+                                + "/" + clasFileGJInfo.mFileGJName+".bmp");
+                        deleteFile(PathUtils.PROJECT_PATH
+                                + "/" + proData.get(i).mFileProjectName
+                                + "/" + clasFileGJInfo.mFileGJName+".CK");
                         //删除含有光标的图片的单张图片
                         deleteFile(PathUtils.DRAWPROJECT_PATH
                                 + "/" + proData.get(i).mFileProjectName
-                                + "/" + clasFileGJInfo.mFileGJName);
+                                + "/" + clasFileGJInfo.mFileGJName+".bmp");
+                        ArrFileGJ.remove(j);
                     }
                 }
                 if (proSelect == 2) { //全部选中的时候删除文件夹
                     //删除原图的工程
                     deleteDirectory(PathUtils.PROJECT_PATH + "/" + proData.get(i).mFileProjectName);
                     //删除含有光标的图片的工程
-                    deleteDirectory(PathUtils.DRAWPROJECT_PATH + "/"+ proData.get(i).mFileProjectName);
+                    deleteDirectory(PathUtils.DRAWPROJECT_PATH + "/" + proData.get(i).mFileProjectName);
+                    proData.remove(i);
                 }
             }
         }
+        return proData;
     }
 
     /**
      * 删除目录及目录下的文件
      *
-     * @param dir
-     *            要删除的目录的文件路径
+     * @param dir 要删除的目录的文件路径
      * @return 目录删除成功返回true，否则返回false
      */
     public static boolean deleteDirectory(String dir) {
@@ -299,7 +368,7 @@ public class FileUtil {
         File dirFile = new File(dir);
         // 如果dir对应的文件不存在，或者不是一个目录，则退出
         if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
-            Log.i("fei","删除目录失败：" + dir + "不存在！");
+            Log.i("fei", "删除目录失败：" + dir + "不存在！");
             return false;
         }
         boolean flag = true;
@@ -321,12 +390,12 @@ public class FileUtil {
             }
         }
         if (!flag) {
-            Log.i("fei","删除目录失败！");
+            Log.i("fei", "删除目录失败！");
             return false;
         }
         // 删除当前目录
         if (dirFile.delete()) {
-            Log.i("fei","删除目录" + dir + "成功！");
+            Log.i("fei", "删除目录" + dir + "成功！");
             return true;
         } else {
             return false;
@@ -337,8 +406,7 @@ public class FileUtil {
     /**
      * 删除单个文件
      *
-     * @param fileName
-     *            要删除的文件的文件名
+     * @param fileName 要删除的文件的文件名
      * @return 单个文件删除成功返回true，否则返回false
      */
     public static boolean deleteFile(String fileName) {
@@ -346,14 +414,14 @@ public class FileUtil {
         // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
-                Log.i("fei","删除单个文件" + fileName + "成功！");
+                Log.i("fei", "删除单个文件" + fileName + "成功！");
                 return true;
             } else {
-                Log.i("fei","删除单个文件" + fileName + "失败！");
+                Log.i("fei", "删除单个文件" + fileName + "失败！");
                 return false;
             }
         } else {
-            Log.i("fei","删除单个文件失败：" + fileName + "不存在！");
+            Log.i("fei", "删除单个文件失败：" + fileName + "不存在！");
             return false;
         }
     }
@@ -365,20 +433,48 @@ public class FileUtil {
      * @param m_ListProject
      * @return
      */
-    public static long GetFileSize(List<ClasFileProjectInfo> m_ListProject) {
+    public static long GetFileSize(List<ClasFileProjectInfo> m_ListProject,int type) {
         long lProFileSize = 0;
         long lGjFileSize = 0;
         for (int i = 0; i < m_ListProject.size(); i++) {
             if (m_ListProject.get(i).nIsSelect == 2) {
                 // isExistSelect = true;
-                String soDir = PathUtils.PROJECT_PATH + "/" + m_ListProject.get(i).mFileProjectName;
-                lProFileSize += FileUtil.getInstance().getFileSize(new File(soDir));
+                if(type == 1){ //导出之后可直接使用的图片
+                    String soDir = PathUtils.DRAWPROJECT_PATH + "/" + m_ListProject.get(i).mFileProjectName;
+                    lProFileSize += FileUtil.getInstance().getFileSize(new File(soDir));
+                }else if(type == 2){ //导出到电脑的图片
+                    String soDir = PathUtils.PROJECT_PATH + "/" + m_ListProject.get(i).mFileProjectName;
+                    lProFileSize += FileUtil.getInstance().getFileSize(new File(soDir));
+                }else if(type == 3){//以上两种都有的图片
+                    String soDir = PathUtils.PROJECT_PATH + "/" + m_ListProject.get(i).mFileProjectName;
+                    lProFileSize += FileUtil.getInstance().getFileSize(new File(soDir));
+                    soDir = PathUtils.DRAWPROJECT_PATH + "/" + m_ListProject.get(i).mFileProjectName;
+                    lProFileSize += FileUtil.getInstance().getFileSize(new File(soDir));
+                }
             } else if (m_ListProject.get(i).nIsSelect == 1) {
                 // isExistSelect = true;
                 for (int j = 0; j < m_ListProject.get(i).mstrArrFileGJ.size(); j++) {
                     if (m_ListProject.get(i).mstrArrFileGJ.get(j).bIsSelect == true) {
-                        File sourceF = new File(PathUtils.PROJECT_PATH + "/" + m_ListProject.get(i).mFileProjectName + "/" + m_ListProject.get(i).mstrArrFileGJ.get(j).mFileGJName);
-                        lGjFileSize += FileUtil.getInstance().getFileSizes(sourceF);
+                        if(type == 1){ //导出之后可直接使用的图片
+                            File sourceF = new File(PathUtils.DRAWPROJECT_PATH +
+                                    "/" + m_ListProject.get(i).mFileProjectName + "/"
+                                    + m_ListProject.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+                            lGjFileSize += FileUtil.getInstance().getFileSizes(sourceF);
+                        }else if(type == 2){ //导出到电脑的图片
+                            File sourceF = new File(PathUtils.PROJECT_PATH +
+                                    "/" + m_ListProject.get(i).mFileProjectName + "/"
+                                    + m_ListProject.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+                            lGjFileSize += FileUtil.getInstance().getFileSizes(sourceF);
+                        }else if(type == 3){//以上两种都有的图片
+                            File sourceF = new File(PathUtils.PROJECT_PATH +
+                                    "/" + m_ListProject.get(i).mFileProjectName + "/" +
+                                    m_ListProject.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+                            lGjFileSize += FileUtil.getInstance().getFileSizes(sourceF);
+                            sourceF = new File(PathUtils.DRAWPROJECT_PATH +
+                                    "/" + m_ListProject.get(i).mFileProjectName + "/"
+                                    + m_ListProject.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+                            lGjFileSize += FileUtil.getInstance().getFileSizes(sourceF);
+                        }
                     }
                 }
             }
@@ -386,6 +482,45 @@ public class FileUtil {
         FileUtil.getInstance().m_lTotalfileSize = lProFileSize + lGjFileSize;
         return lProFileSize + lGjFileSize;
     }
+
+    /**
+     * 获取设备占用内存的百分比
+     *
+     * @return
+     */
+    public static String getFreeSpaceperSend() {
+        File datapath = Environment.getDataDirectory();
+        StatFs dataFs = new StatFs(datapath.getPath());
+
+        long freeSizes = (long) dataFs.getFreeBlocks() * (long) dataFs.getBlockSize();
+        long allSizes = (long) dataFs.getBlockCount() * (long) dataFs.getBlockSize();
+
+        long free = freeSizes / (1024 * 1024);
+        long all = allSizes / (1024 * 1024);
+        return (free * 100 / all) + "%";
+    }
+
+    /**
+     * 将文件存储在外部存储中
+     * 路径不存在先生成路径，文件不存在生成文件
+     *
+     * @param path
+     * @param name
+     * @return
+     * @throws IOException
+     */
+    public static File getFile(String path, String name) throws IOException {
+        File parent = new File(path + "/");
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
+        File file = new File(path + "/" + name);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        return file;
+    }
+
     // 截取byte数组中某段�?
     public byte[] SubByte(byte[] bBefData, int nStartPos, int nEndPos) {
         int nPos = nEndPos - nStartPos;
@@ -404,6 +539,9 @@ public class FileUtil {
         FileInputStream inStream = null;
         FileOutputStream outStream = null;
         try {
+            if(target.exists()){
+                target.delete();
+            }
             inStream = new FileInputStream(source);
             outStream = new FileOutputStream(target);
             in = inStream.getChannel();
@@ -619,6 +757,167 @@ public class FileUtil {
         }
     }
 
+
+    /**
+     * 文件管理U盘导出文件的最后阶段 ，根据type确定导出的类型
+     * @param targetDir
+     * @param type 1；导出可直接使用的图片 2：导出到上位机的文件  3： 两种都进行导出
+     * @param AppDatPara
+     */
+    public static void copyFileInThread(String targetDir,int type,App_DataPara AppDatPara){
+        File sourceF = null;
+        File ckSourceF = null;
+        File drawSourceF = null;
+        File targetPathF = null;
+        File drawTargetPathF = null;
+        File targetF = null;
+        File ckTargetF = null;
+        File drawTargetF = null;
+
+        String soDir = null;
+        String drawSoDir = null;
+        String tarDir = null;
+        String drawTarDir = null;
+        for (int i = 0; i < App_DataPara.getApp().proData.size(); i++) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            if (App_DataPara.getApp().proData.get(i).nIsSelect == 2) {
+                soDir = PathUtils.PROJECT_PATH + "/" + App_DataPara.getApp().proData.get(i).mFileProjectName;
+                drawSoDir = PathUtils.DRAWPROJECT_PATH+"/"+App_DataPara.getApp().proData.get(i).mFileProjectName;
+                tarDir = targetDir + File.separator +"工程"+File.separator + App_DataPara.getApp().proData.get(i).mFileProjectName;
+                drawTarDir = targetDir + File.separator +"Draw工程"+ File.separator+ App_DataPara.getApp().proData.get(i).mFileProjectName;
+                try {
+                    if(type == 1){ //导出之后可直接使用的图片
+                        if (null != drawSoDir && drawSoDir.length() != 0 && null != drawSoDir && drawSoDir.length() != 0) {
+                            // 拷贝含有标志的文件
+                            FileUtil.getInstance().copyDirectiory(drawSoDir, drawTarDir, AppDatPara);
+                        }
+                    }else if(type == 2){ //导出到电脑的图片
+                        if (null != soDir && soDir.length() != 0 && null != tarDir && tarDir.length() != 0) {
+                            // 拷贝原图文件
+                            FileUtil.getInstance().copyDirectiory(soDir, tarDir, AppDatPara);
+                        }
+                    }else if(type == 3){//以上两种都有的图片
+                        if (null != soDir && soDir.length() != 0 && null != tarDir && tarDir.length() != 0) {
+                            // 拷贝原图文件
+                            FileUtil.getInstance().copyDirectiory(soDir, tarDir, AppDatPara);
+                        }
+                        if (null != drawSoDir && drawSoDir.length() != 0 && null != drawSoDir && drawSoDir.length() != 0) {
+                            // 拷贝含有标志的文件
+                            FileUtil.getInstance().copyDirectiory(drawSoDir, drawTarDir, AppDatPara);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (App_DataPara.getApp().proData.get(i).nIsSelect == 1) {
+                for (int j = 0; j < App_DataPara.getApp().proData.get(i).mstrArrFileGJ.size(); j++) {
+                    if (App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).bIsSelect == true) {
+                        targetPathF = new File(targetDir + File.separator +
+                                "工程"+ File.separator+App_DataPara.getApp().proData.get(i).mFileProjectName);
+                        drawTargetPathF = new File(targetDir + File.separator +
+                                "Draw工程"+ File.separator+App_DataPara.getApp().proData.get(i).mFileProjectName);
+                        sourceF = new File(PathUtils.PROJECT_PATH
+                                + "/" + App_DataPara.getApp().proData.get(i).mFileProjectName
+                                + "/" + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+                        ckSourceF = new File(PathUtils.PROJECT_PATH
+                                + "/" + App_DataPara.getApp().proData.get(i).mFileProjectName
+                                + "/" + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName+".CK");
+                        drawSourceF = new File(PathUtils.DRAWPROJECT_PATH
+                                + "/" + App_DataPara.getApp().proData.get(i).mFileProjectName
+                                + "/" + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+                        targetF = new File(targetPathF.toString()
+                                + File.separator + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+                        ckTargetF = new File(targetPathF.toString()
+                                + File.separator + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName+".CK");
+                        drawTargetF = new File(drawTargetPathF.toString()
+                                + File.separator + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName+".bmp");
+
+                        if(type == 1){ //导出之后可直接使用的图片
+                            // 拷贝含有标志的文件
+                            if (null != drawSourceF && null != drawTargetF) {
+                                if (drawTargetPathF.exists()) {
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(drawSourceF, drawTargetF, AppDatPara);
+                                } else {
+                                    // 新建目标目录
+                                    (drawTargetPathF).mkdirs();
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(drawSourceF, drawTargetF, AppDatPara);
+                                }
+                            }
+                        }else if(type == 2){ //导出到电脑的图片
+                            // 拷贝原图文件
+                            if (null != sourceF && null != targetF) {
+                                if (targetPathF.exists()) {
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(sourceF, targetF, AppDatPara);
+                                } else {
+                                    // 新建目标目录
+                                    (targetPathF).mkdirs();
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(sourceF, targetF, AppDatPara);
+                                }
+                            }
+                            if (null != ckSourceF && null != ckTargetF) {
+                                if (targetPathF.exists()) {
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(ckSourceF, ckTargetF, AppDatPara);
+                                } else {
+                                    // 新建目标目录
+                                    (targetPathF).mkdirs();
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(ckSourceF, ckTargetF, AppDatPara);
+                                }
+                            }
+                        }else if(type == 3){//以上两种都有的图片
+                            // 拷贝原图文件
+                            if (null != sourceF && null != targetF) {
+                                if (targetPathF.exists()) {
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(sourceF, targetF, AppDatPara);
+                                } else {
+                                    // 新建目标目录
+                                    (targetPathF).mkdirs();
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(sourceF, targetF, AppDatPara);
+                                }
+                            }
+                            if (null != ckSourceF && null != ckTargetF) {
+                                if (targetPathF.exists()) {
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(ckSourceF, ckTargetF, AppDatPara);
+                                } else {
+                                    // 新建目标目录
+                                    (targetPathF).mkdirs();
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(ckSourceF, ckTargetF, AppDatPara);
+                                }
+                            }
+                            // 拷贝含有标志的文件
+                            if (null != drawSourceF && null != drawTargetF) {
+                                if (drawTargetPathF.exists()) {
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(drawSourceF, drawTargetF, AppDatPara);
+                                } else {
+                                    // 新建目标目录
+                                    (drawTargetPathF).mkdirs();
+                                    // 拷贝文件
+                                    FileUtil.getInstance().copyFile(drawSourceF, drawTargetF, AppDatPara);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     // 删除路径下所有文�?
     public void deleteAllFilesOfDir(File path) {
         if (!path.exists())
@@ -643,42 +942,4 @@ public class FileUtil {
             return false;
         }
     }
-
-    /**
-     * 获取设备占用内存的百分比
-     * @return
-     */
-    public static String getFreeSpaceperSend() {
-        File datapath = Environment.getDataDirectory();
-        StatFs dataFs = new StatFs(datapath.getPath());
-
-        long freeSizes = (long) dataFs.getFreeBlocks() * (long) dataFs.getBlockSize();
-        long allSizes = (long) dataFs.getBlockCount() * (long) dataFs.getBlockSize();
-
-        long free = freeSizes / (1024 * 1024);
-        long all = allSizes / (1024*1024);
-        return (free*100/all )+"%";
-    }
-
-    /**
-     * 将文件存储在外部存储中
-     * 路径不存在先生成路径，文件不存在生成文件
-     *
-     * @param path
-     * @param name
-     * @return
-     * @throws IOException
-     */
-    public static File getFile(String path, String name) throws IOException {
-        File parent = new File(path + "/");
-        if (!parent.exists()) {
-            parent.mkdirs();
-        }
-        File file = new File(path + "/" + name);
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        return file;
-    }
-
 }

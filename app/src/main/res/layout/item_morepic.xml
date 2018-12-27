@@ -11,9 +11,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <com.ck.ui.MorePicShowView
+    <ImageView
         android:id="@+id/morePic_show_mpsv"
         android:layout_width="match_parent"
+        android:scaleType="fitXY"
         android:layout_height="100pt" />
 
     <TextView
@@ -29,10 +30,8 @@
 
     <LinearLayout
         android:id="@+id/morePic_choice_ll"
-        android:layout_width="35pt"
-        android:layout_height="35pt"
-        android:paddingLeft="15pt"
-        android:paddingBottom="15pt"
+        android:layout_width="45pt"
+        android:layout_height="45pt"
         android:layout_alignParentRight="true"
         android:orientation="vertical">
         <CheckBox

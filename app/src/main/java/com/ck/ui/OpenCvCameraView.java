@@ -33,12 +33,12 @@ public class OpenCvCameraView extends View {
 
     public int m_nScreenWidth, m_nScreenHeight;
     public Bitmap m_DrawBitmap;
+    public Mat m_Mat;
     public Bitmap m_DrawGrayBitmap;
     public Bitmap showBitmap;
     public Bitmap blackWriteBitmap;
     public boolean isBlackWrite = false;
     public boolean isFindSide = false;
-    public boolean isCanMove = true;
     public boolean isStart = false; //是否开始检测
     public float width = 0;
     boolean m_bCountMode = true; // 自动计算还是手动计算
@@ -57,6 +57,7 @@ public class OpenCvCameraView extends View {
     private float startX = 0, startY = 0; //拖动时单点按下时的坐标
     private int BaseX = 0, BaseY = 0;  //完成一次拖动后需要保存的坐标
     private float LeftFlagX = 0, LeftFlagY = 0, RightFlagX = 0, RightFlagY = 0; //拖动光标的偏移量
+    private boolean isCanMove = false; //左右光标是否能拖拽移动
     private int x = 0, y = 0;  //  实际拖动时的X,Y 轴的增量
     private float baseSideLength = 0;  //双点触控的按下的两点距离
     private boolean doublePoit = false; // 是否为双点触控
@@ -123,7 +124,6 @@ public class OpenCvCameraView extends View {
             max_X = (int) (m_nScreenWidth / m_fXDensity);
         }
     }
-
     /**
      * 打开相机
      */
@@ -244,6 +244,10 @@ public class OpenCvCameraView extends View {
     public void setZY(int nDrawFlag) {
         m_nDrawFlag = nDrawFlag;
         invalidate();
+    }
+
+    public void changeEx(){
+        m_DrawBitmap =  OpenCvLieFUtil.doneExChange(m_DrawBitmap);
     }
 
     public void onMove() {
@@ -408,7 +412,7 @@ public class OpenCvCameraView extends View {
 
         m_PaintDrawLine.setColor(Color.RED);
         m_PaintDrawLine.setTextSize(Stringutil.getDimens(R.dimen.x20));
-        String str = String.format("%.03f", length / mf_fXDensity / 10.00000000) + "mm";
+        String str = String.format("%.02f", length / mf_fXDensity / 10.00000000) + "mm";
         str = str.equals("NaNmm") ? "0.00mm" : str; //有时format的返回值为NaN
         canvas.drawText(str, 40, 50, m_PaintDrawLine);
         width = Float.valueOf(str.replace("mm", ""));
@@ -416,21 +420,26 @@ public class OpenCvCameraView extends View {
         m_PaintDrawLine.setStrokeWidth(2);
         int nYMid = m_nScreenHeight / 2;
         int nKDY = nYMid + nYMid * 3 / 4;
+        int zeroX = m_nScreenWidth/2;
         canvas.drawLine(0, nKDY, m_nScreenWidth, nKDY, m_PaintDrawLine);//打底线
-        canvas.drawLine(1, nKDY, 1, nKDY - 30, m_PaintDrawLine); // 0刻度线
-        canvas.drawText("0", 1, nKDY + 20, m_PaintDrawLine);
+        canvas.drawLine(zeroX, nKDY, zeroX, nKDY - 30, m_PaintDrawLine); // 0刻度线
+        canvas.drawText("0", zeroX-5, nKDY + 20, m_PaintDrawLine);
         //底部标度尺的绘制
         float unit = 10;
-        for (int i = 1; i <= max_X; i++) {
+        for (int i = 1; i <= max_X/2; i++) {
             if (i % unit == 0) {
-                canvas.drawLine(i * mf_fXDensity, nKDY, i * mf_fXDensity, nKDY - 30, m_PaintDrawLine);
-                if (i == 100) {
-                    canvas.drawText((i / unit) + "", i * mf_fXDensity - 20, nKDY + 20, m_PaintDrawLine);
+                canvas.drawLine(zeroX - i * mf_fXDensity, nKDY, zeroX - i * mf_fXDensity, nKDY - 30, m_PaintDrawLine);
+                canvas.drawLine(zeroX + i * mf_fXDensity, nKDY, zeroX + i * mf_fXDensity, nKDY - 30, m_PaintDrawLine);
+                if (i == max_X/2) {
+                    canvas.drawText((i / unit) + "", zeroX +i * mf_fXDensity - 25, nKDY + 20, m_PaintDrawLine);
+                    canvas.drawText((i / unit) + "", zeroX -i * mf_fXDensity + 2, nKDY + 20, m_PaintDrawLine);
                 } else {
-                    canvas.drawText((i / unit) + "", i * mf_fXDensity - 15, nKDY + 20, m_PaintDrawLine);
+                    canvas.drawText((i / unit) + "", zeroX - i * mf_fXDensity - 15, nKDY + 20, m_PaintDrawLine);
+                    canvas.drawText((i / unit) + "", zeroX + i * mf_fXDensity - 15, nKDY + 20, m_PaintDrawLine);
                 }
             } else {
-                canvas.drawLine(i * mf_fXDensity, nKDY, i * mf_fXDensity, nKDY - 15, m_PaintDrawLine);
+                canvas.drawLine(zeroX - i * mf_fXDensity, nKDY, zeroX - i * mf_fXDensity, nKDY - 15, m_PaintDrawLine);
+                canvas.drawLine(zeroX + i * mf_fXDensity, nKDY, zeroX + i * mf_fXDensity, nKDY - 15, m_PaintDrawLine);
             }
         }
     }
@@ -582,6 +591,7 @@ public class OpenCvCameraView extends View {
         if (null == m_DrawBitmap) {
             m_DrawBitmap = Bitmap.createBitmap(RGBData.cols(), RGBData.rows(), Bitmap.Config.ARGB_8888);
         }
+        m_Mat = RGBData;
         org.opencv.android.Utils.matToBitmap(RGBData, m_DrawBitmap);
         RGBData.release();
         grayData.release();
@@ -604,9 +614,6 @@ public class OpenCvCameraView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isCanMove) {
-            return super.onTouchEvent(event);
-        }
         if (m_DrawBitmap == null || m_DrawBitmap.isRecycled()) {
             return super.onTouchEvent(event);
         }
@@ -616,19 +623,21 @@ public class OpenCvCameraView extends View {
                     case MotionEvent.ACTION_DOWN:
                         startX = event.getX();
                         startY = event.getY();
-                        if (Math.abs(nLX - (startX + BaseX)) < 50 && Math.abs((startY + BaseY) - nLY) < 50) {
+                        if (Math.abs(nLLx - (startX + BaseX)) < 30 && Math.abs((startY + BaseY) - nLLy) < 30) {
                             setZY(1);
-                        } else if (Math.abs((startX + BaseX) - nRX) < 50 && Math.abs((startY + BaseY) - nRY) < 50) {
+                            isCanMove = true;
+                        } else if (Math.abs((startX + BaseX) - nRLx) < 30 && Math.abs((startY + BaseY) - nRLy) < 30) {
                             setZY(2);
+                            isCanMove = true;
                         }
-                        LeftFlagX = startX - nLX;
-                        LeftFlagY = startY - nLY;
-                        RightFlagX = startX - nRX;
-                        RightFlagY = startY - nRY;
+                        LeftFlagX = startX - nLX + BaseX;
+                        LeftFlagY = startY - nLY + BaseY;
+                        RightFlagX = startX - nRX + BaseX;
+                        RightFlagY = startY - nRY + BaseY;
                         break;
                     case MotionEvent.ACTION_MOVE:
                         if (!doublePoit) {
-                            if (m_nDrawFlag == 1 || m_nDrawFlag == 2) {
+                            if (isCanMove) {
                                 if (m_nDrawFlag == 1) {
                                     FindLieFenUtils.m_nCLXLineSite = ((event.getX() - LeftFlagX + BaseX) / m_nScreenWidth) * m_DraBitMapWith;
                                     FindLieFenUtils.m_nCLYLineSite = ((event.getY() - LeftFlagY + BaseY) / m_nScreenHeight) * m_DraBitMapHight;
@@ -649,6 +658,7 @@ public class OpenCvCameraView extends View {
                         BaseX = x;
                         BaseY = y;
                         doublePoit = false;
+                        isCanMove = false;
                         break;
                 }
             } else if (event.getPointerCount() == 2) {

@@ -5,204 +5,199 @@
     android:background="?attr/background"
     android:orientation="vertical">
 
-    <include layout="@layout/ac_basetitle" />
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="@dimen/xhdpi_50dp"
+        android:gravity="center_vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:layout_marginBottom="@dimen/xhdpi_50dp"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_50dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_companyName"/>
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_companyNameCon"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_50dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_compantNet"/>
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_compantNetCon"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_50dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_phone"/>
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_phoneNum"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_50dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_divice"/>
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_diviceNum"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_50dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_hardVision"/>
-                <TextView
-                    android:id="@+id/about_hardVision_tv"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="V 1.2.0"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_50dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_SysVision"/>
-                <TextView
-                    android:id="@+id/about_sysVision_tv"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="V 1.5.1"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_50dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="@string/str_lastVision"/>
-                <TextView
-                    android:id="@+id/about_softVision_tv"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="V 1.5.1"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/xhdpi_60dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:textColor="?attr/textColor"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:text="@string/str_freeSpace"/>
-                <TextView
-                    android:id="@+id/about_freeSpace_tv"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:textSize="@dimen/xhdpi_25sp"
-                    android:textColor="?attr/textColor"
-                    android:text="30%"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/about_back_bt"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="@dimen/xhdpi_10dp"
-            android:layout_marginRight="@dimen/xhdpi_30dp"
-            android:text="@string/str_back" />
-    </RelativeLayout>
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_companyName"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
 
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="@string/str_companyNameCon"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_50dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_compantNet"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="@string/str_compantNetCon"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_50dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_phone"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="@string/str_phoneNum"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_50dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_divice"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="@string/str_diviceNum"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_50dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_hardVision"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/about_hardVision_tv"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="V 1.2.0"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_50dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_SysVision"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/about_sysVision_tv"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="V 1.5.1"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_50dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_lastVision"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/about_softVision_tv"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="V 1.5.1"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xhdpi_60dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/str_freeSpace"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+
+        <TextView
+            android:id="@+id/about_freeSpace_tv"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="30%"
+            android:textColor="?attr/textColor"
+            android:textSize="@dimen/xhdpi_25sp" />
+    </LinearLayout>
 </LinearLayout>

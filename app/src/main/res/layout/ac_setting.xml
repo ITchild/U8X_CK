@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/xhdpi_20dp"
+        android:layout_marginTop="10pt"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -23,7 +23,7 @@
 
             <RadioGroup
                 android:id="@+id/setting_tab_rg"
-                android:layout_width="@dimen/xhdpi_300dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/xhdpi_2dp"
                 android:background="?attr/background"
@@ -62,14 +62,24 @@
                     android:text="检定设置"
                     android:textColor="?attr/textColor"
                     android:textSize="@dimen/xhdpi_25sp" />
+
+                <RadioButton
+                    android:id="@+id/setting_about_rb"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/xhdpi_90dp"
+                    android:background="?attr/checkBox"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="检定设置"
+                    android:textColor="?attr/textColor"
+                    android:textSize="@dimen/xhdpi_25sp" />
             </RadioGroup>
         </LinearLayout>
 
         <RelativeLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_marginRight="@dimen/xhdpi_70dp"
-            android:layout_weight="2"
+            android:layout_weight="2.5"
             android:background="?attr/background"
             android:orientation="vertical">
 
@@ -92,6 +102,14 @@
                 android:layout_height="match_parent"
                 android:visibility="gone">
                 <include layout="@layout/ac_setting_check"></include>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/setting_about_ll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+                <include layout="@layout/ac_about"></include>
             </LinearLayout>
 
             <Button

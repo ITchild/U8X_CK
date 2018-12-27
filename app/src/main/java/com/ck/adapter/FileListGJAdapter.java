@@ -1,23 +1,23 @@
 package com.ck.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ck.bean.MeasureDataBean;
-import com.ck.db.DBService;
 import com.ck.info.ClasFileProjectInfo;
-import com.ck.ui.MorePicShowView;
+import com.ck.utils.FileUtil;
 import com.ck.utils.PathUtils;
+import com.ck.utils.Stringutil;
+import com.google.gson.Gson;
 import com.hc.u8x_ck.R;
-
-import java.util.List;
 
 public class FileListGJAdapter extends RecyclerView.Adapter<FileListGJAdapter.ViewHolder> {
     ClasFileProjectInfo mProject;
@@ -68,21 +68,39 @@ public class FileListGJAdapter extends RecyclerView.Adapter<FileListGJAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        //按采样方式进行压缩  inSampleSize 为4，表示长宽缩为原来的1/4
         String objName = mProject.mFileProjectName;
         String fileName = mProject.mstrArrFileGJ.get(position).mFileGJName;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 8;
-        Bitmap bitmap = BitmapFactory.decodeFile(PathUtils.PROJECT_PATH+"/"+objName+ "/"+fileName,options);
-        holder.morePic_show_mpsv.setBitmap(bitmap,0,0,"");
-
-        List<MeasureDataBean> datas = DBService.getInstence(mContext).getMeasureData(objName,fileName,MeasureDataBean.FILESTATE_USERING);
-        String length = "";
-        if(null != datas && datas.size() > 0){
-            length = datas.get(0).getWidth()+"mm";
+        if(null != mProject.mstrArrFileGJ.get(position).getSrc()){
+            holder.morePic_show_mpsv.setImageBitmap(mProject.mstrArrFileGJ.get(position).getSrc());
         }
-        holder.morePic_show_name.setText(fileName.replace(".bmp","-")+length);
+        String width = mProject.mstrArrFileGJ.get(position).getWidth();
+        if(Stringutil.isEmpty(width)) { //TODO ：如果列表的宽度为空，则进行重新的查询
+            String json = FileUtil.readData(PathUtils.PROJECT_PATH + "/" + objName + "/" + fileName + ".CK");
+            if (!Stringutil.isEmpty(json)) {
+                MeasureDataBean bean = new Gson().fromJson(json, MeasureDataBean.class);
+                holder.morePic_show_name.setText(fileName + "-" + bean.getWidth());
+            }
+        }else{//TODO :列表的宽度不为空，则直接使用
+            holder.morePic_show_name.setText(fileName + "-" + width);
+        }
+        holder.morePic_show_mpsv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(null != mOnFileGJItemClick){
+                    mOnFileGJItemClick.onGJSelect(false,position);
+                }
+            }
+        });
 
+        holder.morePic_choice_ll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(null != mOnFileGJItemClick){
+                    mOnFileGJItemClick.onGJSelect(true,position);
+                }
+            }
+        });
+        holder.morePic_choice_cb.setChecked(mProject.mstrArrFileGJ.get(position).bIsSelect);
     }
 
     @Override
@@ -104,15 +122,23 @@ public class FileListGJAdapter extends RecyclerView.Adapter<FileListGJAdapter.Vi
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
-        MorePicShowView morePic_show_mpsv;
+        ImageView morePic_show_mpsv;
         TextView morePic_show_name;
+        LinearLayout morePic_choice_ll;
+        CheckBox morePic_choice_cb;
         public ViewHolder(View view) {
             super(view);
             if(null == morePic_show_mpsv) {
-                morePic_show_mpsv = (MorePicShowView) view.findViewById(R.id.morePic_show_mpsv);
+                morePic_show_mpsv = (ImageView) view.findViewById(R.id.morePic_show_mpsv);
             }
             if(null == morePic_show_name){
                 morePic_show_name = (TextView) view.findViewById(R.id.morePic_show_name);
+            }
+            if(null == morePic_choice_ll){
+                morePic_choice_ll = (LinearLayout) view.findViewById(R.id.morePic_choice_ll);
+            }
+            if(null == morePic_choice_cb){
+                morePic_choice_cb = (CheckBox) view.findViewById(R.id.morePic_choice_cb);
             }
         }
     }

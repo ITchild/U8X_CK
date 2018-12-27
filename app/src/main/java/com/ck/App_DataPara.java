@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.ck.base.BaseApplication;
 import com.ck.db.DBService;
 import com.ck.dimenUtil.RudenessScreenHelper;
+import com.ck.info.ClasFileProjectInfo;
 import com.ck.netcloud.ClasSysPara;
 import com.hc.u8x_ck.R;
 
@@ -51,7 +52,6 @@ public class App_DataPara extends BaseApplication {
     /**
      * 屏幕密度
      */
-    public float fDispDensity;
     public int nTheme = R.style.AppTheme_Black;
     public ClasSysPara sysPara = new ClasSysPara();           //系统参数
     /**
@@ -59,25 +59,15 @@ public class App_DataPara extends BaseApplication {
      */
     public boolean m_bPlayMusic;
     /**
-     * 选择的仪器索引
-     */
-    public int m_nSelectUserNidx = 0;
-
-    /**
      * 数据库
      */
     public DBService m_DbService;
-    /**
-     * 工程ListView选择item
-     */
-    public int m_nProjectSeleteNidx = 0;
-    /**
-     * 构件ListView选择item
-     */
-    public int m_nGJSeleteNidx = -1;
     private List<Activity> acList;
     private IntentFilter mFilter;
     private String m_strESDir = null;
+    /**
+     * U盘的广播的监听
+     */
     private BroadcastReceiver mHandleMsg = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -98,6 +88,11 @@ public class App_DataPara extends BaseApplication {
     public static App_DataPara getApp() {
         return app;
     }
+
+    /**
+     * 文件相关的数据的全局列表
+     */
+    public List<ClasFileProjectInfo> proData = new ArrayList<>();
 
     //设计图标注的宽度
     public int designWidth = 800;
@@ -137,6 +132,20 @@ public class App_DataPara extends BaseApplication {
         for (Activity activity : acList) {
             activity.finish();
         }
+    }
+
+    public void finishOtherAll(Activity ac){
+        if (null == acList || null == ac) {
+            return;
+        }
+        Log.i("fei", acList.size() + "");
+        for (Activity activity : acList) {
+            if(ac != activity) {
+                activity.finish();
+            }
+        }
+        acList.clear();
+        acList.add(ac);
     }
 
     /**
