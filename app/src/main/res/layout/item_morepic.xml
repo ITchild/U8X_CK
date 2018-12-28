@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <ImageView
+        <ImageView
         android:id="@+id/morePic_show_mpsv"
         android:layout_width="match_parent"
         android:scaleType="fitXY"

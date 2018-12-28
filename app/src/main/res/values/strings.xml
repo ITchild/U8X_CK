@@ -12,6 +12,8 @@
 
 
     <string name="str_blackWrite">黑白图</string>
+    <string name="str_before">上一张</string>
+    <string name="str_next">下一张</string>
     <string name="str_handModle">手动</string>
     <string name="str_autoModle">自动</string>
     <string name="str_pic">原  图</string>

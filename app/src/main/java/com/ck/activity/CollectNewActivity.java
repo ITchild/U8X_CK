@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 
 import com.ck.base.TitleBaseActivity;
 import com.ck.bean.MeasureDataBean;
-import com.ck.db.DBService;
 import com.ck.dlg.CreateObjFileDialog;
 import com.ck.dlg.LoadingDialog;
 import com.ck.dlg.SigleBtMsgDialog;
@@ -31,12 +30,10 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 /**
  * @author fei
@@ -226,13 +223,13 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
                 onCollectStart();
             }
         });
-        if (!OpenCVLoader.initDebug()) {
-            Log.w(TAG, "static loading library fail,Using Manager for initialization");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallback);
-        } else {
-            Log.w(TAG, "OpenCV library found inside package. Using it!");
+//        if (!OpenCVLoader.initDebug()) {
+//            Log.w(TAG, "static loading library fail,Using Manager for initialization");
+//            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallback);
+//        } else {
+//            Log.w(TAG, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
+//        }
         collectState = 0;
     }
 
@@ -273,6 +270,7 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
             showToast("文件名重复");
             return;
         }
+        collect_cameraView.setZY(0); //恢复光标的颜色
         collect_cameraView.setDrawingCacheEnabled(true);
         FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
                 "/" + proName, fileName, "%s.bmp");
@@ -304,7 +302,6 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
 //        DBService.getInstence(this).SetMeasureData(dataBean);
 
         //刷新列表
-        collect_cameraView.setZY(0); //恢复光标的颜色
         collect_cameraView.setBlackWrite(false, false);
         fileName = FileUtil.GetDigitalPile(fileName);//文件名称默认增加1
         PreferenceHelper.setString("obj","gjname",fileName);
@@ -316,35 +313,6 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         collect_cameraView.setVisibility(View.VISIBLE);
         colleact_drag_ll.setVisibility(View.GONE);
         collectState = 0;//更新状态标志
-    }
-
-    /**
-     * 编辑后的保存
-     */
-    private void onUpDate() {
-        File isHaveFile = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + fileName + ".bmp");
-        if (isHaveFile.exists()) {
-            collect_cameraView.setDrawingCacheEnabled(true);
-            FileUtil.saveDrawBmpFile(collect_cameraView.getDrawingCache(),
-                    "/" + proName, fileName, "%s.bmp");
-            collect_cameraView.setDrawingCacheEnabled(false);
-            List<MeasureDataBean> isHaveData = DBService.getInstence(this).
-                    getMeasureData(proName, fileName + ".bmp", MeasureDataBean.FILESTATE_USERING);
-            if (null != isHaveData && isHaveData.size() > 0) {
-                //更新数据库内容
-                MeasureDataBean dataBean = new MeasureDataBean();
-                dataBean.setObjName(proName);
-                dataBean.setFileName(fileName + ".bmp");
-                dataBean.setWidth(collect_cameraView.width);
-                dataBean.setLeftY(FindLieFenUtils.m_nCLYLineSite);
-                dataBean.setLeftX(FindLieFenUtils.m_nCLXLineSite);
-                dataBean.setRightY(FindLieFenUtils.m_nCRYLineSite);
-                dataBean.setRightX(FindLieFenUtils.m_nCRXLineSite);
-                DBService.getInstence(this).upDateMeasureData(dataBean);
-                showToast(getStr(R.string.str_saveSuccess));
-                return;
-            }
-        }
     }
 
     /**

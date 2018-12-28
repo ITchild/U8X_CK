@@ -102,6 +102,20 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         if(null == loading){
             loading = new LoadingDialog(this);
         }
+        mProjectAdapter = new FileListProjectAdapter(this, App_DataPara.getApp().proData);
+        fileBower_proList_rv.setLayoutManager(new LinearLayoutManager(this));
+        fileBower_proList_rv.setAdapter(mProjectAdapter);
+        if (null == fileData) {
+            fileData = new ClasFileProjectInfo();
+        }
+        if (null != App_DataPara.getApp().proData && App_DataPara.getApp().proData.size() > 0) {
+            fileData = App_DataPara.getApp().proData.get(0);
+        }else {
+            fileData = new ClasFileProjectInfo();
+        }
+        mGJAdapter = new FileListGJAdapter(this, fileData);
+        fileBower_fileList_rv.setLayoutManager(new GridLayoutManager(this,3));
+        fileBower_fileList_rv.setAdapter(mGJAdapter);
     }
 
     @Override
@@ -121,26 +135,64 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
             fileData = new ClasFileProjectInfo();
         }
         mGJAdapter.setData(fileData, backgroundPosition);
+        if(fileData.mstrArrFileGJ.size()>0) {
+            fileBower_fileList_rv.scrollToPosition(0);
+        }
     }
 
     /**
-     * 初始化文件列表
+     * 开启子线程提前加载文件系统的列表
      */
-    private void initListData(){
-        mProjectAdapter = new FileListProjectAdapter(this, App_DataPara.getApp().proData);
-        fileBower_proList_rv.setLayoutManager(new LinearLayoutManager(this));
-        fileBower_proList_rv.setAdapter(mProjectAdapter);
-        if (null == fileData) {
-            fileData = new ClasFileProjectInfo();
-        }
-        if (null != App_DataPara.getApp().proData && App_DataPara.getApp().proData.size() > 0) {
-            fileData = App_DataPara.getApp().proData.get(0);
-        }else {
-            fileData = new ClasFileProjectInfo();
-        }
-        mGJAdapter = new FileListGJAdapter(this, fileData);
-        fileBower_fileList_rv.setLayoutManager(new GridLayoutManager(this,3));
-        fileBower_fileList_rv.setAdapter(mGJAdapter);
+    private void setFileDataBefor() {
+        startLoading();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                App_DataPara.getApp().proData = PathUtils.getProFileList();
+                if (null != App_DataPara.getApp().proData) {
+                    boolean flagRefresh = true;
+                    for (ClasFileProjectInfo proInfo : App_DataPara.getApp().proData) {
+                        for (ClasFileGJInfo gjInfo : proInfo.mstrArrFileGJ) {
+                            String path = PathUtils.PROJECT_PATH + "/" + proInfo.mFileProjectName
+                                    + "/" + gjInfo.mFileGJName + ".bmp";
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inSampleSize = 15;
+
+                            gjInfo.setSrc(BitmapFactory.decodeFile(path, options));
+                            String json = FileUtil.readData(PathUtils.PROJECT_PATH + "/"
+                                    + proInfo.mFileProjectName + "/" + gjInfo.mFileGJName + ".CK");
+                            if (!Stringutil.isEmpty(json)) {
+                                MeasureDataBean bean = new Gson().fromJson(json, MeasureDataBean.class);
+                                gjInfo.setWidth(bean.getWidth() + "");
+                            }
+                            if(flagRefresh){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if(null != mProjectAdapter) {
+                                            mProjectAdapter.setData(App_DataPara.getApp().proData,0);
+                                            mGJAdapter.setData(App_DataPara.getApp().proData.
+                                                    get(mProjectAdapter.getSelect()),0);
+                                            stopLoading();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        flagRefresh = false;
+                    }
+                }
+                stopLoading();
+            }
+        }).start();
+    }
+
+    @Override
+    protected void initListener() {
+        super.initListener();
+        fileBower_allChoice_ll.setOnClickListener(this);
+        fileBower_del_tv.setOnClickListener(this);
+        fileBower_toUPan_tv.setOnClickListener(this);
         //TODO : 工程列表的监听
         mProjectAdapter.setOnFileProItemClick(new FileListProjectAdapter.OnFileProItemClick() {
             @Override
@@ -166,58 +218,23 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     }
 
     /**
-     * 开启子线程提前加载文件系统的列表
-     */
-    private void setFileDataBefor() {
-        startLoading();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                App_DataPara.getApp().proData = PathUtils.getProFileList();
-                if (null != App_DataPara.getApp().proData) {
-                    for (ClasFileProjectInfo proInfo : App_DataPara.getApp().proData) {
-                        for (ClasFileGJInfo gjInfo : proInfo.mstrArrFileGJ) {
-                            String path = PathUtils.PROJECT_PATH + "/" + proInfo.mFileProjectName
-                                    + "/" + gjInfo.mFileGJName + ".bmp";
-                            BitmapFactory.Options options = new BitmapFactory.Options();
-                            options.inSampleSize = 10;
-                            gjInfo.setSrc(BitmapFactory.decodeFile(path, options));
-                            String json = FileUtil.readData(PathUtils.PROJECT_PATH + "/"
-                                    + proInfo.mFileProjectName + "/" + gjInfo.mFileGJName + ".CK");
-                            if (!Stringutil.isEmpty(json)) {
-                                MeasureDataBean bean = new Gson().fromJson(json, MeasureDataBean.class);
-                                gjInfo.setWidth(bean.getWidth() + "");
-                            }
-                        }
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        stopLoading();
-                        initListData();
-                    }
-                });
-            }
-        }).start();
-    }
-
-    @Override
-    protected void initListener() {
-        super.initListener();
-        fileBower_allChoice_ll.setOnClickListener(this);
-        fileBower_del_tv.setOnClickListener(this);
-        fileBower_toUPan_tv.setOnClickListener(this);
-    }
-
-    /**
      * 工程列表的点击（非选中）
      *
      * @param position
      */
-    protected void clickObjList(int position) {
+    protected void clickObjList(final int position) {
         mProjectAdapter.setSelect(position);
-        refreshFileListData(position, -1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshFileListData(position, -1);
+                    }
+                });
+            }
+        }).start();
     }
 
     /**
@@ -281,7 +298,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
             App_DataPara.getApp().proData.get(proPosition).nIsSelect = 0;
         }
         mProjectAdapter.notifyDataSetChanged();
-        mGJAdapter.notifyDataSetChanged();
+//        mGJAdapter.notifyDataSetChanged();
         if(isSelectAllObj()){
             //改变全选按钮的提示
             fileBower_allChoice_tv.setBackground(getResources()
@@ -320,13 +337,19 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_F1 ://切换按键，功能为删除
-                onDelete();
-                return true;
-            case KeyEvent.KEYCODE_F2 : //存储按键,功能为转U盘
                 onSaveSDcard();
                 return true;
-            case KeyEvent.KEYCODE_BACK :
+            case KeyEvent.KEYCODE_F2 : //存储按键,功能为转U盘
+                onDelete();
+                return true;
+            case KeyEvent.KEYCODE_BACK ://返回键
                 finishActivity();
+                return true;
+            case KeyEvent.KEYCODE_DPAD_UP :
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+            case KeyEvent.KEYCODE_ENTER:
                 return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -559,7 +582,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Catition.EDITBACKTOFILE && requestCode == Catition.FLIETURNTOEDIT){
+        if(resultCode == Catition.EDITBACKTOFILE && requestCode == Catition.FLIETURNTOEDIT){
             mProjectAdapter.notifyDataSetChanged();
             mGJAdapter.notifyDataSetChanged();
         }

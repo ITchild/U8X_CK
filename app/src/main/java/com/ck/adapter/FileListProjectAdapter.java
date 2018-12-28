@@ -136,6 +136,7 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
             m_TVTime.setVisibility(View.VISIBLE);
             if (null == m_LL) {
                 m_LL = (LinearLayout) view.findViewById(R.id.ui_list_project);
+                m_LL.setFocusable(true);
             }
             if (null == cilik_ll) {
                 cilik_ll = view.findViewById(R.id.LinearLayout1);

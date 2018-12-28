@@ -20,6 +20,8 @@ import com.ck.dlg.TwoBtMsgDialog;
 import com.ck.utils.CarmeraDataDone;
 import com.hc.u8x_ck.R;
 
+import org.opencv.android.OpenCVLoader;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +68,7 @@ public class HomeActivity extends TitleBaseActivity {
         home_display.setLayoutManager(new GridLayoutManager(this, num));
         mHomeDisAdapter = new HomeDisAdapter(this, homeDisData);
         home_display.setAdapter(mHomeDisAdapter);
+        OpenCVLoader.initDebug();
     }
 
     @Override

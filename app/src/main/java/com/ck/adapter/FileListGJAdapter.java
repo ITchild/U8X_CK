@@ -67,7 +67,7 @@ public class FileListGJAdapter extends RecyclerView.Adapter<FileListGJAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         String objName = mProject.mFileProjectName;
         String fileName = mProject.mstrArrFileGJ.get(position).mFileGJName;
         if(null != mProject.mstrArrFileGJ.get(position).getSrc()){
@@ -81,7 +81,7 @@ public class FileListGJAdapter extends RecyclerView.Adapter<FileListGJAdapter.Vi
                 holder.morePic_show_name.setText(fileName + "-" + bean.getWidth());
             }
         }else{//TODO :列表的宽度不为空，则直接使用
-            holder.morePic_show_name.setText(fileName + "-" + width);
+            holder.morePic_show_name.setText(fileName + "-" + width+"mm");
         }
         holder.morePic_show_mpsv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,6 +97,8 @@ public class FileListGJAdapter extends RecyclerView.Adapter<FileListGJAdapter.Vi
             public void onClick(View view) {
                 if(null != mOnFileGJItemClick){
                     mOnFileGJItemClick.onGJSelect(true,position);
+                    holder.morePic_choice_cb.setChecked(
+                            mProject.mstrArrFileGJ.get(position).bIsSelect? true:false);
                 }
             }
         });

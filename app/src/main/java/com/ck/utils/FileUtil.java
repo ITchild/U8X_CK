@@ -178,7 +178,7 @@ public class FileUtil {
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(imageFile);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -253,7 +253,7 @@ public class FileUtil {
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(imageFile);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

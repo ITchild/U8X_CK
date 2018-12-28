@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
+    android:focusable="true"
     android:orientation="vertical" >
 
     <include layout="@layout/ac_basetitle"></include>
@@ -51,6 +52,7 @@
                 android:id="@+id/fileBower_proList_rv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:focusable="true"
                 android:layout_weight="1">
             </android.support.v7.widget.RecyclerView>
 
