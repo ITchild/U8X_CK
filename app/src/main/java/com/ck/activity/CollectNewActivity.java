@@ -132,10 +132,10 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
 
             @Override
             public Mat onCameraFrame(final CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-                if (isLoading) {
-                    isLoading = false;
-                    stopLoading();
-                }
+//                if (isLoading) {
+//                    isLoading = false;
+//                    stopLoading();
+//                }
                 if(null != cameraErrorDialog && cameraErrorDialog.isShowing()) {
                     cameraErrorDialog.dismiss();
                 }
@@ -161,8 +161,8 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     @Override
     protected void onResume() {
         super.onResume();
-        showLoading();
-        isLoading = true;
+//        showLoading();
+//        isLoading = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -239,7 +239,7 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     private void onBeforTakePic() {
         stopCameraView();
 //        collect_cameraView.changeEx();//处理畸变
-        collect_cameraView.setZY(1);
+        collect_cameraView.setZY(1,false);
         collect_cameraView.onBeforTakePic();//预拍之后的预处理
         collect_OpenCvCamera.disableView();
         collect_OpenCvCamera.setVisibility(View.GONE);
@@ -265,18 +265,18 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
      * 保存照片数据
      */
     private void onSave() {
-        File isHaveFile = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + fileName + ".CK3");
+        File isHaveFile = new File(PathUtils.PROJECT_PATH + "/" + proName + "/" + fileName + ".CK");
         if (isHaveFile.exists()) {
             showToast("文件名重复");
             return;
         }
-        collect_cameraView.setZY(0); //恢复光标的颜色
-        collect_cameraView.setDrawingCacheEnabled(true);
-        FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
-                "/" + proName, fileName, "%s.bmp");
-        FileUtil.saveDrawBmpFile(collect_cameraView.getDrawingCache(),
-                "/" + proName, fileName, "%s.bmp");
-        collect_cameraView.setDrawingCacheEnabled(false);
+        collect_cameraView.setZY(0,false); //恢复光标的颜色
+//        collect_cameraView.setDrawingCacheEnabled(true);
+//        FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
+//                "/" + proName, fileName, "%s.bmp");
+//        FileUtil.saveDrawBmpFile(collect_cameraView.getDrawingCache(),
+//                "/" + proName, fileName, "%s.bmp");
+//        collect_cameraView.setDrawingCacheEnabled(false);
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         MeasureDataBean dataBean = new MeasureDataBean();
         dataBean.setObjName(proName);
@@ -298,7 +298,8 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         dataBean.setDelDate("0000/00/00");
 //        dataBean.setImageBytes(BMPUtils.bitmapToByteArr(collect_cameraView.m_DrawBitmap));
         Gson gson = new Gson();
-        FileUtil.saveBmpFile(gson.toJson(dataBean), "/" + proName, fileName, "%s.CK");
+        FileUtil.saveCKFile(gson.toJson(dataBean), "/" + proName, fileName,
+                "%s.CK",collect_cameraView.m_DrawBitmap);
 //        DBService.getInstence(this).SetMeasureData(dataBean);
 
         //刷新列表
@@ -390,9 +391,9 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
             //切换
             if(collectState == 1) {
                 if (collect_cameraView.m_nDrawFlag == 2 || collect_cameraView.m_nDrawFlag == 0) {
-                    collect_cameraView.setZY(1);
+                    collect_cameraView.setZY(1,false);
                 } else {
-                    collect_cameraView.setZY(2);
+                    collect_cameraView.setZY(2,false);
                 }
             }
             return true;

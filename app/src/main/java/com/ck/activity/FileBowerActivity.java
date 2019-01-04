@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,15 +28,18 @@ import com.ck.dlg.LoadingDialog;
 import com.ck.dlg.SigleBtMsgDialog;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
+import com.ck.ui.OpenCvCameraView;
 import com.ck.utils.BroadcastAction;
 import com.ck.utils.Catition;
 import com.ck.utils.FileUtil;
+import com.ck.utils.FindLieFenUtils;
 import com.ck.utils.PathUtils;
 import com.ck.utils.Stringutil;
 import com.google.gson.Gson;
 import com.hc.u8x_ck.R;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,21 +47,27 @@ import java.util.List;
  * 为文件管理的Activity
  */
 
-public class FileBowerActivity extends TitleBaseActivity implements View.OnClickListener{
+public class FileBowerActivity extends TitleBaseActivity implements View.OnClickListener {
 
-    protected ClasFileProjectInfo fileData;
+    private List<ClasFileGJInfo> fileGJData;
     private RecyclerView fileBower_proList_rv;
     private FileListProjectAdapter mProjectAdapter;
     private RecyclerView fileBower_fileList_rv;
     private FileListGJAdapter mGJAdapter;
     private DLG_FileProgress m_ProgressDialog;
 
+    private OpenCvCameraView fileBower_camera;
     private TextView fileBower_allChoice_tv;
     private LinearLayout fileBower_allChoice_ll;
     private TextView fileBower_del_tv;
     private TextView fileBower_toUPan_tv;
 
-    private LoadingDialog loading ;
+    private int pageIndex = 12;//分页加载的每一页的个数
+    private int currPageNum = 0;
+
+    private LoadingDialog loading;//loading框
+    private boolean isCanSecelt = false;//是否出现选框
+    private boolean isBreakGetListData = false;//加载的子线程是否打断
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -93,98 +103,137 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.UpdataProgress);
         registerReceiver(mReceiver, filter);
+        fileBower_camera = findView(R.id.fileBower_camera);
         fileBower_allChoice_tv = findView(R.id.fileBower_allChoice_tv);
         fileBower_allChoice_ll = findView(R.id.fileBower_allChoice_ll);
         fileBower_proList_rv = findView(R.id.fileBower_proList_rv);
         fileBower_fileList_rv = findView(R.id.fileBower_fileList_rv);
         fileBower_del_tv = findView(R.id.fileBower_del_tv);
         fileBower_toUPan_tv = findView(R.id.fileBower_toUPan_tv);
-        if(null == loading){
+        if (null == loading) {
             loading = new LoadingDialog(this);
         }
         mProjectAdapter = new FileListProjectAdapter(this, App_DataPara.getApp().proData);
         fileBower_proList_rv.setLayoutManager(new LinearLayoutManager(this));
         fileBower_proList_rv.setAdapter(mProjectAdapter);
-        if (null == fileData) {
-            fileData = new ClasFileProjectInfo();
+        if (null == fileGJData) {
+            fileGJData = new ArrayList<>();
         }
-        if (null != App_DataPara.getApp().proData && App_DataPara.getApp().proData.size() > 0) {
-            fileData = App_DataPara.getApp().proData.get(0);
-        }else {
-            fileData = new ClasFileProjectInfo();
-        }
-        mGJAdapter = new FileListGJAdapter(this, fileData);
-        fileBower_fileList_rv.setLayoutManager(new GridLayoutManager(this,3));
+        mGJAdapter = new FileListGJAdapter(this, fileGJData);
+        fileBower_fileList_rv.setLayoutManager(new GridLayoutManager(this, 3));
         fileBower_fileList_rv.setAdapter(mGJAdapter);
     }
 
     @Override
     protected void initData() {
         super.initData();
+        startLoading();
+        App_DataPara.getApp().proData = PathUtils.getProFileList();
+        refreshList(3);
         baseTitle_title_tv.setText("文件管理");
-        setFileDataBefor();
+        loadMorePicData();
     }
 
-    /**
-     * 刷新文件列表数据
-     */
-    private void refreshFileListData(int position, int backgroundPosition) {
-        if (null != App_DataPara.getApp().proData && App_DataPara.getApp().proData.size() > 0) {
-            fileData = App_DataPara.getApp().proData.get(position);
-        }else {
-            fileData = new ClasFileProjectInfo();
-        }
-        mGJAdapter.setData(fileData, backgroundPosition);
-        if(fileData.mstrArrFileGJ.size()>0) {
-            fileBower_fileList_rv.scrollToPosition(0);
-        }
-    }
+//    /**
+//     * 刷新文件列表数据
+//     */
+//    private void refreshFileListData(int position, int backgroundPosition) {
+//        mGJAdapter.setData(fileGJData, backgroundPosition);
+//        if (fileGJData.size() > 0) {
+//            fileBower_fileList_rv.scrollToPosition(0);
+//        }
+//    }
 
     /**
      * 开启子线程提前加载文件系统的列表
      */
-    private void setFileDataBefor() {
+    private void loadMorePicData() {
         startLoading();
+        isBreakGetListData = false;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                App_DataPara.getApp().proData = PathUtils.getProFileList();
                 if (null != App_DataPara.getApp().proData) {
-                    boolean flagRefresh = true;
-                    for (ClasFileProjectInfo proInfo : App_DataPara.getApp().proData) {
-                        for (ClasFileGJInfo gjInfo : proInfo.mstrArrFileGJ) {
-                            String path = PathUtils.PROJECT_PATH + "/" + proInfo.mFileProjectName
-                                    + "/" + gjInfo.mFileGJName + ".bmp";
-                            BitmapFactory.Options options = new BitmapFactory.Options();
-                            options.inSampleSize = 15;
-
-                            gjInfo.setSrc(BitmapFactory.decodeFile(path, options));
-                            String json = FileUtil.readData(PathUtils.PROJECT_PATH + "/"
-                                    + proInfo.mFileProjectName + "/" + gjInfo.mFileGJName + ".CK");
-                            if (!Stringutil.isEmpty(json)) {
-                                MeasureDataBean bean = new Gson().fromJson(json, MeasureDataBean.class);
-                                gjInfo.setWidth(bean.getWidth() + "");
-                            }
-                            if(flagRefresh){
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if(null != mProjectAdapter) {
-                                            mProjectAdapter.setData(App_DataPara.getApp().proData,0);
-                                            mGJAdapter.setData(App_DataPara.getApp().proData.
-                                                    get(mProjectAdapter.getSelect()),0);
-                                            stopLoading();
-                                        }
-                                    }
-                                });
+                    int flagPosition = 0;
+                    ClasFileProjectInfo proInfo = App_DataPara.getApp().proData.get(mProjectAdapter.getSelect());
+                    for (int i=pageIndex*currPageNum;i<proInfo.mstrArrFileGJ.size();i++) {
+                        ClasFileGJInfo gjInfo = proInfo.mstrArrFileGJ.get(i);
+                        if (isBreakGetListData) {
+                            return;
+                        }
+                        if(Stringutil.isEmpty(gjInfo.getWidth())) {
+                            String jsons = FileUtil.readData(PathUtils.PROJECT_PATH + "/"
+                                    + proInfo.mFileProjectName + "/" + gjInfo.mFileGJName);
+                            if (null != jsons) {
+                                if (!Stringutil.isEmpty(jsons)) {
+                                    MeasureDataBean bean = new Gson().fromJson(jsons, MeasureDataBean.class);
+                                    gjInfo.setWidth(bean.getWidth() + "");
+                                }
                             }
                         }
-                        flagRefresh = false;
+                        if(null == gjInfo.getSrc()) {
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inSampleSize = 7;
+                            byte[] picByte = FileUtil.readPicData(PathUtils.PROJECT_PATH + "/"
+                                    + proInfo.mFileProjectName + "/" + gjInfo.mFileGJName);
+                            if (null != picByte) {
+                                gjInfo.setSrc(BitmapFactory.decodeByteArray(picByte,
+                                        0, picByte.length, options));
+                            }
+                        }
+                        flagPosition++;
+                        fileGJData.add(gjInfo);
+                        if (flagPosition == pageIndex) {
+                            refreshList(2);
+                            return;
+                        }
                     }
+                    loadNoMore(flagPosition);
                 }
-                stopLoading();
             }
         }).start();
+    }
+
+    private void loadNoMore(final int flagPosition){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stopLoading();
+                if(flagPosition == 0){
+                    currPageNum --;
+                    showToast("没有更多了");
+                }else {
+                    refreshList(2);
+                    showToast("已经加载到最后");
+                }
+            }
+        });
+    }
+
+    /**
+     * 刷新列表
+     *
+     * @Param type  1:所有都刷新   2：刷新图片  3：刷新工程列表
+     */
+    private void refreshList(final int type) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (null != mProjectAdapter && null != mGJAdapter) {
+                    if (type == 1) {
+                        mProjectAdapter.setData(App_DataPara.getApp().proData, mProjectAdapter.getSelect());
+                        mGJAdapter.setData(fileGJData, mGJAdapter.getSelect());
+                    } else if (type == 2) {
+                        if (App_DataPara.getApp().proData.size() > mProjectAdapter.getSelect()) {
+                            mGJAdapter.setData(fileGJData, mGJAdapter.getSelect());
+                        }
+                    } else if (type == 3) {
+                        mProjectAdapter.setData(App_DataPara.getApp().proData, mProjectAdapter.getSelect());
+                    }
+                    stopLoading();
+                }
+            }
+        });
     }
 
     @Override
@@ -197,21 +246,41 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         mProjectAdapter.setOnFileProItemClick(new FileListProjectAdapter.OnFileProItemClick() {
             @Override
             public void onClickIsChoice(boolean isChoice, int position) {
-                if (isChoice) {//是否进行勾选
+                clickObjList(position);
+                if (isCanSecelt) {//是否进行勾选
                     choiceObjList(position);
                 } else {//点击一整项
-                    clickObjList(position);
+//                    clickObjList(position);
                 }
+            }
+
+            @Override
+            public void onLongClick(int position) {
+                changeViewToSecelect();
             }
         });
         //TODO : 文件列表的监听
         mGJAdapter.setOnFileGJItemClick(new FileListGJAdapter.OnFileGJItemClick() {
             @Override
             public void onGJSelect(boolean isSelect, int position) {
-                if (isSelect) {
+                if (isCanSecelt) {
                     choiceFileList(position);
                 } else {//点击一整项
                     cilickFileObjList(position);
+                }
+            }
+
+            @Override
+            public void onGJLongClick(int position) {
+                changeViewToSecelect();
+            }
+        });
+        fileBower_fileList_rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (!recyclerView.canScrollVertically(1)) {//滑动到底部的处理
+                    currPageNum ++ ;
+                    loadMorePicData();
                 }
             }
         });
@@ -224,17 +293,9 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      */
     protected void clickObjList(final int position) {
         mProjectAdapter.setSelect(position);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshFileListData(position, -1);
-                    }
-                });
-            }
-        }).start();
+        currPageNum = 0;
+        fileGJData.clear();
+        loadMorePicData();
     }
 
     /**
@@ -243,7 +304,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      * @param position
      */
     protected void choiceObjList(int position) {
-        if(null == App_DataPara.getApp().proData || App_DataPara.getApp().proData.size() ==0){
+        if (null == App_DataPara.getApp().proData || App_DataPara.getApp().proData.size() == 0) {
             return;
         }
         int choiceState = App_DataPara.getApp().proData.get(position).nIsSelect;
@@ -253,12 +314,12 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
             optFileListChoice(position, false);
         }
         mProjectAdapter.setSelect(position);
-        refreshFileListData(position, mGJAdapter.getSelect());
-        if(isSelectAllObj()){
+        mGJAdapter.setData(fileGJData, mGJAdapter.getSelect());
+        if (isSelectAllObj()) {
             //改变全选按钮的提示
             fileBower_allChoice_tv.setBackground(getResources()
                     .getDrawable(R.drawable.checkbox_all_true));
-        }else{
+        } else {
             fileBower_allChoice_tv.setBackground(getResources()
                     .getDrawable(R.drawable.checkbox_false));
         }
@@ -266,23 +327,28 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
 
     /**
      * 文件列表的点击事件
+     *
      * @param position
      */
     protected void cilickFileObjList(int position) {
         mGJAdapter.setSelect(position);
-        Intent intent = new Intent(this,EditPicActivity.class);
-        intent.putExtra("objPosition",mProjectAdapter.getSelect());
-        intent.putExtra("gjPosition",mGJAdapter.getSelect());
+        Intent intent = new Intent(this, EditPicActivity.class);
+        intent.putExtra("objPosition", mProjectAdapter.getSelect());
+        intent.putExtra("gjPosition", mGJAdapter.getSelect());
         startActivityForResult(intent, Catition.FLIETURNTOEDIT);
     }
 
     protected void choiceFileList(int position) {
         int proPosition = mProjectAdapter.getSelect();
-        fileData.mstrArrFileGJ.get(position).bIsSelect
-                = !fileData.mstrArrFileGJ.get(position).bIsSelect;
+        App_DataPara.getApp().proData.get(mProjectAdapter.getSelect())
+                .mstrArrFileGJ.get(position).bIsSelect
+                = ! App_DataPara.getApp().proData.get(mProjectAdapter.getSelect())
+                .mstrArrFileGJ.get(position).bIsSelect;
+        fileGJData.get(position).bIsSelect =  App_DataPara.getApp().proData.
+                get(mProjectAdapter.getSelect()).mstrArrFileGJ.get(position).bIsSelect;
         boolean isAllSelect = true;
         boolean isNoneSelect = true;
-        for (ClasFileGJInfo gjInfo : fileData.mstrArrFileGJ) {
+        for (ClasFileGJInfo gjInfo : App_DataPara.getApp().proData.get(mProjectAdapter.getSelect()).mstrArrFileGJ) {
             if (!gjInfo.bIsSelect) {
                 isAllSelect = false;
             }
@@ -299,11 +365,11 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         }
         mProjectAdapter.notifyDataSetChanged();
 //        mGJAdapter.notifyDataSetChanged();
-        if(isSelectAllObj()){
+        if (isSelectAllObj()) {
             //改变全选按钮的提示
             fileBower_allChoice_tv.setBackground(getResources()
                     .getDrawable(R.drawable.checkbox_all_true));
-        }else{
+        } else {
             fileBower_allChoice_tv.setBackground(getResources()
                     .getDrawable(R.drawable.checkbox_false));
         }
@@ -329,24 +395,31 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
 
     /**
      * 按键的监听
+     *
      * @param keyCode
      * @param event
      * @return
      */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode){
-            case KeyEvent.KEYCODE_F1 ://切换按键，功能为删除
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_F1://切换按键，功能为删除
                 onSaveSDcard();
                 return true;
-            case KeyEvent.KEYCODE_F2 : //存储按键,功能为转U盘
+            case KeyEvent.KEYCODE_F2: //存储按键,功能为转U盘
                 onDelete();
                 return true;
-            case KeyEvent.KEYCODE_BACK ://返回键
-                finishActivity();
+            case KeyEvent.KEYCODE_BACK://返回键
+                if (isCanSecelt) {
+                    changeViewToNoSecelct();
+                } else {
+                    finishActivity();
+                }
                 return true;
-            case KeyEvent.KEYCODE_DPAD_UP :
+            case KeyEvent.KEYCODE_DPAD_UP:
+                return true;
             case KeyEvent.KEYCODE_DPAD_DOWN:
+                return true;
             case KeyEvent.KEYCODE_DPAD_LEFT:
             case KeyEvent.KEYCODE_DPAD_RIGHT:
             case KeyEvent.KEYCODE_ENTER:
@@ -364,6 +437,9 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     private void optFileListChoice(int proPosition, boolean isSelect) {
         List<ClasFileGJInfo> listData = App_DataPara.getApp().proData.get(proPosition).mstrArrFileGJ;
         for (ClasFileGJInfo info : listData) {
+            info.bIsSelect = isSelect;
+        }
+        for (ClasFileGJInfo info : fileGJData){
             info.bIsSelect = isSelect;
         }
         App_DataPara.getApp().proData.get(proPosition).nIsSelect = isSelect ? 2 : 0;
@@ -394,16 +470,16 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         for (int i = 0; i < App_DataPara.getApp().proData.size(); i++) {
             optFileListChoice(i, !isSelect);
         }
-        if(!isSelect){
+        if (!isSelect) {
             //改变全选按钮的提示
             fileBower_allChoice_tv.setBackground(getResources()
                     .getDrawable(R.drawable.checkbox_all_true));
-        }else{
+        } else {
             fileBower_allChoice_tv.setBackground(getResources()
                     .getDrawable(R.drawable.checkbox_false));
         }
-        mProjectAdapter.setData(App_DataPara.getApp().proData,mProjectAdapter.getSelect());
-        mGJAdapter.setData(App_DataPara.getApp().proData.get(mProjectAdapter.getSelect()),mGJAdapter.getSelect());
+        mProjectAdapter.setData(App_DataPara.getApp().proData, mProjectAdapter.getSelect());
+        mGJAdapter.setData(fileGJData, mGJAdapter.getSelect());
     }
 
     /**
@@ -413,6 +489,10 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      * @throw
      */
     protected void onDelete() {
+        if (!isCanSecelt) {
+            changeViewToSecelect();
+            return;
+        }
         if (!isHaveSeclect()) {
             return;
         }
@@ -429,48 +509,91 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     }
 
     /**
+     * 改变布局到选择状态
+     */
+    private void changeViewToSecelect() {
+        isCanSecelt = true;
+        mGJAdapter.toSelectView(true);
+        mProjectAdapter.toSelectView(true);
+        fileBower_allChoice_tv.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 改变布局到不能选择状态
+     */
+    private void changeViewToNoSecelct() {
+        isCanSecelt = false;
+        mGJAdapter.toSelectView(false);
+        mProjectAdapter.toSelectView(false);
+        fileBower_allChoice_tv.setVisibility(View.GONE);
+        for (ClasFileProjectInfo proInfo : App_DataPara.getApp().proData) {
+            for (ClasFileGJInfo gjInfo : proInfo.mstrArrFileGJ) {
+                gjInfo.bIsSelect = false;
+            }
+            proInfo.nIsSelect = 0;
+        }
+    }
+
+    /**
      * 删除选中文件的具体方法
      */
     private void delSelectFile() {
         FileUtil.delSeleceFile(App_DataPara.getApp().proData);
+        for (ClasFileProjectInfo projectInfo : App_DataPara.getApp().proData) {
+            if (projectInfo.nIsSelect == 2) {
+                App_DataPara.getApp().proData.remove(projectInfo);
+            } else if (projectInfo.nIsSelect == 1) {
+                for (ClasFileGJInfo fileGJInfo : projectInfo.mstrArrFileGJ) {
+                    if (fileGJInfo.bIsSelect) {
+                        projectInfo.mstrArrFileGJ.remove(fileGJInfo);
+                    }
+                }
+            }
+        }
         int position = mProjectAdapter.getSelect();
         int allLength = App_DataPara.getApp().proData.size();
-        Log.i("fei","总体长度"+allLength);
-        if(allLength == 0){
+        Log.i("fei", "总体长度" + allLength);
+        if (allLength == 0) {
             position = 0;
-        }else {
+        } else {
             if (position >= allLength) {
                 position = allLength - 1;
             }
         }
         mProjectAdapter.setData(App_DataPara.getApp().proData, position);
-        refreshFileListData(0, -1);//刷新文件列表
+        currPageNum = 0;
+        loadMorePicData();
     }
 
     /**
      * 删除数据中的文件
      */
-    private void delDbMeasure(){
-        for(ClasFileProjectInfo info : App_DataPara.getApp().proData){
-            if(info.nIsSelect == 2){
+    private void delDbMeasure() {
+        for (ClasFileProjectInfo info : App_DataPara.getApp().proData) {
+            if (info.nIsSelect == 2) {
                 DBService.getInstence(this).delMeasureData(
-                        info.mFileProjectName,null);
-            }else if(info.nIsSelect == 1){
+                        info.mFileProjectName, null);
+            } else if (info.nIsSelect == 1) {
                 List<ClasFileGJInfo> ArrFileGJ = info.mstrArrFileGJ;
                 for (int j = 0; j < ArrFileGJ.size(); j++) {
                     ClasFileGJInfo clasFileGJInfo = ArrFileGJ.get(j);
                     if (clasFileGJInfo.bIsSelect) {
                         DBService.getInstence(this).delMeasureData(
-                                info.mFileProjectName,clasFileGJInfo.mFileGJName);
+                                info.mFileProjectName, clasFileGJInfo.mFileGJName);
                     }
                 }
             }
         }
     }
+
     /**
      * 将文件转存的U盘
      */
     protected void onSaveSDcard() {
+        if (!isCanSecelt) {
+            changeViewToSecelect();
+            return;
+        }
         if (!isHaveSeclect()) {//判断是否有文件被选中
             return;
         }
@@ -489,14 +612,14 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         dialog.setOnChoiceSaveClick(new ChoiceSaveTypeDialog.OnChoiceSaveClick() {
             @Override
             public void isOk(boolean isOk, int type) {
-                if(isOk){
-                    if(type == -1){
+                if (isOk) {
+                    if (type == -1) {
                         showToast("请选择导入U盘的数据类型");
-                    }else{
+                    } else {
                         dialog.dismiss();
-                        copyFile(targetDir,type);
+                        copyFile(targetDir, type);
                     }
-                }else{
+                } else {
                     dialog.dismiss();
                 }
             }
@@ -504,7 +627,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     }
 
     // 拷贝选中文件
-    private void copyFile(String targetDir , int type) {
+    private void copyFile(String targetDir, int type) {
         if (null != AppDatPara.GetExternalStorageDirectory()) {
             File targetFile = new File(targetDir);
             targetFile.mkdirs();
@@ -513,7 +636,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
             // 如果存在选中转U盘状态,显示进度条
             if (new File(targetDir).exists()) {
                 if (targetFile.exists() && targetFile.canRead() && targetFile.canWrite()) {
-                    copyFileToUPan(targetDir,type);
+                    copyFileToUPan(targetDir, type);
                 } else {
                     sendBroadcast(new Intent(BroadcastAction.UpdataProgress).putExtra("ProgressValue", -1));
                 }
@@ -529,7 +652,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      */
     private void copyFileToUPan(final String targetDir, final int type) {
         // 获取拷贝文件总共大小值 ，将值传入拷贝文件中
-        long lTotalfileSize = FileUtil.GetFileSize(App_DataPara.getApp().proData,type);
+        long lTotalfileSize = FileUtil.GetFileSize(App_DataPara.getApp().proData, type);
         // 新建目标目录
         if (null == m_ProgressDialog || !m_ProgressDialog.isShowing()) {
             m_ProgressDialog = new DLG_FileProgress(this, lTotalfileSize);
@@ -539,10 +662,111 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         }
         new Thread() {
             public void run() {
-                FileUtil.copyFileInThread(targetDir,type,AppDatPara);
+//                FileUtil.copyFileInThread(targetDir, type, AppDatPara);
+                copyFileInThread(targetDir, type, AppDatPara);
             }
         }.start();
     }
+
+    /**
+     * 文件管理U盘导出文件的最后阶段 ，根据type确定导出的类型
+     *
+     * @param targetDir
+     * @param type       1；导出可直接使用的图片 2：导出到上位机的文件  3： 两种都进行导出
+     * @param AppDatPara
+     */
+    private void copyFileInThread(String targetDir, int type, App_DataPara AppDatPara) {
+        File ckSourceF = null;
+        File targetPathF = null;
+        File drawTargetPathF = null;
+        File ckTargetF = null;
+        File drawTargetF = null;
+        for (int i = 0; i < App_DataPara.getApp().proData.size(); i++) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            if (App_DataPara.getApp().proData.get(i).nIsSelect != 0) {
+                for (int j = 0; j < App_DataPara.getApp().proData.get(i).mstrArrFileGJ.size(); j++) {
+                    if (App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).bIsSelect == true) {
+                        targetPathF = new File(targetDir + File.separator +
+                                "工程" + File.separator + App_DataPara.getApp().proData.get(i).mFileProjectName);
+                        drawTargetPathF = new File(targetDir + File.separator +
+                                "Draw工程" + File.separator + App_DataPara.getApp().proData.get(i).mFileProjectName);
+                        ckSourceF = new File(PathUtils.PROJECT_PATH
+                                + "/" + App_DataPara.getApp().proData.get(i).mFileProjectName
+                                + "/" + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName);
+                        ckTargetF = new File(targetPathF.toString()
+                                + File.separator + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName);
+                        drawTargetF = new File(drawTargetPathF.toString()
+                                + File.separator + App_DataPara.getApp().proData.get(i).mstrArrFileGJ.get(j).mFileGJName
+                                .replace(".CK", ".png"));
+
+                        if (type == 1) { //导出之后可直接使用的图片
+                            // 拷贝含有标志的文件
+                            if (null != ckTargetF && null != drawTargetF) {
+                                drawTargetPathF.mkdirs();// 新建目标目录
+                                makeDrawPicToFile(ckTargetF, drawTargetF, AppDatPara);
+                            }
+                        } else if (type == 2) { //导出到电脑的图片
+                            if (null != ckSourceF && null != ckTargetF) {
+                                targetPathF.mkdirs();// 新建目标目录
+                                FileUtil.getInstance().copyFile(ckSourceF, ckTargetF, AppDatPara);// 拷贝文件
+                            }
+                        } else if (type == 3) {//以上两种都有的图片
+                            // 拷贝原图文件
+                            if (null != ckSourceF && null != ckTargetF) {
+                                targetPathF.mkdirs();// 新建目标目录
+                                FileUtil.getInstance().copyFile(ckSourceF, ckTargetF, AppDatPara);// 拷贝文件
+                            }
+                            // 拷贝含有标志的文件
+                            if (null != ckTargetF && null != drawTargetF) {
+                                drawTargetPathF.mkdirs();// 新建目标目录
+                                makeDrawPicToFile(ckTargetF, drawTargetF, AppDatPara);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 导出图片的时候进行图片和数据的合成
+     *
+     * @param source
+     * @param target
+     * @param m_Context
+     */
+    public void makeDrawPicToFile(File source, File target, Context m_Context) {
+        if (null == source || null == target || null == m_Context) {
+            return;
+        }
+        byte[] bytes = FileUtil.readPicData(source.getPath());
+        Bitmap picBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        String json = FileUtil.readData(source.getPath());
+        MeasureDataBean dataBean = new Gson().fromJson(json, MeasureDataBean.class);
+        fileBower_camera.setBitmap(picBitmap, true);
+        FindLieFenUtils.m_nCLXLineSite = dataBean.getLeftX();
+        FindLieFenUtils.m_nCLYLineSite = dataBean.getLeftY();
+        FindLieFenUtils.m_nCRXLineSite = dataBean.getRightX();
+        FindLieFenUtils.m_nCRYLineSite = dataBean.getRightY();
+        FindLieFenUtils.bytGrayAve = dataBean.getAvage();
+        fileBower_camera.makeInitSetting();
+        fileBower_camera.setZY(0, true);
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        fileBower_camera.setDrawingCacheEnabled(true);
+        FileUtil.saveDrawToUFile(fileBower_camera.getDrawingCache(), target);
+        fileBower_camera.setDrawingCacheEnabled(false);
+    }
+
 
     private void showMsgCon(String str) {
         final SigleBtMsgDialog alert = new SigleBtMsgDialog(this);
@@ -557,7 +781,6 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
             }
         });
     }
-
 
     /**
      * 判断是否有文件被选中
@@ -582,26 +805,40 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == Catition.EDITBACKTOFILE && requestCode == Catition.FLIETURNTOEDIT){
-            mProjectAdapter.notifyDataSetChanged();
-            mGJAdapter.notifyDataSetChanged();
+        if (resultCode == Catition.EDITBACKTOFILE && requestCode == Catition.FLIETURNTOEDIT) {
+            int filePosition = 0;
+            if (null != data) {
+                filePosition = data.getIntExtra("filePosition", 0);
+            }
+            if(filePosition >= fileGJData.size()) {
+                ClasFileProjectInfo projectInfo = App_DataPara.getApp().proData.get(mProjectAdapter.getSelect());
+                fileGJData.clear();
+                for (int i=0;i<filePosition ;i++){
+                    fileGJData.add(projectInfo.mstrArrFileGJ.get(i));
+                }
+                mGJAdapter.setData(fileGJData, filePosition);
+            }else{
+                mGJAdapter.setData(fileGJData, filePosition);
+            }
+            fileBower_fileList_rv.scrollToPosition(filePosition);
         }
     }
 
-    private void stopLoading(){
-        if(null != loading && loading.isShowing()){
+    private void stopLoading() {
+        if (null != loading && loading.isShowing()) {
             loading.dismiss();
         }
     }
 
-    private void startLoading(){
-        if(null != loading && !loading.isShowing()){
+    private void startLoading() {
+        if (null != loading && !loading.isShowing()) {
             loading.show();
         }
     }
 
-    private void finishActivity(){
+    private void finishActivity() {
         App_DataPara.getApp().proData.clear();
+        isBreakGetListData = true;
         finish();
     }
 

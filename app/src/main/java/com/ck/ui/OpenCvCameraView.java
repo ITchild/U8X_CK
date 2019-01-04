@@ -241,9 +241,13 @@ public class OpenCvCameraView extends View {
     /**
      * @param nDrawFlag 0自动，左右线红色，1手动，左侧游标，2手动，右侧游标
      */
-    public void setZY(int nDrawFlag) {
+    public void setZY(int nDrawFlag,boolean isOnThread) {
         m_nDrawFlag = nDrawFlag;
-        invalidate();
+        if(isOnThread){
+            postInvalidate();
+        }else{
+            invalidate();
+        }
     }
 
     public void changeEx(){
@@ -254,7 +258,7 @@ public class OpenCvCameraView extends View {
         invalidate();
     }
 
-    public void setBitmap(Bitmap map) {
+    public void setBitmap(Bitmap map,boolean isOnThread) {
         m_bOpenOldFile = true;
         m_DrawBitmap = map;
         m_DraBitMapWith = m_DrawBitmap.getWidth();
@@ -266,7 +270,11 @@ public class OpenCvCameraView extends View {
                 blackWriteBitmap = OpenCvLieFUtil.getDonePic(m_DrawBitmap);
             }
         }).start();
-        invalidate();
+        if(isOnThread){
+            postInvalidate();
+        }else{
+            invalidate();
+        }
     }
 
     /**
@@ -303,7 +311,7 @@ public class OpenCvCameraView extends View {
                 drawRuleAndFlag(canvas);//画刻度和标志
                 return; //防止异步线程中将m_DrawBitmap回收（在这里进行检测）
             }
-            String str = "裂缝宽度检测";
+            String str = "正在连接... ...";
             Paint paint = getPaint(Paint.Style.FILL, 5, Color.RED,
                     mContext.getResources().getDimension(R.dimen.carmeraStartText));
             float fWidth = paint.measureText(str);
@@ -313,48 +321,9 @@ public class OpenCvCameraView extends View {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         RectF rectF = new RectF(0, 0, m_nScreenWidth, m_nScreenHeight); // w和h分别是屏幕的宽和高，也就是你想让图片显示的宽和高
         if (!isStart) {
-//        if(! isStart) {
             showBitmap = isBlackWrite ? blackWriteBitmap : m_DrawBitmap;
-//        }else{
-//            showBitmap = m_DrawBitmap;
-//        }
             canvas.drawBitmap(showBitmap, null, rectF, null);
-//            if (isFindSide) { //描边
-//                Paint paint = getPaint(Paint.Style.FILL, 2, Color.GREEN, 25);
-//                List<PointBean> greenData = OpenCvLieFUtil.greenData;
-//                List<PointBean> buleData = OpenCvLieFUtil.buleData;
-//                if (null != greenData && greenData.size() > 1) {
-//                    for (int i = 3; i < greenData.size(); i += 3) {
-//                        float greenX = greenData.get(i).getX();
-//                        float greenY = greenData.get(i).getY();
-//                        greenX = (float) (((greenX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-//                        greenY = (float) (((greenY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-//
-//                        float greenX_ = greenData.get(i - 3).getX();
-//                        float greenY_ = greenData.get(i - 3).getY();
-//                        greenX_ = (float) (((greenX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-//                        greenY_ = (float) (((greenY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-//
-//                        canvas.drawLine(greenX_, greenY_, greenX, greenY, paint);
-//                    }
-//                }
-//                paint.setColor(Color.BLUE);
-//                for (int i = 3; i < buleData.size(); i += 3) {
-//                    float buleX = buleData.get(i).getX();
-//                    float buleY = buleData.get(i).getY();
-//                    buleX = (float) (((buleX * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-//                    buleY = (float) (((buleY * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-//
-//                    float buleX_ = buleData.get(i - 3).getX();
-//                    float buleY_ = buleData.get(i - 3).getY();
-//                    buleX_ = (float) (((buleX_ * 1.0) / m_DraBitMapWith) * m_nScreenWidth);
-//                    buleY_ = (float) (((buleY_ * 1.0) / m_DraBitMapHight) * m_nScreenHeight);
-//
-//                    canvas.drawLine(buleX_, buleY_, buleX, buleY, paint);
-//                }
-//            }
         }
-
         drawRuleAndFlag(canvas);//画刻度和标志
     }
 
@@ -624,10 +593,10 @@ public class OpenCvCameraView extends View {
                         startX = event.getX();
                         startY = event.getY();
                         if (Math.abs(nLLx - (startX + BaseX)) < 30 && Math.abs((startY + BaseY) - nLLy) < 30) {
-                            setZY(1);
+                            setZY(1,false);
                             isCanMove = true;
                         } else if (Math.abs((startX + BaseX) - nRLx) < 30 && Math.abs((startY + BaseY) - nRLy) < 30) {
-                            setZY(2);
+                            setZY(2,false);
                             isCanMove = true;
                         }
                         LeftFlagX = startX - nLX + BaseX;

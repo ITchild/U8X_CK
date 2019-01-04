@@ -89,20 +89,9 @@ public class PathUtils {
             File[] gjList = OrderByDate(PathUtils.PROJECT_PATH + File.separator + project.mFileProjectName);
             for (int j = 0; j < gjList.length; j++) {
                 ClasFileGJInfo gj = new ClasFileGJInfo();
-                String name = gjList[j].getName();
-                if(name.endsWith("bmp")) {
-                    String[] names = name.split("\\.");
-                    if (null != names && names.length > 1) {
-                        gj.mFileGJName = names[0];
-                    } else {
-                        gj.mFileGJName = name;
-                    }
-//                File file = new File(PathUtils.PROJECT_PATH + File.separator + project.mFileProjectName, gjList[j].getName());
-//                gj.mLastModifiedDate = format.format(file.lastModified());
-                    project.mstrArrFileGJ.add(gj);
-                }
+                gj.mFileGJName = gjList[j].getName();
+                project.mstrArrFileGJ.add(gj);
             }
-//            Collections.sort(project.mstrArrFileGJ);
             m_ListProject.add(project);
         }
         return m_ListProject;

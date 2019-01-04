@@ -22,6 +22,7 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
     private Context mContext;
     private List<ClasFileProjectInfo> mProjects;
     private int nSelect;
+    private boolean isCanSelect = false;
     private OnFileProItemClick mOnFileProItemClick;
     private LayoutInflater mInflater;
 
@@ -35,6 +36,10 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
         this.mProjects = projects;
         this.nSelect = nSelect;
         notifyDataSetChanged();
+    }
+    public void toSelectView(boolean isCanSelect){
+        this.isCanSelect = isCanSelect;
+        this.notifyDataSetChanged();
     }
 
     public int getSelect() {
@@ -55,7 +60,7 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        holder.mCBNidx.setText(" " + (position + 1));
+        holder.mCBNidx.setVisibility(isCanSelect ? View.VISIBLE :View.GONE );
         holder.mCBNidx.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,6 +75,15 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
                 if (null != mOnFileProItemClick) {
                     mOnFileProItemClick.onClickIsChoice(false, position);
                 }
+            }
+        });
+        holder.cilik_ll.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (null != mOnFileProItemClick) {
+                    mOnFileProItemClick.onLongClick(position);
+                }
+                return false;
             }
         });
         if (mProjects.get(position).nIsSelect == 2) {
@@ -89,11 +103,7 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
             else
                 holder.m_LL.setBackgroundColor(Color.WHITE);
         }
-        holder.m_TVProject.setText(mProjects.get(position).mFileProjectName);
-        holder.m_TVGJNum.setText(mProjects.get(position).mstrArrFileGJ.size() + "");
-        holder.m_TVGJNum.setVisibility(View.GONE);
-        holder.m_TVTime.setText(mProjects.get(position).mLastModifiedDate);
-        holder.m_TVTime.setVisibility(View.GONE);
+        holder.m_TVProject.setText(position+"    "+mProjects.get(position).mFileProjectName);
     }
 
     @Override
@@ -107,13 +117,12 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
 
     public interface OnFileProItemClick {
         void onClickIsChoice(boolean isChoice, int position);
+        void onLongClick(int position);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         CheckBox mCBNidx;
         TextView m_TVProject;
-        TextView m_TVGJNum;
-        TextView m_TVTime;
         LinearLayout m_LL;
         LinearLayout cilik_ll;
 
@@ -125,15 +134,6 @@ public class FileListProjectAdapter extends RecyclerView.Adapter<FileListProject
             if (null == m_TVProject) {
                 m_TVProject = (TextView) view.findViewById(R.id.tv_projectName);
             }
-            if (null == m_TVGJNum) {
-                m_TVGJNum = (TextView) view.findViewById(R.id.tv_gjNum);
-            }
-            if (null == m_TVTime) {
-                m_TVTime = (TextView) view.findViewById(R.id.tv_time);
-            }
-            mCBNidx.setVisibility(View.VISIBLE);
-            m_TVGJNum.setVisibility(View.VISIBLE);
-            m_TVTime.setVisibility(View.VISIBLE);
             if (null == m_LL) {
                 m_LL = (LinearLayout) view.findViewById(R.id.ui_list_project);
                 m_LL.setFocusable(true);

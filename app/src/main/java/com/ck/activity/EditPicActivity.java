@@ -25,8 +25,6 @@ import com.ck.utils.Stringutil;
 import com.google.gson.Gson;
 import com.hc.u8x_ck.R;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -95,8 +93,8 @@ public class EditPicActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void refresfFileData(){
         fileName =  App_DataPara.getApp().proData.get(proPosition).mstrArrFileGJ.get(filePosition).mFileGJName;
-        editPic_cameraView.setBitmap(getPicBitmat());
-        String json = FileUtil.readData(PathUtils.PROJECT_PATH+"/"+proName+ "/"+fileName+".CK");
+        editPic_cameraView.setBitmap(getPicBitmat(),false);
+        String json = FileUtil.readData(PathUtils.PROJECT_PATH+"/"+proName+ "/"+fileName);
         if(!Stringutil.isEmpty(json)) {
             dataBean = new Gson().fromJson(json, MeasureDataBean.class);
             FindLieFenUtils.m_nCLXLineSite = dataBean.getLeftX();
@@ -105,7 +103,7 @@ public class EditPicActivity extends TitleBaseActivity implements View.OnClickLi
             FindLieFenUtils.m_nCRYLineSite = dataBean.getRightY();
             FindLieFenUtils.bytGrayAve = dataBean.getAvage();
             editPic_cameraView.makeInitSetting();
-            editPic_cameraView.setZY(1);
+            editPic_cameraView.setZY(1,false);
         }
     }
 
@@ -114,14 +112,9 @@ public class EditPicActivity extends TitleBaseActivity implements View.OnClickLi
      * @return
      */
     private Bitmap getPicBitmat(){
-        String path = PathUtils.PROJECT_PATH + "/" + proName  + "/" + fileName+".bmp";
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(path);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        Bitmap bitmap = BitmapFactory.decodeStream(fis);
+        String path = PathUtils.PROJECT_PATH + "/" + proName  + "/" + fileName;
+        byte[] bytes = FileUtil.readPicData(path);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
         FindLieFenUtils.setBitmapWidth(bitmap.getWidth());
         return bitmap;
     }
@@ -130,8 +123,8 @@ public class EditPicActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void finshWhitBack(){
         Intent intent = new Intent();
-        intent.putExtra("objPosition",proPosition);
-        setResult(Catition.EDITBACKTOFILE);
+        intent.putExtra("filePosition",filePosition);
+        setResult(Catition.EDITBACKTOFILE,intent);
         finish();
     }
 
@@ -181,11 +174,7 @@ public class EditPicActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onUpDate() {
         int typeFlag = editPic_cameraView.m_nDrawFlag;
-        editPic_cameraView.setZY(0);
-        editPic_cameraView.setDrawingCacheEnabled(true);
-        FileUtil.saveDrawBmpFile(editPic_cameraView.getDrawingCache(),
-                "/" + proName, fileName, "%s.bmp");
-        editPic_cameraView.setDrawingCacheEnabled(false);
+        editPic_cameraView.setZY(0,false);
         //更新数据文件
         dataBean.setWidth(editPic_cameraView.width);
         dataBean.setLeftY(FindLieFenUtils.m_nCLYLineSite);
@@ -193,10 +182,11 @@ public class EditPicActivity extends TitleBaseActivity implements View.OnClickLi
         dataBean.setRightY(FindLieFenUtils.m_nCRYLineSite);
         dataBean.setRightX(FindLieFenUtils.m_nCRXLineSite);
         Gson gson = new Gson();
-        FileUtil.saveBmpFile(gson.toJson(dataBean), "/" + proName, fileName, "%s.CK");
+        FileUtil.saveCKFile(gson.toJson(dataBean), "/" + proName, fileName,
+                "%s.CK",editPic_cameraView.m_DrawBitmap);
         App_DataPara.getApp().proData.get(proPosition).mstrArrFileGJ.get(filePosition).setWidth(editPic_cameraView.width+"");
         showToast(getStr(R.string.str_saveSuccess));
-        editPic_cameraView.setZY(typeFlag);
+        editPic_cameraView.setZY(typeFlag,false);
     }
 
 

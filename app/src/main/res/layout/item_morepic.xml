@@ -2,29 +2,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5pt"
     android:layout_marginLeft="5pt"
-    android:layout_marginRight="5pt">
+    android:layout_marginRight="5pt"
+    android:layout_marginTop="5pt">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <ImageView
-        android:id="@+id/morePic_show_mpsv"
-        android:layout_width="match_parent"
-        android:scaleType="fitXY"
-        android:layout_height="100pt" />
+        <LinearLayout
+            android:id="@+id/morePic_show_ll"
+            android:layout_width="match_parent"
+            android:layout_height="110pt"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/morePic_show_name"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="15pt"
-        android:text="Name+mm"/>
+            <ImageView
+                android:id="@+id/morePic_show_mpsv"
+                android:layout_width="match_parent"
+                android:layout_height="100pt"
+                android:layout_marginLeft="5pt"
+                android:layout_marginRight="5pt"
+                android:scaleType="fitXY" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/morePic_show_name"
+            android:layout_width="match_parent"
+            android:layout_height="20pt"
+            android:layout_marginBottom="3pt"
+            android:layout_marginTop="3pt"
+            android:gravity="center"
+            android:text="Name+mm"
+            android:textColor="@color/white"
+            android:textSize="15pt" />
     </LinearLayout>
 
 
@@ -34,15 +46,17 @@
         android:layout_height="45pt"
         android:layout_alignParentRight="true"
         android:orientation="vertical">
+
         <CheckBox
             android:id="@+id/morePic_choice_cb"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/cb_style"
-            android:focusable="false"
             android:button="@null"
             android:clickable="false"
-            android:focusableInTouchMode="false" />
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:visibility="gone" />
     </LinearLayout>
 
 

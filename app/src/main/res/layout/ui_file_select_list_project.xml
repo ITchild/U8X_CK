@@ -3,63 +3,46 @@
     android:id="@+id/ui_list_project"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:background="?attr/background">
 
-    <CheckBox
-        android:id="@+id/project_checkboxID"
-        android:layout_width="@dimen/xhdpi_70dp"
-        android:layout_height="@dimen/xhdpi_50dp"
-        android:layout_marginLeft="@dimen/xhdpi_10dp"
-        android:button="@drawable/cb_style"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:gravity="center|left"
-        android:text="12"
-        android:textColor="?attr/textColor"
-        android:textSize="@dimen/xhdpi_20sp"
-        android:visibility="gone" />
-
     <LinearLayout
-        android:id="@+id/LinearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/xhdpi_50dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_projectName"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4.5"
-            android:gravity="center_vertical"
-            android:paddingLeft="@dimen/xhdpi_10dp"
-            android:singleLine="true"
-            android:text="TextView"
+        <CheckBox
+            android:id="@+id/project_checkboxID"
+            android:layout_width="30pt"
+            android:layout_height="30pt"
+            android:layout_marginLeft="3pt"
+            android:button="@drawable/cb_style"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="center|left"
             android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_22sp" />
-
-        <TextView
-            android:id="@+id/tv_gjNum"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2.5"
-            android:gravity="center"
-            android:singleLine="true"
-            android:text="TextView"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_25sp"
             android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tv_time"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3.5"
-            android:gravity="center"
-            android:singleLine="true"
-            android:text="TextView"
-            android:textColor="?attr/textColor"
-            android:textSize="@dimen/xhdpi_25sp"
-            android:visibility="gone" />
+        <LinearLayout
+            android:id="@+id/LinearLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="60pt"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/tv_projectName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="2pt"
+                android:singleLine="true"
+                android:text="TextView"
+                android:textColor="?attr/textColor"
+                android:textSize="18pt" />
+        </LinearLayout>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1pt"
+        android:background="@color/white"></View>
 
 </LinearLayout>

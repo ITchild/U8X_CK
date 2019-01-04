@@ -1,110 +1,121 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/LinearLayout1"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/background"
-    android:focusable="true"
-    android:orientation="vertical" >
+    android:layout_height="match_parent">
 
-    <include layout="@layout/ac_basetitle"></include>
+    <com.ck.ui.OpenCvCameraView
+        android:id="@+id/fileBower_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <LinearLayout
-        android:id="@+id/Layout"
+        android:id="@+id/LinearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9"
-        android:visibility="visible" >
+        android:layout_height="match_parent"
+        android:background="?attr/background"
+        android:focusable="true"
+        android:orientation="vertical">
+
+        <include layout="@layout/ac_basetitle"></include>
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical" >
+            android:id="@+id/Layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="9"
+            android:visibility="visible">
 
             <LinearLayout
-                android:id="@+id/fileBower_allChoice_ll"
-                android:layout_width="match_parent"
-                android:layout_height="60pt"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/fileBower_allChoice_tv"
-                    android:layout_width="30pt"
-                    android:layout_height="30pt"
-                    android:layout_marginLeft="3pt"
-                    android:layout_marginRight="3pt"
-                    android:background="@drawable/checkbox_false"/>
+                <LinearLayout
+                    android:id="@+id/fileBower_allChoice_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="60pt"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <TextView
+                    <TextView
+                        android:id="@+id/fileBower_allChoice_tv"
+                        android:layout_width="30pt"
+                        android:layout_height="30pt"
+                        android:layout_marginLeft="3pt"
+                        android:layout_marginRight="3pt"
+                        android:background="@drawable/checkbox_false"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NO.工程名称"
+                        android:textColor="?attr/textColor"
+                        android:textSize="@dimen/x16" />
+                </LinearLayout>
+
+                <View
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/textColor"
-                    android:textSize="@dimen/x16"
-                    android:text="NO.工程名称"/>
+                    android:layout_height="@dimen/xhdpi_2dp"
+                    android:background="?attr/textColor" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/fileBower_proList_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:focusable="true"></android.support.v7.widget.RecyclerView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40pt"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/fileBower_del_tv"
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/str_del"
+                        android:textColor="@color/white"
+                        android:textSize="15pt" />
+
+                    <TextView
+                        android:id="@+id/fileBower_toUPan_tv"
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/str_ToUPan"
+                        android:textColor="@color/white"
+                        android:textSize="15pt" />
+
+                </LinearLayout>
+
             </LinearLayout>
+
             <View
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/xhdpi_2dp"
+                android:layout_width="@dimen/xhdpi_2dp"
+                android:layout_height="match_parent"
                 android:background="?attr/textColor" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/fileBower_proList_rv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:focusable="true"
-                android:layout_weight="1">
-            </android.support.v7.widget.RecyclerView>
-
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40pt"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/fileBower_del_tv"
-                    android:layout_width="0dip"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textSize="15pt"
-                    android:textColor="@color/white"
-                    android:gravity="center"
-                    android:text="@string/str_del"/>
-
-                <TextView
-                    android:id="@+id/fileBower_toUPan_tv"
-                    android:layout_width="0dip"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textSize="15pt"
-                    android:textColor="@color/white"
-                    android:gravity="center"
-                    android:text="@string/str_ToUPan"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="@dimen/xhdpi_2dp"
-            android:layout_height="match_parent"
-            android:background="?attr/textColor" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:padding="@dimen/x5"
-            android:orientation="vertical" >
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/fileBower_fileList_rv"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
-                android:fadeScrollbars="false"
-                android:scrollbarSize="5pt"
-                android:scrollbarThumbVertical="@color/yellow">
-            </android.support.v7.widget.RecyclerView>
+                android:layout_weight="3"
+                android:orientation="vertical"
+                android:padding="@dimen/x5">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/fileBower_fileList_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fadeScrollbars="false"
+                    android:scrollbarSize="5pt"
+                    android:scrollbarThumbVertical="@color/yellow"
+                    android:scrollbars="vertical"></android.support.v7.widget.RecyclerView>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

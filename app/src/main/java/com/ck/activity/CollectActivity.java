@@ -105,7 +105,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                     changeStartStopTakeView(Catition.CollectView.START);
                     changeCollectView(1);
                     collect_cameraView.setCountMode(true);
-                    collect_cameraView.setZY(0);
+                    collect_cameraView.setZY(0,false);
                     break;
                 default:
                     super.onManagerConnected(status);
@@ -262,10 +262,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
                 FindLieFenUtils.bytGrayAve = data.get(position).getAvage();
                 collect_cameraView.makeInitSetting();
                 Bitmap bitmap = BitmapFactory.decodeStream(fis);
-                collect_cameraView.setBitmap(bitmap);
+                collect_cameraView.setBitmap(bitmap,false);
                 FindLieFenUtils.setBitmapWidth(bitmap.getWidth());
                 changeCollectView(1);
-                collect_cameraView.setZY(1);
+                collect_cameraView.setZY(1,false);
                 collect_autoOrhand_bt.setText("");
                 collect_startStop_bt.setText(getStr(R.string.str_startCollect));
                 collect_Cursor_bt.setText(getStr(R.string.str_leftCursor));
@@ -419,7 +419,7 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onBeforTakePic() {
         stopCameraView();
-        collect_cameraView.setZY(1);
+        collect_cameraView.setZY(1,false);
         changeStartStopTakeView(Catition.CollectView.TAKEPHOTO);
         collect_cameraView.onBeforTakePic();//预拍之后的预处理
     }
@@ -536,14 +536,14 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
     private void onCountMode() {
         if (collect_autoOrhand_bt.getText().toString().equals(getStr(R.string.str_Auto))) {
             collect_cameraView.setCountMode(false);//手动计算
-            collect_cameraView.setZY(1);
+            collect_cameraView.setZY(1,false);
             collect_autoOrhand_bt.setText(getStr(R.string.str_Hand));
             collect_Cursor_bt.setText(getStr(R.string.str_leftCursor));
             collect_left_bt.setText(getStr(R.string.str_toLeft));
             collect_right_bt.setText(getStr(R.string.str_toRight));
         } else if (collect_autoOrhand_bt.getText().toString().equals(getStr(R.string.str_Hand))) {
             collect_cameraView.setCountMode(true);//自动计算
-            collect_cameraView.setZY(0);
+            collect_cameraView.setZY(0,false);
             collect_autoOrhand_bt.setText(getStr(R.string.str_Auto));
             collect_Cursor_bt.setText("");
             collect_left_bt.setText("");
@@ -598,10 +598,10 @@ public class CollectActivity extends TitleBaseActivity implements View.OnClickLi
      */
     private void onSelectCursor() {
         if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_leftCursor))) {
-            collect_cameraView.setZY(2);
+            collect_cameraView.setZY(2,false);
             collect_Cursor_bt.setText(getStr(R.string.str_rightCursor));
         } else if (collect_Cursor_bt.getText().toString().equals(getStr(R.string.str_rightCursor))) {
-            collect_cameraView.setZY(1);
+            collect_cameraView.setZY(1,false);
             collect_Cursor_bt.setText(getStr(R.string.str_leftCursor));
         }
     }

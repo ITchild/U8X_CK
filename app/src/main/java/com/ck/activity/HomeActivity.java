@@ -288,7 +288,7 @@ public class HomeActivity extends TitleBaseActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return true; //屏蔽返回键
+//            return true; //屏蔽返回键
         }
         return super.onKeyDown(keyCode, event);
     }
