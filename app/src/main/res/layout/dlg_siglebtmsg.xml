@@ -12,7 +12,7 @@
         android:background="#F6B800"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/xhdpi_10dp"
-        android:text="提示框"
+        android:text="提示"
         android:textColor="?attr/textColor"
         android:textSize="@dimen/xhdpi_30sp" />
 

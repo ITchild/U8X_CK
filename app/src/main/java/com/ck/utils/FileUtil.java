@@ -230,7 +230,7 @@ public class FileUtil {
      * 保存bitmap图片自定义格式
      * @param json
      */
-    public static void saveCKFile(String json, String m_strSaveProName, String m_strSaveGJName, String style,Bitmap bitmap) {
+    public static void saveCKFile(String json, String m_strSaveProName, String m_strSaveGJName,Bitmap bitmap) {
         String mediaState = Environment.getExternalStorageState();
         if ((!mediaState.equals(Environment.MEDIA_MOUNTED)) || (mediaState.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
             Log.d("fei", "Media storage not ready:" + mediaState);
@@ -242,9 +242,8 @@ public class FileUtil {
         if (!path.exists()) {
             path.mkdirs();
         }
-        String fileName = String.format(style, m_strSaveGJName);
         try {
-            ckFile = new File(path, fileName);
+            ckFile = new File(path, m_strSaveGJName);
             if (!ckFile.exists()) {
                 ckFile.getParentFile().mkdirs();
                 ckFile.createNewFile();
@@ -255,8 +254,6 @@ public class FileUtil {
             RandomAccessFile raf = new RandomAccessFile(ckFile, "rwd");
             raf.write(json.getBytes());
             raf.seek(2048);
-//            byte[] flagByte = BitmapToBytes(bitmap);
-//            raf.write(flagByte,2048,flagByte.length+2048);
             raf.write(BitmapToBytes(bitmap));
             raf.close();
         } catch (IOException e) {
@@ -498,16 +495,21 @@ public class FileUtil {
                 // isExistSelect = true;
                 for (int j = 0; j < m_ListProject.get(i).mstrArrFileGJ.size(); j++) {
                     if (m_ListProject.get(i).mstrArrFileGJ.get(j).bIsSelect == true) {
-                        File sourceF = new File(PathUtils.PROJECT_PATH + "/"
-                                + m_ListProject.get(i).mFileProjectName + "/"
-                                + m_ListProject.get(i).mstrArrFileGJ.get(j).mFileGJName);
-                        lGjFileSize += FileUtil.getInstance().getFileSizes(sourceF);
+//                        File sourceF = new File(PathUtils.PROJECT_PATH + "/"
+//                                + m_ListProject.get(i).mFileProjectName + "/"
+//                                + m_ListProject.get(i).mstrArrFileGJ.get(j).mFileGJName);
+//                        lGjFileSize += FileUtil.getInstance().getFileSizes(sourceF);
+                        lGjFileSize++;
                     }
                 }
             }
         }
         FileUtil.getInstance().m_lTotalfileSize = lProFileSize + lGjFileSize;
-        return lProFileSize + lGjFileSize;
+        if(type == 3){
+            return 2*(lProFileSize + lGjFileSize);
+        }else {
+            return lProFileSize + lGjFileSize;
+        }
     }
 
     /**
@@ -573,10 +575,11 @@ public class FileUtil {
             outStream = new FileOutputStream(target);
             in = inStream.getChannel();
             out = outStream.getChannel();
-            long len = 0;
-            len = in.size();
+//            long len = 0;
+//            len = in.size();
             in.transferTo(0, in.size(), out);
-            fileSize += len;
+//            fileSize += len;
+            fileSize ++;
             // 显示拷贝进度
             // DLG_FileProgress.getInstance().setProgressValue(fileSize,
             // m_lTotalfileSize);
@@ -658,7 +661,8 @@ public class FileUtil {
             if (flist[i].isDirectory()) {
                 size = size + getFileSize(flist[i]);
             } else {
-                size = size + flist[i].length();
+//                size = size + flist[i].length();
+                size ++;
             }
         }
         return size;

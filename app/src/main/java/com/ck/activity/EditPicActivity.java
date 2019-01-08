@@ -182,8 +182,8 @@ public class EditPicActivity extends TitleBaseActivity implements View.OnClickLi
         dataBean.setRightY(FindLieFenUtils.m_nCRYLineSite);
         dataBean.setRightX(FindLieFenUtils.m_nCRXLineSite);
         Gson gson = new Gson();
-        FileUtil.saveCKFile(gson.toJson(dataBean), "/" + proName, fileName,
-                "%s.CK",editPic_cameraView.m_DrawBitmap);
+        FileUtil.saveCKFile(gson.toJson(dataBean), "/"
+                + proName, fileName,editPic_cameraView.m_DrawBitmap);
         App_DataPara.getApp().proData.get(proPosition).mstrArrFileGJ.get(filePosition).setWidth(editPic_cameraView.width+"");
         showToast(getStr(R.string.str_saveSuccess));
         editPic_cameraView.setZY(typeFlag,false);

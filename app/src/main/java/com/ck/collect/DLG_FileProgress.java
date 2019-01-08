@@ -115,10 +115,10 @@ public class DLG_FileProgress extends Dialog implements android.view.View.OnClic
 		int id = arg0.getId();
 		switch (id) {
 		case R.id.bt_yes:
-			InfoDialog2Btn("转存U盘成功。\n\n建议先安全卸载U盘，再拔出。" +
-					"\n1.点击\"安全卸载\"进入\"存储\"界面。\n" +
-					"2.拖动\"存储\"界面找到\"卸载USB存储设备\"。\n" +
-					"3.点击\"卸载\"，\"确定\",并返回。");
+//			InfoDialog2Btn("转存U盘成功。\n\n建议先安全卸载U盘，再拔出。" +
+//					"\n1.点击\"安全卸载\"进入\"存储\"界面。\n" +
+//					"2.拖动\"存储\"界面找到\"卸载USB存储设备\"。\n" +
+//					"3.点击\"卸载\"，\"确定\",并返回。");
 			this.dismiss();
 			break;
 		}

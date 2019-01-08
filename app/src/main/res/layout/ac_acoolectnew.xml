@@ -8,7 +8,6 @@
     <include
         layout="@layout/ac_basetitle"
         android:visibility="gone"></include>
-    <!--android:layout_marginRight="243.75pt"-->
 
     <RelativeLayout xmlns:opencv="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
@@ -40,6 +39,27 @@
         <!--</LinearLayout>-->
 
         <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="20pt"
+            android:gravity="center_vertical"
+            android:layout_marginTop="81pt">
+            <ImageView
+                android:layout_width="25pt"
+                android:layout_height="25pt"
+                android:src="@drawable/ic_launcher"/>
+            <TextView
+                android:id="@+id/acllect_num_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/bule"
+                android:layout_marginLeft="5pt"
+                android:textSize="20pt"
+                android:text="0"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/colleact_drag_ll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,7 +67,6 @@
             android:layout_marginTop="20pt"
             android:orientation="vertical"
             android:visibility="gone">
-
             <Button
                 android:id="@+id/collect_blackWrite_bt"
                 android:layout_width="@dimen/x80"
@@ -57,7 +76,6 @@
                 android:text="@string/str_blackWrite"
                 android:textColor="@color/black"
                 android:textSize="@dimen/x14" />
-
         </LinearLayout>
 
     </RelativeLayout>

@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.ck.base.TitleBaseActivity;
 import com.ck.bean.MeasureDataBean;
@@ -53,6 +54,7 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     private LinearLayout collect_boot_ll;
     private LoadingDialog mLoadingDialog;
     private SigleBtMsgDialog cameraErrorDialog;
+    private TextView acllect_num_tv;//当前工程保存的构件数
 
     private String proName = "工程1", fileName = "构件1";
 
@@ -83,21 +85,20 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
 
     @Override
     protected void initView() {
-        super.initView();
         collect_OpenCvCamera = findView(R.id.collect_OpenCvCamera);
         collect_cameraView = findView(R.id.collect_cameraView);
 //        collect_key_ll = findView(R.id.collect_key_ll);
         collect_blackWrite_bt = findView(R.id.collect_blackWrite_bt);
         colleact_drag_ll = findView(R.id.colleact_drag_ll);
         collect_boot_ll = findView(R.id.collect_boot_ll);
+        acllect_num_tv = findView(R.id.acllect_num_tv);
         mLoadingDialog = new LoadingDialog(this);
         initCamera();
+        super.initView();
     }
-
 
     @Override
     protected void initData() {
-        super.initData();
         proName = PreferenceHelper.getString("obj", "proname");
         if (Stringutil.isEmpty(proName)) {
             proName = "工程1";
@@ -106,6 +107,10 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         if (Stringutil.isEmpty(fileName)) {
             fileName = "构件1";
         }
+        collect_cameraView.setProAndFileName(proName,fileName);
+        collect_cameraView.invalidate();
+        getProListSize();
+        super.initData();
     }
 
 
@@ -161,8 +166,6 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     @Override
     protected void onResume() {
         super.onResume();
-//        showLoading();
-//        isLoading = true;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -223,13 +226,7 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
                 onCollectStart();
             }
         });
-//        if (!OpenCVLoader.initDebug()) {
-//            Log.w(TAG, "static loading library fail,Using Manager for initialization");
-//            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallback);
-//        } else {
-//            Log.w(TAG, "OpenCV library found inside package. Using it!");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-//        }
+        mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         collectState = 0;
     }
 
@@ -262,6 +259,21 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     }
 
     /**
+     * 获取当前工程下的文件个数
+     */
+    private void getProListSize(){
+        File proFile = new File(PathUtils.PROJECT_PATH+"/"+proName);
+        if(null != proFile && proFile.exists()){
+            if(proFile.isDirectory()){
+                int legth = 0;
+                if(null !=  proFile.listFiles() && proFile.listFiles().length != 0){
+                    legth = proFile.listFiles().length;
+                }
+                acllect_num_tv.setText(legth+"");
+            }
+        }
+    }
+    /**
      * 保存照片数据
      */
     private void onSave() {
@@ -271,12 +283,6 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
             return;
         }
         collect_cameraView.setZY(0,false); //恢复光标的颜色
-//        collect_cameraView.setDrawingCacheEnabled(true);
-//        FileUtil.saveBmpImageFile(collect_cameraView.m_DrawBitmap,
-//                "/" + proName, fileName, "%s.bmp");
-//        FileUtil.saveDrawBmpFile(collect_cameraView.getDrawingCache(),
-//                "/" + proName, fileName, "%s.bmp");
-//        collect_cameraView.setDrawingCacheEnabled(false);
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         MeasureDataBean dataBean = new MeasureDataBean();
         dataBean.setObjName(proName);
@@ -296,17 +302,15 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
         dataBean.setFileState(MeasureDataBean.FILESTATE_USERING);
         dataBean.setFileSize(file.length());
         dataBean.setDelDate("0000/00/00");
-//        dataBean.setImageBytes(BMPUtils.bitmapToByteArr(collect_cameraView.m_DrawBitmap));
         Gson gson = new Gson();
-        FileUtil.saveCKFile(gson.toJson(dataBean), "/" + proName, fileName,
-                "%s.CK",collect_cameraView.m_DrawBitmap);
-//        DBService.getInstence(this).SetMeasureData(dataBean);
-
+        FileUtil.saveCKFile(gson.toJson(dataBean), "/" +
+                proName, fileName, collect_cameraView.m_DrawBitmap);
         //刷新列表
         collect_cameraView.setBlackWrite(false, false);
         fileName = FileUtil.GetDigitalPile(fileName);//文件名称默认增加1
         PreferenceHelper.setString("obj","gjname",fileName);
         PreferenceHelper.setString("obj","proname",proName);
+        getProListSize();
         showToast(getStr(R.string.str_saveSuccess));
         collect_cameraView.setStartView();
         collect_OpenCvCamera.enableView();
@@ -322,7 +326,6 @@ public class CollectNewActivity extends TitleBaseActivity implements View.OnClic
     private void onMakeNews() {
         showObj_Gj_FileListOrCreate("测试新建");
     }
-
 
     /**
      * 用于显示选择工程列表，构件列表，新建文件名称的Dialog

@@ -26,6 +26,7 @@ import com.ck.dlg.ChoiceSaveTypeDialog;
 import com.ck.dlg.DLG_Alert;
 import com.ck.dlg.LoadingDialog;
 import com.ck.dlg.SigleBtMsgDialog;
+import com.ck.dlg.TwoBtMsgDialog;
 import com.ck.info.ClasFileGJInfo;
 import com.ck.info.ClasFileProjectInfo;
 import com.ck.ui.OpenCvCameraView;
@@ -62,8 +63,11 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     private TextView fileBower_del_tv;
     private TextView fileBower_toUPan_tv;
 
-    private int pageIndex = 12;//分页加载的每一页的个数
-    private int currPageNum = 0;
+    private final int pageIndex = 12;//分页加载的每一页的个数
+    private int currPageNum = 0;//当前工程的第几页
+    private int gjPosition = 0;//构件文件的选中项
+
+    private Intent intent;//发送复制进度广播的Intent
 
     private LoadingDialog loading;//loading框
     private boolean isCanSecelt = false;//是否出现选框
@@ -131,18 +135,69 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         App_DataPara.getApp().proData = PathUtils.getProFileList();
         refreshList(3);
         baseTitle_title_tv.setText("文件管理");
-        loadMorePicData();
+        if(null != App_DataPara.getApp().proData && App_DataPara.getApp().proData.size()>0) {
+            initListData();
+        }
     }
 
-//    /**
-//     * 刷新文件列表数据
-//     */
-//    private void refreshFileListData(int position, int backgroundPosition) {
-//        mGJAdapter.setData(fileGJData, backgroundPosition);
-//        if (fileGJData.size() > 0) {
-//            fileBower_fileList_rv.scrollToPosition(0);
-//        }
-//    }
+
+    private void initListData(){
+        startLoading();
+        isBreakGetListData = false;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (null != App_DataPara.getApp().proData) {
+                    int flagPosition = 0;
+                    for(int i=0;i<App_DataPara.getApp().proData.size();i++) {
+                        ClasFileProjectInfo proInfo = App_DataPara.getApp().proData.get(i);
+                        for (ClasFileGJInfo gjInfo : proInfo.mstrArrFileGJ) {
+                            if (isBreakGetListData) {
+                                return;
+                            }
+                            if (Stringutil.isEmpty(gjInfo.getWidth())) {
+                                String jsons = FileUtil.readData(PathUtils.PROJECT_PATH + "/"
+                                        + proInfo.mFileProjectName + "/" + gjInfo.mFileGJName);
+                                if (null != jsons) {
+                                    if (!Stringutil.isEmpty(jsons)) {
+                                        MeasureDataBean bean = new Gson().fromJson(jsons, MeasureDataBean.class);
+                                        gjInfo.setWidth(bean.getWidth() + "");
+                                    }
+                                }
+                            }
+                            if (null == gjInfo.getSrc()) {
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inSampleSize = 7;
+                                byte[] picByte = FileUtil.readPicData(PathUtils.PROJECT_PATH + "/"
+                                        + proInfo.mFileProjectName + "/" + gjInfo.mFileGJName);
+                                if (null != picByte) {
+                                    gjInfo.setSrc(BitmapFactory.decodeByteArray(picByte,
+                                            0, picByte.length, options));
+                                }
+                            }
+                            flagPosition++;
+                            if (i==0 && flagPosition == pageIndex) {
+                                fileGJData.clear();
+                                for(int mm=0;mm<pageIndex;mm++){
+                                    fileGJData.add(App_DataPara.getApp().proData.get(0).mstrArrFileGJ.get(mm));
+                                }
+                                gjPosition = 0;
+                                refreshList(2);
+                            }
+                        }
+                        if(i==0 && flagPosition < pageIndex){
+                            fileGJData.clear();
+                            for(int mm=0;mm<flagPosition;mm++){
+                                fileGJData.add(App_DataPara.getApp().proData.get(0).mstrArrFileGJ.get(mm));
+                            }
+                            gjPosition = 0;
+                            refreshList(2);
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
 
     /**
      * 开启子线程提前加载文件系统的列表
@@ -222,10 +277,10 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
                 if (null != mProjectAdapter && null != mGJAdapter) {
                     if (type == 1) {
                         mProjectAdapter.setData(App_DataPara.getApp().proData, mProjectAdapter.getSelect());
-                        mGJAdapter.setData(fileGJData, mGJAdapter.getSelect());
+                        mGJAdapter.setData(fileGJData, gjPosition);
                     } else if (type == 2) {
                         if (App_DataPara.getApp().proData.size() > mProjectAdapter.getSelect()) {
-                            mGJAdapter.setData(fileGJData, mGJAdapter.getSelect());
+                            mGJAdapter.setData(fileGJData, gjPosition);
                         }
                     } else if (type == 3) {
                         mProjectAdapter.setData(App_DataPara.getApp().proData, mProjectAdapter.getSelect());
@@ -294,6 +349,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     protected void clickObjList(final int position) {
         mProjectAdapter.setSelect(position);
         currPageNum = 0;
+        gjPosition = 0;
         fileGJData.clear();
         loadMorePicData();
     }
@@ -526,6 +582,8 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         mGJAdapter.toSelectView(false);
         mProjectAdapter.toSelectView(false);
         fileBower_allChoice_tv.setVisibility(View.GONE);
+        fileBower_allChoice_tv.setBackground(getResources()
+                .getDrawable(R.drawable.checkbox_false));
         for (ClasFileProjectInfo proInfo : App_DataPara.getApp().proData) {
             for (ClasFileGJInfo gjInfo : proInfo.mstrArrFileGJ) {
                 gjInfo.bIsSelect = false;
@@ -539,11 +597,13 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
      */
     private void delSelectFile() {
         FileUtil.delSeleceFile(App_DataPara.getApp().proData);
-        for (ClasFileProjectInfo projectInfo : App_DataPara.getApp().proData) {
+        for (int i=0;i<App_DataPara.getApp().proData.size();i++) {
+            ClasFileProjectInfo projectInfo = App_DataPara.getApp().proData.get(i);
             if (projectInfo.nIsSelect == 2) {
                 App_DataPara.getApp().proData.remove(projectInfo);
             } else if (projectInfo.nIsSelect == 1) {
-                for (ClasFileGJInfo fileGJInfo : projectInfo.mstrArrFileGJ) {
+                for (int j=0;j<projectInfo.mstrArrFileGJ.size();j++) {
+                    ClasFileGJInfo fileGJInfo = projectInfo.mstrArrFileGJ.get(j);
                     if (fileGJInfo.bIsSelect) {
                         projectInfo.mstrArrFileGJ.remove(fileGJInfo);
                     }
@@ -562,6 +622,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         }
         mProjectAdapter.setData(App_DataPara.getApp().proData, position);
         currPageNum = 0;
+        gjPosition = 0;
         loadMorePicData();
     }
 
@@ -607,6 +668,35 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
             showMsgCon(getStr(R.string.str_System_Low));
             return;
         }
+        final File drawFile = new File(targetDir+"/Draw工程");
+        final File file = new File(targetDir+"/工程");
+        if(drawFile.exists() || file.exists()){
+            final TwoBtMsgDialog btMsgDialog = new TwoBtMsgDialog(FileBowerActivity.this);
+            btMsgDialog.show();
+            btMsgDialog.setMsg("已存在目标文件\n是否重新复制？");
+            btMsgDialog.setBtCancelTxt("取消");
+            btMsgDialog.setBtOkTxt("确定");
+            btMsgDialog.setOnBtClickListener(new TwoBtMsgDialog.OnBtClickListener() {
+                @Override
+                public void onBtClick(boolean isOk) {
+                    if(isOk){
+                        FileUtil.deleteDirectory(drawFile.getAbsolutePath());
+                        FileUtil.deleteDirectory(file.getAbsolutePath());
+                        choiceCopyType(targetDir);
+                    }
+                    btMsgDialog.dismiss();
+                }
+            });
+        }else{
+            choiceCopyType(targetDir);
+        }
+    }
+
+    /**
+     * 选择要导出的类型
+     * @param targetDir
+     */
+    private void choiceCopyType(final String targetDir){
         final ChoiceSaveTypeDialog dialog = new ChoiceSaveTypeDialog(FileBowerActivity.this);
         dialog.show();
         dialog.setOnChoiceSaveClick(new ChoiceSaveTypeDialog.OnChoiceSaveClick() {
@@ -627,7 +717,7 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
     }
 
     // 拷贝选中文件
-    private void copyFile(String targetDir, int type) {
+    private void copyFile(final String targetDir, final int type) {
         if (null != AppDatPara.GetExternalStorageDirectory()) {
             File targetFile = new File(targetDir);
             targetFile.mkdirs();
@@ -706,9 +796,9 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
 
                         if (type == 1) { //导出之后可直接使用的图片
                             // 拷贝含有标志的文件
-                            if (null != ckTargetF && null != drawTargetF) {
+                            if (null != ckSourceF && null != drawTargetF) {
                                 drawTargetPathF.mkdirs();// 新建目标目录
-                                makeDrawPicToFile(ckTargetF, drawTargetF, AppDatPara);
+                                makeDrawPicToFile(ckSourceF, drawTargetF, AppDatPara);
                             }
                         } else if (type == 2) { //导出到电脑的图片
                             if (null != ckSourceF && null != ckTargetF) {
@@ -722,9 +812,9 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
                                 FileUtil.getInstance().copyFile(ckSourceF, ckTargetF, AppDatPara);// 拷贝文件
                             }
                             // 拷贝含有标志的文件
-                            if (null != ckTargetF && null != drawTargetF) {
+                            if (null != ckSourceF && null != drawTargetF) {
                                 drawTargetPathF.mkdirs();// 新建目标目录
-                                makeDrawPicToFile(ckTargetF, drawTargetF, AppDatPara);
+                                makeDrawPicToFile(ckSourceF, drawTargetF, AppDatPara);
                             }
                         }
                     }
@@ -765,6 +855,12 @@ public class FileBowerActivity extends TitleBaseActivity implements View.OnClick
         fileBower_camera.setDrawingCacheEnabled(true);
         FileUtil.saveDrawToUFile(fileBower_camera.getDrawingCache(), target);
         fileBower_camera.setDrawingCacheEnabled(false);
+        FileUtil.getInstance().fileSize ++;
+        if (null == intent) {
+            intent = new Intent(BroadcastAction.UpdataProgress);
+        }
+        intent.putExtra("ProgressValue",  FileUtil.getInstance().fileSize);
+        m_Context.sendBroadcast(intent);
     }
 
 

@@ -66,6 +66,9 @@ public class OpenCvCameraView extends View {
     private float doubleFristLength = 0;//双点触控第一次的长度
     private float doubleSecondLength = 0;//双点触控第二次的长度
 
+    private String proName = "";//工程名称
+    private String fileName = "";//构件名称
+
     private int checkFlag = -1;
     private OnOpenCameraListener listener;
 
@@ -208,6 +211,17 @@ public class OpenCvCameraView extends View {
     }
 
     /**
+     * 设置要显示的工程名和文件名
+     * @param proName
+     * @param fileName
+     */
+    public void setProAndFileName(String proName,String fileName){
+        this.proName = proName;
+        this.fileName = fileName;
+    }
+
+
+    /**
      * 设置显示描边
      *
      * @param isFindSide
@@ -316,13 +330,16 @@ public class OpenCvCameraView extends View {
                     mContext.getResources().getDimension(R.dimen.carmeraStartText));
             float fWidth = paint.measureText(str);
             canvas.drawText(str, m_nScreenWidth / 2 - fWidth / 2, m_nScreenHeight / 2, paint);
+            drawRuleAndFlag(canvas);//画刻度和标志
             return;
         }
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         RectF rectF = new RectF(0, 0, m_nScreenWidth, m_nScreenHeight); // w和h分别是屏幕的宽和高，也就是你想让图片显示的宽和高
         if (!isStart) {
-            showBitmap = isBlackWrite ? blackWriteBitmap : m_DrawBitmap;
-            canvas.drawBitmap(showBitmap, null, rectF, null);
+            if (m_DrawBitmap != null && !m_DrawBitmap.isRecycled()) {
+                showBitmap = isBlackWrite ? blackWriteBitmap : m_DrawBitmap;
+                canvas.drawBitmap(showBitmap, null, rectF, null);
+            }
         }
         drawRuleAndFlag(canvas);//画刻度和标志
     }
@@ -378,17 +395,20 @@ public class OpenCvCameraView extends View {
         canvas.drawLine(nRLx, nRLy, nRX, nRY, m_PaintDrawLine);
         canvas.drawLine(nRCUpX, nRCUpY, nRX, nRY, m_PaintDrawLine);
         canvas.drawLine(nRCDownX, nRCDownY, nRX, nRY, m_PaintDrawLine);
-
+        m_PaintDrawLine.setColor(Color.BLUE);
+        m_PaintDrawLine.setTextSize(Stringutil.getDimens(R.dimen.x22));
+        canvas.drawText("工程名称："+proName, 20, 40, m_PaintDrawLine);
+        canvas.drawText("构件名称："+fileName, 20, 70, m_PaintDrawLine);
         m_PaintDrawLine.setColor(Color.RED);
         m_PaintDrawLine.setTextSize(Stringutil.getDimens(R.dimen.x20));
         String str = String.format("%.02f", length / mf_fXDensity / 10.00000000) + "mm";
         str = str.equals("NaNmm") ? "0.00mm" : str; //有时format的返回值为NaN
-        canvas.drawText(str, 40, 50, m_PaintDrawLine);
+        canvas.drawText(str, 20, 130, m_PaintDrawLine);
         width = Float.valueOf(str.replace("mm", ""));
         m_PaintDrawLine.setTextSize(20);
         m_PaintDrawLine.setStrokeWidth(2);
         int nYMid = m_nScreenHeight / 2;
-        int nKDY = nYMid + nYMid * 3 / 4;
+        int nKDY = nYMid + nYMid * 4 / 5;
         int zeroX = m_nScreenWidth/2;
         canvas.drawLine(0, nKDY, m_nScreenWidth, nKDY, m_PaintDrawLine);//打底线
         canvas.drawLine(zeroX, nKDY, zeroX, nKDY - 30, m_PaintDrawLine); // 0刻度线
@@ -480,7 +500,6 @@ public class OpenCvCameraView extends View {
 
     /**
      * 图像的放大与缩小
-     *
      * @param isToLarge
      */
     public void setLargeOrSmall(boolean isToLarge, boolean isRefresh) {

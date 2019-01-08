@@ -55,7 +55,9 @@ public class ChoiceSaveTypeDialog extends U8BaseDialog {
     @Override
     protected void initView() {
         choiceSave_Draw_cb = (CheckBox) findView(R.id.choiceSave_Draw_cb);
+        choiceSave_Draw_cb.setChecked(true);
         choiceSave_NoDraw_cb = (CheckBox)findView(R.id.choiceSave_NoDraw_cb);
+        choiceSave_NoDraw_cb.setChecked(true);
         choiceSave_OK_bt = (Button)findView(R.id.choiceSave_OK_bt);
         choiceSave_Cancel_bt = (Button) findView(R.id.choiceSave_Cancel_bt);
     }
